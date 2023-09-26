@@ -1,7 +1,10 @@
 /// A bitboard where each bit represents a square on a chess board.
+#[derive(Clone, Copy)]
 pub struct Bitboard(u64);
 
 impl Bitboard {
+    pub const EMPTY: Bitboard = Bitboard(0);
+
     /// Determines whether the bitboard is empty or not.
     pub fn is_empty(&self) -> bool {
         self.0 == 0
@@ -14,7 +17,7 @@ mod tests {
 
     #[test]
     fn is_empty() {
-        let bitboard = Bitboard(0);
+        let bitboard = Bitboard::EMPTY;
 
         assert_eq!(bitboard.is_empty(), true);
     }
