@@ -25,16 +25,11 @@ mod tests {
     }
 
     #[test]
-    fn to_index_white() {
+    fn to_index() {
         let white = Color::White;
-
-        assert_eq!(white.to_index(), 0);
-    }
-
-    #[test]
-    fn to_index_black() {
         let black = Color::Black;
 
+        assert_eq!(white.to_index(), 0);
         assert_eq!(black.to_index(), 1);
     }
 }
