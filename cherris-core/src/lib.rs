@@ -1,6 +1,9 @@
 mod color;
 pub use crate::color::*;
 
+mod role;
+pub use crate::role::*;
+
 mod piece;
 pub use crate::piece::*;
 

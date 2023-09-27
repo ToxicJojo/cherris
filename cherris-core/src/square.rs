@@ -1,4 +1,7 @@
+use crate::{File, Rank};
+
 /// Represents a single sqaure on a chess board.
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Square(u8);
 
 impl Square {
@@ -8,6 +11,14 @@ impl Square {
     /// Converts a `Square` to a `usize`.
     pub fn to_index(&self) -> usize {
         self.0 as usize
+    }
+}
+
+impl From<(File, Rank)> for Square {
+    fn from(value: (File, Rank)) -> Self {
+        let index = value.0.to_index() + value.1.to_index() * 8;
+
+        Square(index as u8)
     }
 }
 
@@ -27,5 +38,11 @@ mod tests {
 
         assert_eq!(a1, 0);
         assert_eq!(h8, 63);
+    }
+
+    #[test]
+    fn from_file_rank() {
+        assert_eq!(Square::from((File::A, Rank::First)), Square(0));
+        assert_eq!(Square::from((File::H, Rank::Eigth)), Square(63));
     }
 }
