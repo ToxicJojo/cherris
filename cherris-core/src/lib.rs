@@ -15,3 +15,6 @@ pub use crate::square::*;
 
 mod bitboard;
 pub use crate::bitboard::*;
+
+mod board;
+pub use crate::board::*;
