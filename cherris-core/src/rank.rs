@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 /// Represents a rank on a chess board.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Rank {
@@ -48,6 +50,14 @@ impl Rank {
     }
 }
 
+impl Display for Rank {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let index = self.to_index() + 1;
+
+        write!(f, "{}", index)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -80,5 +90,11 @@ mod tests {
 
         assert_eq!(first, Rank::First);
         assert_eq!(eigth, Rank::Eigth)
+    }
+
+    #[test]
+    fn display() {
+        assert_eq!(Rank::First.to_string(), "1");
+        assert_eq!(Rank::Eigth.to_string(), "8");
     }
 }

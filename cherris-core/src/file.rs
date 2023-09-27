@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 /// Represents a file on a chess board.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum File {
@@ -48,6 +50,21 @@ impl File {
     }
 }
 
+impl Display for File {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            File::A => write!(f, "a"),
+            File::B => write!(f, "b"),
+            File::C => write!(f, "c"),
+            File::D => write!(f, "d"),
+            File::E => write!(f, "e"),
+            File::F => write!(f, "f"),
+            File::G => write!(f, "g"),
+            File::H => write!(f, "h"),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -80,5 +97,11 @@ mod tests {
 
         assert_eq!(a, File::A);
         assert_eq!(h, File::H);
+    }
+
+    #[test]
+    fn display() {
+        assert_eq!(File::A.to_string(), "a");
+        assert_eq!(File::H.to_string(), "h");
     }
 }
