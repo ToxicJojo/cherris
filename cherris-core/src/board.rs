@@ -70,10 +70,10 @@ impl Display for Board {
 
                 write!(f, " ")?;
             }
-            write!(f, "\n")?;
+            writeln!(f)?;
         }
 
-        write!(f, "\n")?;
+        writeln!(f)?;
         write!(f, "  ")?;
 
         for file in File::ALL.iter() {

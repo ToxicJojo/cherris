@@ -20,7 +20,7 @@ impl Display for Piece {
 
         match self.color {
             Color::White => write!(f, "{}", role.to_uppercase()),
-            Color::Black => write!(f, "{}", role.to_string()),
+            Color::Black => write!(f, "{}", role),
         }
     }
 }

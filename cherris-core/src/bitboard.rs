@@ -37,13 +37,13 @@ mod tests {
     fn is_empty() {
         let bitboard = Bitboard::EMPTY;
 
-        assert_eq!(bitboard.is_empty(), true);
+        assert!(bitboard.is_empty());
     }
 
     #[test]
     fn is_not_empty() {
         let bitboard = Bitboard(1);
 
-        assert_eq!(bitboard.is_empty(), false);
+        assert!(!bitboard.is_empty());
     }
 }
