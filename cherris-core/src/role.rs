@@ -1,8 +1,11 @@
-use std::{ops::Index, slice::Iter};
+use std::{
+    ops::{Index, IndexMut},
+    slice::Iter,
+};
 
 use crate::Bitboard;
 
-/// Represents the type of a chess piece.
+/// Represents the role of a chess piece.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Role {
     Pawn,
@@ -43,6 +46,12 @@ impl Index<Role> for [Bitboard; Role::COUNT] {
 
     fn index(&self, index: Role) -> &Self::Output {
         &self[index.to_index()]
+    }
+}
+
+impl IndexMut<Role> for [Bitboard; Role::COUNT] {
+    fn index_mut(&mut self, index: Role) -> &mut Self::Output {
+        &mut self[index.to_index()]
     }
 }
 

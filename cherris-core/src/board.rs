@@ -16,6 +16,7 @@ impl Board {
         }
     }
 
+    /// Return the `Role` on a given `Sqaure`.
     pub fn role_on(&self, sqaure: Square) -> Option<Role> {
         let square_bb = Bitboard::from(sqaure);
 
@@ -28,6 +29,7 @@ impl Board {
         None
     }
 
+    /// Return the `Color` on a given `Sqaure`.
     pub fn color_on(&self, sqaure: Square) -> Option<Color> {
         let square_bb = Bitboard::from(sqaure);
 
@@ -40,7 +42,8 @@ impl Board {
         None
     }
 
-    pub fn piece_one(&self, sqaure: Square) -> Option<Piece> {
+    /// Return the `Piece` on a given `Sqaure`.
+    pub fn piece_on(&self, sqaure: Square) -> Option<Piece> {
         let color = self.color_on(sqaure);
         let role = self.role_on(sqaure);
 
@@ -52,6 +55,16 @@ impl Board {
             }
         }
     }
+
+    /// Puts the given `Piece` on a `Square`.
+    pub fn put_piece_on(&mut self, piece: Piece, sqaure: Square) {
+        let square_bb = Bitboard::from(sqaure);
+
+        self.color[piece.color] |= square_bb;
+        self.color[!piece.color] &= !square_bb;
+
+        self.role[piece.role] |= square_bb;
+    }
 }
 
 impl Display for Board {
@@ -61,7 +74,7 @@ impl Display for Board {
 
             for file in File::ALL.iter() {
                 let square = Square::from((*file, *rank));
-                let piece = self.piece_one(square);
+                let piece = self.piece_on(square);
 
                 match piece {
                     Some(piece) => write!(f, "{}", piece)?,
@@ -81,5 +94,48 @@ impl Display for Board {
         }
 
         Ok(())
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn piece_on() {
+        let mut board = Board::empty();
+        let piece = Piece {
+            color: Color::White,
+            role: Role::Pawn,
+        };
+        let square = Square::D5;
+        board.put_piece_on(piece, square);
+
+        assert_eq!(board.piece_on(square).unwrap(), piece);
+    }
+
+    #[test]
+    fn color_on() {
+        let mut board = Board::empty();
+        let piece = Piece {
+            color: Color::Black,
+            role: Role::Pawn,
+        };
+        let square = Square::C4;
+        board.put_piece_on(piece, square);
+
+        assert_eq!(board.color_on(square).unwrap(), piece.color);
+    }
+
+    #[test]
+    fn role_on() {
+        let mut board = Board::empty();
+        let piece = Piece {
+            color: Color::Black,
+            role: Role::Bishop,
+        };
+        let square = Square::H8;
+        board.put_piece_on(piece, square);
+
+        assert_eq!(board.role_on(square).unwrap(), piece.role);
     }
 }

@@ -2,6 +2,8 @@ use std::fmt::Display;
 
 use crate::{Color, Role};
 
+/// Represents a chess piece that has a role and color.
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Piece {
     pub color: Color,
     pub role: Role,

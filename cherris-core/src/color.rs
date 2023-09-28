@@ -1,4 +1,7 @@
-use std::{ops::Index, slice::Iter};
+use std::{
+    ops::{Index, IndexMut, Not},
+    slice::Iter,
+};
 
 use crate::Bitboard;
 
@@ -32,6 +35,23 @@ impl Index<Color> for [Bitboard; Color::COUNT] {
 
     fn index(&self, index: Color) -> &Self::Output {
         &self[index.to_index()]
+    }
+}
+
+impl IndexMut<Color> for [Bitboard; Color::COUNT] {
+    fn index_mut(&mut self, index: Color) -> &mut Self::Output {
+        &mut self[index.to_index()]
+    }
+}
+
+impl Not for Color {
+    type Output = Color;
+
+    fn not(self) -> Self::Output {
+        match self {
+            Color::White => Color::Black,
+            Color::Black => Color::White,
+        }
     }
 }
 
