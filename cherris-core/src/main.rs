@@ -1,7 +1,10 @@
-use cherris_core::Board;
+use std::str::FromStr;
+
+use cherris_core::Position;
 
 fn main() {
-    let board = Board::empty();
+    let position =
+        Position::from_str("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1").unwrap();
 
-    println!("{}", board);
+    println!("{}", position.board);
 }

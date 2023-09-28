@@ -48,6 +48,16 @@ impl Rank {
             _ => unreachable!(),
         }
     }
+
+    /// Returns one rank up. Wraps around.
+    pub fn down(&self) -> Rank {
+        Rank::from_index(self.to_index().wrapping_sub(1))
+    }
+
+    /// Returns one rank down. Wraps around.
+    pub fn up(&self) -> Rank {
+        Rank::from_index(self.to_index() + 1)
+    }
 }
 
 impl Display for Rank {
@@ -90,6 +100,18 @@ mod tests {
 
         assert_eq!(first, Rank::First);
         assert_eq!(eigth, Rank::Eigth)
+    }
+
+    #[test]
+    fn up() {
+        assert_eq!(Rank::First.up(), Rank::Second);
+        assert_eq!(Rank::Eigth.up(), Rank::First);
+    }
+
+    #[test]
+    fn down() {
+        assert_eq!(Rank::First.down(), Rank::Eigth);
+        assert_eq!(Rank::Eigth.down(), Rank::Seventh);
     }
 
     #[test]

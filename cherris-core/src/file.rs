@@ -48,6 +48,16 @@ impl File {
             _ => unreachable!(),
         }
     }
+
+    /// Returns one file to the left. Wraps around.
+    pub fn left(&self) -> File {
+        File::from_index(self.to_index().wrapping_sub(1))
+    }
+
+    /// Returns one file to the right. Wraps around.
+    pub fn right(&self) -> File {
+        File::from_index(self.to_index() + 1)
+    }
 }
 
 impl Display for File {
@@ -99,6 +109,17 @@ mod tests {
         assert_eq!(h, File::H);
     }
 
+    #[test]
+    fn left() {
+        assert_eq!(File::A.left(), File::H);
+        assert_eq!(File::H.left(), File::G);
+    }
+
+    #[test]
+    fn right() {
+        assert_eq!(File::A.right(), File::B);
+        assert_eq!(File::H.right(), File::A);
+    }
     #[test]
     fn display() {
         assert_eq!(File::A.to_string(), "a");

@@ -21,3 +21,6 @@ pub use crate::bitboard::*;
 
 mod board;
 pub use crate::board::*;
+
+mod position;
+pub use crate::position::*;
