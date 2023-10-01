@@ -1,3 +1,6 @@
+mod error;
+pub use crate::error::*;
+
 mod color;
 pub use crate::color::*;
 

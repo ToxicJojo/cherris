@@ -1,4 +1,6 @@
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
+
+use crate::Error;
 
 /// Represents a rank on a chess board.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -68,6 +70,24 @@ impl Display for Rank {
     }
 }
 
+impl FromStr for Rank {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "1" => Ok(Rank::First),
+            "2" => Ok(Rank::Second),
+            "3" => Ok(Rank::Third),
+            "4" => Ok(Rank::Fourth),
+            "5" => Ok(Rank::Fifth),
+            "6" => Ok(Rank::Sixth),
+            "7" => Ok(Rank::Seventh),
+            "8" => Ok(Rank::Eigth),
+            _ => Err(Error::ParseRank),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -112,6 +132,12 @@ mod tests {
     fn down() {
         assert_eq!(Rank::First.down(), Rank::Eigth);
         assert_eq!(Rank::Eigth.down(), Rank::Seventh);
+    }
+
+    #[test]
+    fn from_str() {
+        assert_eq!(Rank::from_str("1").unwrap(), Rank::First);
+        assert_eq!(Rank::from_str("8").unwrap(), Rank::Eigth);
     }
 
     #[test]

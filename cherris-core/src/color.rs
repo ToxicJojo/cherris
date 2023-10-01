@@ -1,9 +1,10 @@
 use std::{
     ops::{Index, IndexMut, Not},
     slice::Iter,
+    str::FromStr,
 };
 
-use crate::Bitboard;
+use crate::{Bitboard, Error};
 
 /// Represents the colors in chess.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -55,6 +56,18 @@ impl Not for Color {
     }
 }
 
+impl FromStr for Color {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "w" => Ok(Color::White),
+            "b" => Ok(Color::Black),
+            _ => Err(Error::ParseColor),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -78,5 +91,16 @@ mod tests {
 
         assert_eq!(white.to_index(), 0);
         assert_eq!(black.to_index(), 1);
+    }
+
+    #[test]
+    fn from_str() {
+        assert_eq!(Color::from_str("w").unwrap(), Color::White);
+        assert_eq!(Color::from_str("b").unwrap(), Color::Black);
+    }
+
+    #[test]
+    fn from_str_error() {
+        assert_eq!(Color::from_str("c"), Err(Error::ParseColor));
     }
 }

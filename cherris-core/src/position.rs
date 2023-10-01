@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::{Bitboard, Board, Color, File, Rank, Role, Square};
+use crate::{Bitboard, Board, Color, Error, File, Rank, Role, Square};
 
 /// Represents a chess position.
 pub struct Position {
@@ -8,7 +8,7 @@ pub struct Position {
     pub color_to_move: Color,
     pub en_passant_square: Option<Square>,
     pub halfmove_clock: u8,
-    pub fullmove_clock: usize,
+    pub fullmove_number: usize,
 }
 
 #[derive(Debug)]
@@ -17,7 +17,7 @@ pub enum ParseFenError {
 }
 
 impl FromStr for Position {
-    type Err = ParseFenError;
+    type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let parts: Vec<&str> = s.split(' ').collect();
@@ -25,7 +25,7 @@ impl FromStr for Position {
         let color_to_move = parts[1];
         let en_passant = parts[3];
         let halfmove_clock = parts[4];
-        let fullmove_clock = parts[5];
+        let fullmove_number = parts[5];
 
         let mut file = File::A;
         let mut rank = Rank::Eigth;
@@ -100,7 +100,7 @@ impl FromStr for Position {
                     role[Role::King] |= Bitboard::from(sqaure);
                     color[Color::White] |= Bitboard::from(sqaure);
                 }
-                _ => return Err(ParseFenError::InvalidFen),
+                _ => return Err(Error::InvalidFen),
             }
 
             file = file.right();
@@ -108,12 +108,28 @@ impl FromStr for Position {
 
         let board = Board { role, color };
 
+        let color_to_move = Color::from_str(color_to_move)?;
+
+        let mut en_passant_square = None;
+        if en_passant != "-" {
+            let sqaure = Square::from_str(en_passant)?;
+            en_passant_square = Some(sqaure);
+        }
+
+        let halfmove_clock = halfmove_clock
+            .parse::<u8>()
+            .map_err(|_| Error::InvalidFen)?;
+
+        let fullmove_number = fullmove_number
+            .parse::<usize>()
+            .map_err(|_| Error::InvalidFen)?;
+
         Ok(Position {
             board,
-            color_to_move: Color::White,
-            en_passant_square: None,
-            halfmove_clock: 0,
-            fullmove_clock: 0,
+            color_to_move,
+            en_passant_square,
+            halfmove_clock,
+            fullmove_number,
         })
     }
 }

@@ -1,4 +1,6 @@
-use crate::{File, Rank};
+use std::str::FromStr;
+
+use crate::{Error, File, Rank};
 
 /// Represents a single sqaure on a chess board.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -94,6 +96,17 @@ impl From<(File, Rank)> for Square {
     }
 }
 
+impl FromStr for Square {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let file = File::from_str(&s[0..1])?;
+        let rank = Rank::from_str(&s[1..2])?;
+
+        Ok(Square::from((file, rank)))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -116,5 +129,11 @@ mod tests {
     fn from_file_rank() {
         assert_eq!(Square::from((File::A, Rank::First)), Square(0));
         assert_eq!(Square::from((File::H, Rank::Eigth)), Square(63));
+    }
+
+    #[test]
+    fn from_str() {
+        assert_eq!(Square::from_str("a1").unwrap(), Square::A1);
+        assert_eq!(Square::from_str("h8").unwrap(), Square::H8);
     }
 }

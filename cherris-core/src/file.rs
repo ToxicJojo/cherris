@@ -1,4 +1,6 @@
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
+
+use crate::Error;
 
 /// Represents a file on a chess board.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -75,6 +77,24 @@ impl Display for File {
     }
 }
 
+impl FromStr for File {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "a" => Ok(File::A),
+            "b" => Ok(File::B),
+            "c" => Ok(File::C),
+            "d" => Ok(File::D),
+            "e" => Ok(File::E),
+            "f" => Ok(File::F),
+            "g" => Ok(File::G),
+            "h" => Ok(File::H),
+            _ => Err(Error::ParseFile),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -120,6 +140,13 @@ mod tests {
         assert_eq!(File::A.right(), File::B);
         assert_eq!(File::H.right(), File::A);
     }
+
+    #[test]
+    fn from_str() {
+        assert_eq!(File::from_str("a").unwrap(), File::A);
+        assert_eq!(File::from_str("h").unwrap(), File::H);
+    }
+
     #[test]
     fn display() {
         assert_eq!(File::A.to_string(), "a");
