@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::{Bitboard, Color, File, Piece, Rank, Role, Square};
+use crate::{Bitboard, Color, File, Move, Piece, Rank, Role, Square};
 
 /// Represents a chess board.
 pub struct Board {
@@ -64,6 +64,18 @@ impl Board {
         self.color[!piece.color] &= !square_bb;
 
         self.role[piece.role] |= square_bb;
+    }
+
+    pub fn make_move(&mut self, color: Color, chess_move: Move) {
+        let from_bb = Bitboard::from(chess_move.from);
+        let to_bb = Bitboard::from(chess_move.to);
+        let from_to_bb = from_bb ^ to_bb;
+
+        self.color[color] ^= from_to_bb;
+        self.role[chess_move.role] ^= from_to_bb;
+
+        self.color[!color] ^= to_bb;
+        self.role[chess_move.role] ^= to_bb;
     }
 }
 

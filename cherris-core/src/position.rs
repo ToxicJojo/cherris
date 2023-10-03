@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::{Bitboard, Board, Color, Error, File, Rank, Role, Square};
+use crate::{Bitboard, Board, Color, Error, File, Move, Rank, Role, Square};
 
 /// Represents a chess position.
 pub struct Position {
@@ -11,9 +11,10 @@ pub struct Position {
     pub fullmove_number: usize,
 }
 
-#[derive(Debug)]
-pub enum ParseFenError {
-    InvalidFen,
+impl Position {
+    pub fn make_move(&mut self, chess_move: Move) {
+        unimplemented!();
+    }
 }
 
 impl FromStr for Position {

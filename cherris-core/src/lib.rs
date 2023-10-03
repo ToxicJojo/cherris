@@ -27,3 +27,6 @@ pub use crate::board::*;
 
 mod position;
 pub use crate::position::*;
+
+mod chess_move;
+pub use crate::chess_move::*;
