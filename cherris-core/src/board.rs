@@ -66,6 +66,9 @@ impl Board {
         self.role[piece.role] |= square_bb;
     }
 
+    /// Executes a move for a color.
+    /// This function doesn't check for the legality of the move. If an illegal move is made with
+    /// this function it may panic now or cause a panic later.
     pub fn make_move(&mut self, color: Color, chess_move: Move) {
         let from_bb = Bitboard::from(chess_move.from);
         let to_bb = Bitboard::from(chess_move.to);
@@ -74,8 +77,10 @@ impl Board {
         self.color[color] ^= from_to_bb;
         self.role[chess_move.role] ^= from_to_bb;
 
-        self.color[!color] ^= to_bb;
-        self.role[chess_move.role] ^= to_bb;
+        if let Some(capture) = chess_move.capture {
+            self.color[!color] ^= to_bb;
+            self.role[capture] ^= to_bb;
+        }
     }
 }
 
@@ -149,5 +154,58 @@ mod tests {
         board.put_piece_on(piece, square);
 
         assert_eq!(board.role_on(square).unwrap(), piece.role);
+    }
+
+    #[test]
+    fn make_move_no_capture() {
+        let mut board = Board::empty();
+        let piece = Piece {
+            color: Color::White,
+            role: Role::Queen,
+        };
+        board.put_piece_on(piece, Square::A1);
+
+        board.make_move(
+            Color::White,
+            Move {
+                from: Square::A1,
+                to: Square::A8,
+                role: Role::Queen,
+                capture: None,
+                promotion: None,
+            },
+        );
+
+        assert_eq!(board.piece_on(Square::A1), None);
+        assert_eq!(board.piece_on(Square::A8), Some(piece));
+    }
+
+    #[test]
+    fn make_move_capture() {
+        let mut board = Board::empty();
+        let piece_white = Piece {
+            color: Color::White,
+            role: Role::Queen,
+        };
+        let piece_black = Piece {
+            color: Color::Black,
+            role: Role::Queen,
+        };
+        board.put_piece_on(piece_white, Square::A1);
+        board.put_piece_on(piece_black, Square::A8);
+
+        board.make_move(
+            Color::White,
+            Move {
+                from: Square::A1,
+                to: Square::A8,
+                role: Role::Queen,
+                capture: Some(Role::Queen),
+                promotion: None,
+            },
+        );
+
+        assert_eq!(board.piece_on(Square::A1), None);
+        assert_eq!(board.piece_on(Square::A8), Some(piece_white));
     }
 }

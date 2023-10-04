@@ -1,5 +1,6 @@
 use crate::{Role, Square};
 
+/// Represents a move in a chess game.
 pub struct Move {
     pub from: Square,
     pub to: Square,
