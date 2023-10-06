@@ -1,6 +1,7 @@
+use std::fmt::Debug;
 use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Not};
 
-use crate::Square;
+use crate::{File, Rank, Square};
 
 /// A bitboard where each bit represents a square on a chess board.
 #[derive(Clone, Copy)]
@@ -8,6 +9,10 @@ pub struct Bitboard(u64);
 
 impl Bitboard {
     pub const EMPTY: Bitboard = Bitboard(0);
+
+    pub const fn new(value: u64) -> Bitboard {
+        Bitboard(value)
+    }
 
     /// Determines whether the bitboard is empty or not.
     pub fn is_empty(&self) -> bool {
@@ -68,6 +73,26 @@ impl Not for Bitboard {
 
     fn not(self) -> Self::Output {
         Bitboard(!self.0)
+    }
+}
+
+impl Debug for Bitboard {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for rank in Rank::ALL.iter().rev() {
+            for file in File::ALL.iter() {
+                let square = Square::from((*file, *rank));
+                let mask = 1 << square.to_index();
+
+                if self.0 & mask == mask {
+                    write!(f, "1 ")?;
+                } else {
+                    write!(f, "0 ")?;
+                }
+            }
+            writeln!(f)?;
+        }
+
+        Ok(())
     }
 }
 
