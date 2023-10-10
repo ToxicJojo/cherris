@@ -85,12 +85,26 @@ mod tests {
     }
 
     #[test]
+    fn iter() {
+        let mut iter = Color::iter();
+        assert_eq!(iter.next(), Some(&Color::White));
+        assert_eq!(iter.next(), Some(&Color::Black));
+        assert_eq!(iter.next(), None);
+    }
+
+    #[test]
     fn to_index() {
         let white = Color::White;
         let black = Color::Black;
 
         assert_eq!(white.to_index(), 0);
         assert_eq!(black.to_index(), 1);
+    }
+
+    #[test]
+    fn not() {
+        assert_eq!(!Color::White, Color::Black);
+        assert_eq!(!Color::Black, Color::White);
     }
 
     #[test]
