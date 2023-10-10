@@ -14,7 +14,7 @@ pub struct Move {
 
 impl Display for Move {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if let Some(_) = self.capture {
+        if self.capture.is_some() {
             write!(f, "{}x{}", self.from, self.to)
         } else {
             write!(f, "{}-{}", self.from, self.to)

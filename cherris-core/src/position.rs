@@ -20,7 +20,7 @@ impl Position {
             self.fullmove_number += 1;
         }
 
-        if chess_move.role != Role::Pawn && chess_move.capture == None {
+        if chess_move.role != Role::Pawn && chess_move.capture.is_some() {
             self.halfmove_clock += 1;
         }
     }
