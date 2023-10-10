@@ -20,6 +20,22 @@ impl Bitboard {
     }
 }
 
+impl Iterator for Bitboard {
+    type Item = Square;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.0 == 0 {
+            None
+        } else {
+            let index = self.0.trailing_zeros();
+            let sqaure = Square(index as u8);
+            self.0 &= !(1 << index);
+
+            Some(sqaure)
+        }
+    }
+}
+
 impl From<Square> for Bitboard {
     fn from(value: Square) -> Self {
         Bitboard(1 << value.to_index())
@@ -112,5 +128,15 @@ mod tests {
         let bitboard = Bitboard(1);
 
         assert!(!bitboard.is_empty());
+    }
+
+    #[test]
+    fn iterator() {
+        let bitboard = Bitboard::from(Square::A1) | Bitboard::from(Square::H8);
+
+        let mut iter = bitboard.into_iter();
+        assert_eq!(iter.next(), Some(Square::A1));
+        assert_eq!(iter.next(), Some(Square::H8));
+        assert_eq!(iter.next(), None);
     }
 }

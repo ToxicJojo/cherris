@@ -15,6 +15,14 @@ impl Position {
     pub fn make_move(&mut self, chess_move: Move) {
         self.board.make_move(self.color_to_move, chess_move);
         self.color_to_move = !self.color_to_move;
+
+        if self.color_to_move == Color::White {
+            self.fullmove_number += 1;
+        }
+
+        if chess_move.role != Role::Pawn && chess_move.capture == None {
+            self.halfmove_clock += 1;
+        }
     }
 }
 

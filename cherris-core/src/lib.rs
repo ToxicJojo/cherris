@@ -33,3 +33,6 @@ pub use crate::chess_move::*;
 
 mod table_gen;
 pub use crate::table_gen::*;
+
+mod move_generator;
+pub use crate::move_generator::*;

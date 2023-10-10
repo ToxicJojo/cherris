@@ -1,5 +1,5 @@
-use std::slice::Iter;
 use std::str::FromStr;
+use std::{fmt::Display, slice::Iter};
 
 use crate::{Error, File, Rank};
 
@@ -114,6 +114,15 @@ impl From<(File, Rank)> for Square {
     }
 }
 
+impl From<&Square> for (File, Rank) {
+    fn from(value: &Square) -> Self {
+        let file = value.0 % 8;
+        let rank = value.0 / 8;
+
+        (File::from_index(file.into()), Rank::from_index(rank.into()))
+    }
+}
+
 impl FromStr for Square {
     type Err = Error;
 
@@ -122,6 +131,14 @@ impl FromStr for Square {
         let rank = Rank::from_str(&s[1..2])?;
 
         Ok(Square::from((file, rank)))
+    }
+}
+
+impl Display for Square {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let (file, rank): (File, Rank) = self.into();
+
+        write!(f, "{}{}", file, rank)
     }
 }
 
@@ -153,5 +170,11 @@ mod tests {
     fn from_str() {
         assert_eq!(Square::from_str("a1").unwrap(), Square::A1);
         assert_eq!(Square::from_str("h8").unwrap(), Square::H8);
+    }
+
+    #[test]
+    fn display() {
+        assert_eq!(Square::A1.to_string(), "a1");
+        assert_eq!(Square::H8.to_string(), "h8");
     }
 }
