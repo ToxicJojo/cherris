@@ -89,7 +89,7 @@ impl Display for Board {
         for rank in Rank::ALL.iter().rev() {
             write!(f, "{} ", rank)?;
 
-            for file in File::ALL.iter() {
+            for file in File::iter() {
                 let square = Square::from((*file, *rank));
                 let piece = self.piece_on(square);
 
@@ -106,7 +106,7 @@ impl Display for Board {
         writeln!(f)?;
         write!(f, "  ")?;
 
-        for file in File::ALL.iter() {
+        for file in File::iter() {
             write!(f, "{} ", file)?;
         }
 

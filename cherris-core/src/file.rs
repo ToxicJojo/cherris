@@ -1,4 +1,4 @@
-use std::{fmt::Display, str::FromStr};
+use std::{fmt::Display, slice::Iter, str::FromStr};
 
 use crate::Error;
 
@@ -34,6 +34,11 @@ impl File {
     /// Converts a `File` to a `usize`.
     pub fn to_index(&self) -> usize {
         *self as usize
+    }
+
+    /// An iterator over all files starting with the A file.
+    pub fn iter() -> Iter<'static, File> {
+        File::ALL.iter()
     }
 
     /// Returns the file for the given index. Wraps around if index > 7.
@@ -109,6 +114,21 @@ mod tests {
         assert_eq!(File::ALL.len(), File::COUNT);
         assert_eq!(File::ALL.first().unwrap(), &File::A);
         assert_eq!(File::ALL.last().unwrap(), &File::H);
+    }
+
+    #[test]
+    fn iter() {
+        let mut iter = File::iter();
+
+        assert_eq!(iter.next(), Some(&File::A));
+        assert_eq!(iter.next(), Some(&File::B));
+        assert_eq!(iter.next(), Some(&File::C));
+        assert_eq!(iter.next(), Some(&File::D));
+        assert_eq!(iter.next(), Some(&File::E));
+        assert_eq!(iter.next(), Some(&File::F));
+        assert_eq!(iter.next(), Some(&File::G));
+        assert_eq!(iter.next(), Some(&File::H));
+        assert_eq!(iter.next(), None);
     }
 
     #[test]
