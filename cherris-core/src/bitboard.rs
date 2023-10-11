@@ -94,7 +94,7 @@ impl Not for Bitboard {
 
 impl Debug for Bitboard {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for rank in Rank::ALL.iter().rev() {
+        for rank in Rank::iter().rev() {
             for file in File::iter() {
                 let square = Square::from((*file, *rank));
                 let mask = 1 << square.to_index();

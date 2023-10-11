@@ -86,7 +86,7 @@ impl Board {
 
 impl Display for Board {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for rank in Rank::ALL.iter().rev() {
+        for rank in Rank::iter().rev() {
             write!(f, "{} ", rank)?;
 
             for file in File::iter() {

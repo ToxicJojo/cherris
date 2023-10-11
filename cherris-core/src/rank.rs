@@ -1,4 +1,4 @@
-use std::{fmt::Display, str::FromStr};
+use std::{fmt::Display, slice::Iter, str::FromStr};
 
 use crate::Error;
 
@@ -30,6 +30,11 @@ impl Rank {
         Rank::Seventh,
         Rank::Eigth,
     ];
+
+    /// An iterator over all ranks starting with the first one.
+    pub fn iter() -> Iter<'static, Rank> {
+        Rank::ALL.iter()
+    }
 
     /// Converts a `Rank` to a `usize`.
     pub fn to_index(&self) -> usize {
@@ -102,6 +107,21 @@ mod tests {
         assert_eq!(Rank::ALL.len(), Rank::COUNT);
         assert_eq!(Rank::ALL.first().unwrap(), &Rank::First);
         assert_eq!(Rank::ALL.last().unwrap(), &Rank::Eigth);
+    }
+
+    #[test]
+    fn iter() {
+        let mut iter = Rank::iter();
+
+        assert_eq!(iter.next(), Some(&Rank::First));
+        assert_eq!(iter.next(), Some(&Rank::Second));
+        assert_eq!(iter.next(), Some(&Rank::Third));
+        assert_eq!(iter.next(), Some(&Rank::Fourth));
+        assert_eq!(iter.next(), Some(&Rank::Fifth));
+        assert_eq!(iter.next(), Some(&Rank::Sixth));
+        assert_eq!(iter.next(), Some(&Rank::Seventh));
+        assert_eq!(iter.next(), Some(&Rank::Eigth));
+        assert_eq!(iter.next(), None);
     }
 
     #[test]
