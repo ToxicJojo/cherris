@@ -36,3 +36,6 @@ pub use crate::table_gen::*;
 
 mod move_generator;
 pub use crate::move_generator::*;
+
+mod rays;
+pub use crate::rays::*;

@@ -4,8 +4,8 @@ use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, N
 use crate::{File, Rank, Square};
 
 /// A bitboard where each bit represents a square on a chess board.
-#[derive(Clone, Copy)]
-pub struct Bitboard(u64);
+#[derive(Clone, Copy, PartialEq)]
+pub struct Bitboard(pub u64);
 
 impl Bitboard {
     pub const EMPTY: Bitboard = Bitboard(0);
@@ -39,6 +39,17 @@ impl Iterator for Bitboard {
 impl From<Square> for Bitboard {
     fn from(value: Square) -> Self {
         Bitboard(1 << value.to_index())
+    }
+}
+
+impl From<&[Square]> for Bitboard {
+    fn from(value: &[Square]) -> Self {
+        let mut bb = Bitboard::EMPTY;
+        for square in value {
+            bb |= Bitboard::from(*square);
+        }
+
+        bb
     }
 }
 
