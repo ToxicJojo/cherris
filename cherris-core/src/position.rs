@@ -16,12 +16,29 @@ impl Position {
         self.board.make_move(self.color_to_move, chess_move);
         self.color_to_move = !self.color_to_move;
 
+        self.en_passant_square = chess_move.en_passant_square;
+
         if self.color_to_move == Color::White {
             self.fullmove_number += 1;
         }
 
         if chess_move.role != Role::Pawn && chess_move.capture.is_some() {
             self.halfmove_clock += 1;
+        }
+    }
+
+    pub fn unmake_move(&mut self, chess_move: Move) {
+        self.color_to_move = !self.color_to_move;
+        self.board.unmake_move(self.color_to_move, chess_move);
+
+        self.en_passant_square = None;
+
+        if self.color_to_move == Color::Black {
+            self.fullmove_number -= 1;
+        }
+
+        if chess_move.role != Role::Pawn && chess_move.capture.is_some() {
+            self.halfmove_clock -= 1;
         }
     }
 }

@@ -1,5 +1,5 @@
 use std::fmt::Debug;
-use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Not};
+use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Not, Shl, Shr};
 
 use crate::{File, Rank, Square};
 
@@ -9,6 +9,12 @@ pub struct Bitboard(pub u64);
 
 impl Bitboard {
     pub const EMPTY: Bitboard = Bitboard(0);
+    pub const FULL: Bitboard = Bitboard(u64::MAX);
+
+    pub const FIRST_RANK: Bitboard = Bitboard(0x00000000000000FF);
+    pub const SECOND_RANK: Bitboard = Bitboard(0x000000000000FF00);
+    pub const THIRD_RANK: Bitboard = Bitboard(0x0000000000FF0000);
+    pub const SEVENTH_RANK: Bitboard = Bitboard(0x00FF000000000000);
 
     pub const fn new(value: u64) -> Bitboard {
         Bitboard(value)
@@ -92,6 +98,22 @@ impl BitXor for Bitboard {
 impl BitXorAssign for Bitboard {
     fn bitxor_assign(&mut self, rhs: Self) {
         self.0 ^= rhs.0
+    }
+}
+
+impl Shl<u64> for Bitboard {
+    type Output = Bitboard;
+
+    fn shl(self, rhs: u64) -> Self::Output {
+        Bitboard(self.0 << rhs)
+    }
+}
+
+impl Shr<u64> for Bitboard {
+    type Output = Bitboard;
+
+    fn shr(self, rhs: u64) -> Self::Output {
+        Bitboard(self.0 >> rhs)
     }
 }
 
