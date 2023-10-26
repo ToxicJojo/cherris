@@ -73,16 +73,38 @@ impl Board {
     /// This function doesn't check for the legality of the move. If an illegal move is made with
     /// this function it may panic now or cause a panic later.
     pub fn make_move(&mut self, color: Color, chess_move: Move) {
-        let from_bb = Bitboard::from(chess_move.from);
-        let to_bb = Bitboard::from(chess_move.to);
-        let from_to_bb = from_bb ^ to_bb;
+        match chess_move {
+            Move::Standard {
+                from,
+                to,
+                role,
+                capture,
+                ..
+            } => {
+                let from_bb = Bitboard::from(from);
+                let to_bb = Bitboard::from(to);
+                let from_to_bb = from_bb ^ to_bb;
 
-        self.color[color] ^= from_to_bb;
-        self.role[chess_move.role] ^= from_to_bb;
+                self.color[color] ^= from_to_bb;
+                self.role[role] ^= from_to_bb;
 
-        if let Some(capture) = chess_move.capture {
-            self.color[!color] ^= to_bb;
-            self.role[capture] ^= to_bb;
+                if let Some(capture) = capture {
+                    self.color[!color] ^= to_bb;
+                    self.role[capture] ^= to_bb;
+                }
+            }
+            Move::EnPassant { from, to, target } => {
+                let from_bb = Bitboard::from(from);
+                let to_bb = Bitboard::from(to);
+                let target_bb = Bitboard::from(target);
+                let from_to_bb = from_bb ^ to_bb;
+
+                self.color[color] ^= from_to_bb;
+                self.role[Role::Pawn] ^= from_to_bb;
+
+                self.color[!color] ^= target_bb;
+                self.role[Role::Pawn] ^= target_bb;
+            }
         }
     }
 
@@ -90,16 +112,38 @@ impl Board {
     /// This function doesn't check for the legality of the move. If an illegal move is made with
     /// this function it may panic now or cause a panic later.
     pub fn unmake_move(&mut self, color: Color, chess_move: Move) {
-        let from_bb = Bitboard::from(chess_move.from);
-        let to_bb = Bitboard::from(chess_move.to);
-        let from_to_bb = from_bb ^ to_bb;
+        match chess_move {
+            Move::Standard {
+                from,
+                to,
+                role,
+                capture,
+                ..
+            } => {
+                let from_bb = Bitboard::from(from);
+                let to_bb = Bitboard::from(to);
+                let from_to_bb = from_bb ^ to_bb;
 
-        self.color[color] ^= from_to_bb;
-        self.role[chess_move.role] ^= from_to_bb;
+                self.color[color] ^= from_to_bb;
+                self.role[role] ^= from_to_bb;
 
-        if let Some(capture) = chess_move.capture {
-            self.color[!color] ^= to_bb;
-            self.role[capture] ^= to_bb;
+                if let Some(capture) = capture {
+                    self.color[!color] ^= to_bb;
+                    self.role[capture] ^= to_bb;
+                }
+            }
+            Move::EnPassant { from, to, target } => {
+                let from_bb = Bitboard::from(from);
+                let to_bb = Bitboard::from(to);
+                let target_bb = Bitboard::from(target);
+                let from_to_bb = from_bb ^ to_bb;
+
+                self.color[color] ^= from_to_bb;
+                self.role[Role::Pawn] ^= from_to_bb;
+
+                self.color[!color] ^= target_bb;
+                self.role[Role::Pawn] ^= target_bb;
+            }
         }
     }
 
@@ -264,6 +308,7 @@ impl Display for Board {
         Ok(())
     }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -318,12 +363,13 @@ mod tests {
 
         board.make_move(
             Color::White,
-            Move {
+            Move::Standard {
                 from: Square::A1,
                 to: Square::A8,
                 role: Role::Queen,
                 capture: None,
                 promotion: None,
+                en_passant_square: None,
             },
         );
 
@@ -347,17 +393,46 @@ mod tests {
 
         board.make_move(
             Color::White,
-            Move {
+            Move::Standard {
                 from: Square::A1,
                 to: Square::A8,
                 role: Role::Queen,
                 capture: Some(Role::Queen),
                 promotion: None,
+                en_passant_square: None,
             },
         );
 
         assert_eq!(board.piece_on(Square::A1), None);
         assert_eq!(board.piece_on(Square::A8), Some(piece_white));
+    }
+
+    #[test]
+    fn make_move_en_passant() {
+        let mut board = Board::empty();
+        let piece_white = Piece {
+            color: Color::White,
+            role: Role::Pawn,
+        };
+        let piece_black = Piece {
+            color: Color::Black,
+            role: Role::Pawn,
+        };
+
+        board.put_piece_on(piece_white, Square::D5);
+        board.put_piece_on(piece_black, Square::C5);
+
+        board.make_move(
+            Color::White,
+            Move::EnPassant {
+                from: Square::D5,
+                to: Square::C6,
+                target: Square::C5,
+            },
+        );
+
+        assert_eq!(board.piece_on(Square::C5), None);
+        assert_eq!(board.piece_on(Square::C6), Some(piece_white));
     }
 
     #[test]
@@ -369,12 +444,13 @@ mod tests {
         };
         board.put_piece_on(piece, Square::A1);
 
-        let chess_move = Move {
+        let chess_move = Move::Standard {
             from: Square::A1,
             to: Square::A8,
             role: Role::Queen,
             capture: None,
             promotion: None,
+            en_passant_square: None,
         };
 
         board.make_move(Color::White, chess_move);
@@ -398,17 +474,45 @@ mod tests {
         board.put_piece_on(piece_white, Square::A1);
         board.put_piece_on(piece_black, Square::A8);
 
-        let chess_move = Move {
+        let chess_move = Move::Standard {
             from: Square::A1,
             to: Square::A8,
             role: Role::Queen,
             capture: Some(Role::Queen),
             promotion: None,
+            en_passant_square: None,
         };
         board.make_move(Color::White, chess_move);
         board.unmake_move(Color::White, chess_move);
 
         assert_eq!(board.piece_on(Square::A8), Some(piece_black));
         assert_eq!(board.piece_on(Square::A1), Some(piece_white));
+    }
+
+    #[test]
+    fn unmake_move_en_passant() {
+        let mut board = Board::empty();
+        let piece_white = Piece {
+            color: Color::White,
+            role: Role::Pawn,
+        };
+        let piece_black = Piece {
+            color: Color::Black,
+            role: Role::Pawn,
+        };
+
+        board.put_piece_on(piece_white, Square::C6);
+
+        board.unmake_move(
+            Color::White,
+            Move::EnPassant {
+                from: Square::D5,
+                to: Square::C6,
+                target: Square::C5,
+            },
+        );
+
+        assert_eq!(board.piece_on(Square::D5), Some(piece_white));
+        assert_eq!(board.piece_on(Square::C5), Some(piece_black));
     }
 }

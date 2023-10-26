@@ -4,31 +4,66 @@ use crate::{Role, Square};
 
 /// Represents a move in a chess game.
 #[derive(Clone, Copy)]
-pub struct Move {
-    pub from: Square,
-    pub to: Square,
-    pub role: Role,
-    pub capture: Option<Role>,
-    pub promotion: Option<Role>,
-    pub en_passant_square: Option<Square>,
+pub enum Move {
+    Standard {
+        from: Square,
+        to: Square,
+        role: Role,
+        capture: Option<Role>,
+        promotion: Option<Role>,
+        en_passant_square: Option<Square>,
+    },
+    EnPassant {
+        from: Square,
+        to: Square,
+        target: Square,
+    },
 }
 
 impl Display for Move {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.capture.is_some() {
-            write!(f, "{}x{}", self.from, self.to)
-        } else {
-            write!(f, "{}-{}", self.from, self.to)
+        match self {
+            Move::Standard {
+                from,
+                to,
+                role,
+                capture,
+                promotion,
+                en_passant_square,
+            } => {
+                if capture.is_some() {
+                    write!(f, "{}x{}", from, to)
+                } else {
+                    write!(f, "{}-{}", from, to)
+                }
+            }
+            Move::EnPassant { from, to, .. } => {
+                write!(f, "{}x{}", from, to)
+            }
         }
     }
 }
 
 impl Debug for Move {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.capture.is_some() {
-            write!(f, "{}x{}", self.from, self.to)
-        } else {
-            write!(f, "{}-{}", self.from, self.to)
+        match self {
+            Move::Standard {
+                from,
+                to,
+                role,
+                capture,
+                promotion,
+                en_passant_square,
+            } => {
+                if capture.is_some() {
+                    write!(f, "{}x{}", from, to)
+                } else {
+                    write!(f, "{}-{}", from, to)
+                }
+            }
+            Move::EnPassant { from, to, .. } => {
+                write!(f, "{}x{}", from, to)
+            }
         }
     }
 }

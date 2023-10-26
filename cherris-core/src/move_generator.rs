@@ -24,27 +24,36 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
     let pawns_attack = pawns & !hv_pins;
     let pawns_pinned_diag = pawns_attack & diag_ping;
     let pawns_attack_unpinned = pawns_attack & !pawns_pinned_diag;
+
     let pawns_walk = pawns & !diag_ping;
     let pawns_forward = match position.color_to_move {
         Color::White => pawns_walk & (empty >> 8),
         Color::Black => pawns_walk & (empty << 8),
     };
+    let pawns_pinned_hv = pawns_forward & hv_pins;
+    let pawns_forward_pinned = pawns_forward & pawns_pinned_hv;
+    let pawns_forward_unpinned = pawns_forward & !pawns_forward_pinned;
+
     let pawns_push = match position.color_to_move {
         Color::White => pawns_forward & Bitboard::SECOND_RANK & (empty >> 16),
         Color::Black => pawns_forward & Bitboard::SEVENTH_RANK & (empty << 16),
     };
+
+    let pawns_push_pinned = pawns_push & pawns_pinned_hv;
+    let pawns_push_unpinned = pawns_push & !pawns_push_pinned;
 
     let en_passant_bb = position
         .en_passant_square
         .map_or(Bitboard::EMPTY, |ep| Bitboard::from(ep));
 
     for from in pawns_attack_unpinned {
-        let attacks = pawn_attacks(from, position.color_to_move)
-            & (position.board.color[!position.color_to_move] | en_passant_bb)
-            & check_mask;
+        let attacks = pawn_attacks(from, position.color_to_move) & check_mask;
+
+        let attacks_en_passant = attacks & en_passant_bb;
+        let attacks = attacks & position.board.color[!position.color_to_move];
 
         for to in attacks {
-            let mv = Move {
+            let mv = Move::Standard {
                 role: Role::Pawn,
                 from,
                 to,
@@ -52,19 +61,30 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
                 promotion: None,
                 en_passant_square: None,
             };
+
+            moves.push(mv);
+        }
+
+        for to in attacks_en_passant {
+            let target = match position.color_to_move {
+                Color::White => Square(to.0 - 8),
+                Color::Black => Square(to.0 + 8),
+            };
+
+            let mv = Move::EnPassant { from, to, target };
 
             moves.push(mv);
         }
     }
 
     for from in pawns_pinned_diag {
-        let attacks = pawn_attacks(from, position.color_to_move)
-            & (position.board.color[!position.color_to_move] | en_passant_bb)
-            & diag_ping
-            & check_mask;
+        let attacks = pawn_attacks(from, position.color_to_move) & diag_ping & check_mask;
+
+        let attacks_en_passant = attacks & en_passant_bb;
+        let attacks = attacks & position.board.color[!position.color_to_move];
 
         for to in attacks {
-            let mv = Move {
+            let mv = Move::Standard {
                 role: Role::Pawn,
                 from,
                 to,
@@ -75,9 +95,20 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
 
             moves.push(mv);
         }
+
+        for to in attacks_en_passant {
+            let target = match position.color_to_move {
+                Color::White => Square(to.0 - 8),
+                Color::Black => Square(to.0 + 8),
+            };
+
+            let mv = Move::EnPassant { from, to, target };
+
+            moves.push(mv);
+        }
     }
 
-    for from in pawns_forward {
+    for from in pawns_forward_unpinned {
         let attacks = match position.color_to_move {
             Color::White => {
                 let next = from.to_index() + 8;
@@ -90,7 +121,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         } & check_mask;
 
         for to in attacks {
-            let mv = Move {
+            let mv = Move::Standard {
                 role: Role::Pawn,
                 from,
                 to,
@@ -103,7 +134,34 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         }
     }
 
-    for from in pawns_push {
+    for from in pawns_forward_pinned {
+        let attacks = match position.color_to_move {
+            Color::White => {
+                let next = from.to_index() + 8;
+                Bitboard(1 << next)
+            }
+            Color::Black => {
+                let next = from.to_index() as i64 - 8;
+                Bitboard(1 << next)
+            }
+        } & check_mask
+            & hv_pins;
+
+        for to in attacks {
+            let mv = Move::Standard {
+                role: Role::Pawn,
+                from,
+                to,
+                capture: position.board.piece_on(to).map(|piece| piece.role),
+                promotion: None,
+                en_passant_square: None,
+            };
+
+            moves.push(mv);
+        }
+    }
+
+    for from in pawns_push_unpinned {
         let attacks = match position.color_to_move {
             Color::White => {
                 let next = from.to_index() + 16;
@@ -123,7 +181,41 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         };
 
         for to in attacks {
-            let mv = Move {
+            let mv = Move::Standard {
+                role: Role::Pawn,
+                from,
+                to,
+                capture: position.board.piece_on(to).map(|piece| piece.role),
+                promotion: None,
+                en_passant_square: Some(Square::ALL[en_passant]),
+            };
+
+            moves.push(mv);
+        }
+    }
+
+    for from in pawns_push_pinned {
+        let attacks = match position.color_to_move {
+            Color::White => {
+                let next = from.to_index() + 16;
+
+                Bitboard(1 << next)
+            }
+            Color::Black => {
+                let next = from.to_index() as i64 - 16;
+
+                Bitboard(1 << next)
+            }
+        } & check_mask
+            & hv_pins;
+
+        let en_passant = match position.color_to_move {
+            Color::White => from.to_index() + 8,
+            Color::Black => from.to_index() - 8,
+        };
+
+        for to in attacks {
+            let mv = Move::Standard {
                 role: Role::Pawn,
                 from,
                 to,
@@ -144,7 +236,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         attacks &= !attacked_squares;
 
         for to in attacks {
-            let mv = Move {
+            let mv = Move::Standard {
                 role: Role::King,
                 from,
                 to,
@@ -165,7 +257,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         attacks &= !position.board.color[position.color_to_move] & check_mask;
 
         for to in attacks {
-            let mv = Move {
+            let mv = Move::Standard {
                 role: Role::Knight,
                 from,
                 to,
@@ -188,7 +280,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         attacks &= !position.board.color[position.color_to_move] & check_mask;
 
         for to in attacks {
-            let mv = Move {
+            let mv = Move::Standard {
                 role: Role::Rook,
                 from,
                 to,
@@ -207,7 +299,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         attacks &= hv_pins;
 
         for to in attacks {
-            let mv = Move {
+            let mv = Move::Standard {
                 role: Role::Rook,
                 from,
                 to,
@@ -230,7 +322,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         attacks &= !position.board.color[position.color_to_move] & check_mask;
 
         for to in attacks {
-            let mv = Move {
+            let mv = Move::Standard {
                 role: Role::Bishop,
                 from,
                 to,
@@ -249,7 +341,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         attacks &= attacks & diag_ping;
 
         for to in attacks {
-            let mv = Move {
+            let mv = Move::Standard {
                 role: Role::Bishop,
                 from,
                 to,
@@ -272,7 +364,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         attacks &= !position.board.color[position.color_to_move] & check_mask;
 
         for to in attacks {
-            let mv = Move {
+            let mv = Move::Standard {
                 role: Role::Queen,
                 from,
                 to,
@@ -290,7 +382,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         attacks &= !position.board.color[position.color_to_move] & check_mask & diag_ping;
 
         for to in attacks {
-            let mv = Move {
+            let mv = Move::Standard {
                 role: Role::Queen,
                 from,
                 to,
@@ -308,7 +400,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         attacks &= !position.board.color[position.color_to_move] & check_mask & hv_pins;
 
         for to in attacks {
-            let mv = Move {
+            let mv = Move::Standard {
                 role: Role::Queen,
                 from,
                 to,

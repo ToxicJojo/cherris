@@ -18,9 +18,11 @@ fn main() {
 
     let mut position =
         Position::from_str("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1").unwrap();
+    //let mut position =
+    //  Position::from_str("rnbq1bnr/pQpkpppp/3p4/8/8/2P5/PP1PPPPP/RNB1KBNR b KQ - 0 3").unwrap();
 
     let before = Instant::now();
-    //divide(2, &mut position);
+    //divide(1, &mut position);
     let p = perft(6, &mut position);
     println!("Elapsed time: {:.2?}", before.elapsed());
     println!("Nodes: {}", p);
@@ -51,12 +53,16 @@ fn divide(depth: u64, position: &mut Position) {
     let mut total = 0;
 
     for mv in moves {
-        position.make_move(mv);
-        let nodes = perft(depth - 1, position);
-        total += nodes;
-        position.unmake_move(mv);
-
-        println!("{}: {}", mv, nodes);
+        if depth == 1 {
+            println!("{}: {}", mv, 1);
+            total += 1;
+        } else {
+            position.make_move(mv);
+            let nodes = perft(depth - 1, position);
+            total += nodes;
+            position.unmake_move(mv);
+            println!("{}: {}", mv, nodes);
+        }
     }
 
     println!("Total: {}", total);
