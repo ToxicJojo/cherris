@@ -40,33 +40,25 @@ pub fn knight_attacks(square: Square) -> Bitboard {
 pub fn bishop_attacks(square: Square, blocker: Bitboard) -> Bitboard {
     let mask = BISHOP_MASKS[square.to_index()];
     let index = unsafe { _pext_u64(blocker.0, mask) + BISHOP_OFFSETS[square.to_index()] };
-    let attacks = unsafe { BISHOP_ATTACKS[index as usize] };
-
-    attacks
+    unsafe { BISHOP_ATTACKS[index as usize] }
 }
 
 pub fn bishop_xray_attacks(square: Square, blocker: Bitboard) -> Bitboard {
     let mask = BISHOP_MASKS[square.to_index()];
     let index = unsafe { _pext_u64(blocker.0, mask) + BISHOP_OFFSETS[square.to_index()] };
-    let attacks = unsafe { BISHOP_XRAY_ATTACKS[index as usize] };
-
-    attacks
+    unsafe { BISHOP_XRAY_ATTACKS[index as usize] }
 }
 
 pub fn rook_attacks(square: Square, blocker: Bitboard) -> Bitboard {
     let mask = ROOK_MAKS[square.to_index()];
     let index = unsafe { _pext_u64(blocker.0, mask) + ROOK_OFFSETS[square.to_index()] };
-    let attacks = unsafe { Bitboard(ROOK_ATTACKS[index as usize]) };
-
-    attacks
+    unsafe { Bitboard(ROOK_ATTACKS[index as usize]) }
 }
 
 pub fn rook_xray_attacks(square: Square, blocker: Bitboard) -> Bitboard {
     let mask = ROOK_MAKS[square.to_index()];
     let index = unsafe { _pext_u64(blocker.0, mask) + ROOK_OFFSETS[square.to_index()] };
-    let attacks = unsafe { Bitboard(ROOK_XRAY_ATTACKS[index as usize]) };
-
-    attacks
+    unsafe { Bitboard(ROOK_XRAY_ATTACKS[index as usize]) }
 }
 
 pub fn queen_attacks(square: Square, blocker: Bitboard) -> Bitboard {

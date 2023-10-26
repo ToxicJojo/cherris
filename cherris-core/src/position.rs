@@ -27,13 +27,10 @@ impl Position {
             self.fullmove_number += 1;
         }
 
-        match chess_move {
-            Move::Standard { role, capture, .. } => {
-                if role != Role::Pawn && capture.is_some() {
-                    self.halfmove_clock += 1;
-                }
+        if let Move::Standard { role, capture, .. } = chess_move {
+            if role != Role::Pawn && capture.is_some() {
+                self.halfmove_clock += 1;
             }
-            _ => {}
         }
     }
 
@@ -47,13 +44,10 @@ impl Position {
             self.fullmove_number -= 1;
         }
 
-        match chess_move {
-            Move::Standard { role, capture, .. } => {
-                if role != Role::Pawn && capture.is_some() {
-                    self.halfmove_clock -= 1;
-                }
+        if let Move::Standard { role, capture, .. } = chess_move {
+            if role != Role::Pawn && capture.is_some() {
+                self.halfmove_clock -= 1;
             }
-            _ => {}
         }
     }
 }

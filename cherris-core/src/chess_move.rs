@@ -24,12 +24,7 @@ impl Display for Move {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Move::Standard {
-                from,
-                to,
-                role,
-                capture,
-                promotion,
-                en_passant_square,
+                from, to, capture, ..
             } => {
                 if capture.is_some() {
                     write!(f, "{}x{}", from, to)
@@ -48,12 +43,7 @@ impl Debug for Move {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Move::Standard {
-                from,
-                to,
-                role,
-                capture,
-                promotion,
-                en_passant_square,
+                from, to, capture, ..
             } => {
                 if capture.is_some() {
                     write!(f, "{}x{}", from, to)

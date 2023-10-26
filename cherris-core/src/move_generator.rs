@@ -44,7 +44,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
 
     let en_passant_bb = position
         .en_passant_square
-        .map_or(Bitboard::EMPTY, |ep| Bitboard::from(ep));
+        .map_or(Bitboard::EMPTY, Bitboard::from);
 
     for from in pawns_attack_unpinned {
         let attacks = pawn_attacks(from, position.color_to_move) & check_mask;
@@ -338,7 +338,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
     for from in bishops_pinned {
         let mut attacks = bishop_attacks(from, blockers);
         attacks &= !position.board.color[position.color_to_move] & check_mask;
-        attacks &= attacks & diag_ping;
+        attacks &= diag_ping;
 
         for to in attacks {
             let mv = Move::Standard {
