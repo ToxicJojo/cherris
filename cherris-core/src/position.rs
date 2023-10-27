@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::{Bitboard, Board, Color, Error, File, Move, Rank, Role, Square};
+use crate::{Bitboard, Board, CastlingRights, Color, Error, File, Move, Rank, Role, Square};
 
 /// Represents a chess position.
 pub struct Position {
@@ -9,6 +9,7 @@ pub struct Position {
     pub en_passant_square: Option<Square>,
     pub halfmove_clock: u8,
     pub fullmove_number: usize,
+    pub castling_rights: [CastlingRights; Color::COUNT],
 }
 
 impl Position {
@@ -59,6 +60,7 @@ impl FromStr for Position {
         let parts: Vec<&str> = s.split(' ').collect();
         let pieces_str = parts[0];
         let color_to_move = parts[1];
+        let castling_rights = parts[2];
         let en_passant = parts[3];
         let halfmove_clock = parts[4];
         let fullmove_number = parts[5];
@@ -146,6 +148,9 @@ impl FromStr for Position {
 
         let color_to_move = Color::from_str(color_to_move)?;
 
+        let white_castling = CastlingRights::from_str(castling_rights, Color::White);
+        let black_castling = CastlingRights::from_str(castling_rights, Color::Black);
+
         let mut en_passant_square = None;
         if en_passant != "-" {
             let sqaure = Square::from_str(en_passant)?;
@@ -166,6 +171,7 @@ impl FromStr for Position {
             en_passant_square,
             halfmove_clock,
             fullmove_number,
+            castling_rights: [white_castling, black_castling],
         })
     }
 }

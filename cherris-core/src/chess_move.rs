@@ -18,6 +18,8 @@ pub enum Move {
         to: Square,
         target: Square,
     },
+    CastleShort,
+    CastleLong,
 }
 
 impl Display for Move {
@@ -35,6 +37,8 @@ impl Display for Move {
             Move::EnPassant { from, to, .. } => {
                 write!(f, "{}x{}", from, to)
             }
+            Move::CastleShort => write!(f, "O-O"),
+            Move::CastleLong => write!(f, "O-O-O"),
         }
     }
 }
@@ -54,6 +58,8 @@ impl Debug for Move {
             Move::EnPassant { from, to, .. } => {
                 write!(f, "{}x{}", from, to)
             }
+            Move::CastleShort => write!(f, "O-O"),
+            Move::CastleLong => write!(f, "O-O-O"),
         }
     }
 }

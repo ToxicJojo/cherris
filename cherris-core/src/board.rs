@@ -105,6 +105,42 @@ impl Board {
                 self.color[!color] ^= target_bb;
                 self.role[Role::Pawn] ^= target_bb;
             }
+            Move::CastleShort => match color {
+                Color::White => {
+                    let king_bb = Bitboard(1 << 4) | Bitboard(1 << 6);
+                    let rook_bb = Bitboard(1 << 5) | Bitboard(1 << 7);
+
+                    self.color[color] ^= king_bb | rook_bb;
+                    self.role[Role::King] ^= king_bb;
+                    self.role[Role::Rook] ^= rook_bb;
+                }
+                Color::Black => {
+                    let king_bb = Bitboard(1 << 60) | Bitboard(1 << 62);
+                    let rook_bb = Bitboard(1 << 61) | Bitboard(1 << 63);
+
+                    self.color[color] ^= king_bb | rook_bb;
+                    self.role[Role::King] ^= king_bb;
+                    self.role[Role::Rook] ^= rook_bb;
+                }
+            },
+            Move::CastleLong => match color {
+                Color::White => {
+                    let king_bb = Bitboard(1 << 4) | Bitboard(1 << 2);
+                    let rook_bb = Bitboard(1 << 0) | Bitboard(1 << 3);
+
+                    self.color[color] ^= king_bb | rook_bb;
+                    self.role[Role::King] ^= king_bb;
+                    self.role[Role::Rook] ^= rook_bb;
+                }
+                Color::Black => {
+                    let king_bb = Bitboard(1 << 60) | Bitboard(1 << 58);
+                    let rook_bb = Bitboard(1 << 56) | Bitboard(1 << 59);
+
+                    self.color[color] ^= king_bb | rook_bb;
+                    self.role[Role::King] ^= king_bb;
+                    self.role[Role::Rook] ^= rook_bb;
+                }
+            },
         }
     }
 
@@ -144,6 +180,42 @@ impl Board {
                 self.color[!color] ^= target_bb;
                 self.role[Role::Pawn] ^= target_bb;
             }
+            Move::CastleShort => match color {
+                Color::White => {
+                    let king_bb = Bitboard(1 << 4) | Bitboard(1 << 6);
+                    let rook_bb = Bitboard(1 << 5) | Bitboard(1 << 7);
+
+                    self.color[color] ^= king_bb | rook_bb;
+                    self.role[Role::King] ^= king_bb;
+                    self.role[Role::Rook] ^= rook_bb;
+                }
+                Color::Black => {
+                    let king_bb = Bitboard(1 << 60) | Bitboard(1 << 62);
+                    let rook_bb = Bitboard(1 << 61) | Bitboard(1 << 63);
+
+                    self.color[color] ^= king_bb | rook_bb;
+                    self.role[Role::King] ^= king_bb;
+                    self.role[Role::Rook] ^= rook_bb;
+                }
+            },
+            Move::CastleLong => match color {
+                Color::White => {
+                    let king_bb = Bitboard(1 << 4) | Bitboard(1 << 2);
+                    let rook_bb = Bitboard(1 << 0) | Bitboard(1 << 3);
+
+                    self.color[color] ^= king_bb | rook_bb;
+                    self.role[Role::King] ^= king_bb;
+                    self.role[Role::Rook] ^= rook_bb;
+                }
+                Color::Black => {
+                    let king_bb = Bitboard(1 << 60) | Bitboard(1 << 58);
+                    let rook_bb = Bitboard(1 << 56) | Bitboard(1 << 59);
+
+                    self.color[color] ^= king_bb | rook_bb;
+                    self.role[Role::King] ^= king_bb;
+                    self.role[Role::Rook] ^= rook_bb;
+                }
+            },
         }
     }
 
@@ -316,50 +388,31 @@ mod tests {
     #[test]
     fn piece_on() {
         let mut board = Board::empty();
-        let piece = Piece {
-            color: Color::White,
-            role: Role::Pawn,
-        };
-        let square = Square::D5;
-        board.put_piece_on(piece, square);
+        board.put_piece_on(Piece::WHITE_PAWN, Square::D5);
 
-        assert_eq!(board.piece_on(square).unwrap(), piece);
+        assert_eq!(board.piece_on(Square::D5).unwrap(), Piece::WHITE_PAWN);
     }
 
     #[test]
     fn color_on() {
         let mut board = Board::empty();
-        let piece = Piece {
-            color: Color::Black,
-            role: Role::Pawn,
-        };
-        let square = Square::C4;
-        board.put_piece_on(piece, square);
+        board.put_piece_on(Piece::BLACK_PAWN, Square::C4);
 
-        assert_eq!(board.color_on(square).unwrap(), piece.color);
+        assert_eq!(board.color_on(Square::C4).unwrap(), Color::Black);
     }
 
     #[test]
     fn role_on() {
         let mut board = Board::empty();
-        let piece = Piece {
-            color: Color::Black,
-            role: Role::Bishop,
-        };
-        let square = Square::H8;
-        board.put_piece_on(piece, square);
+        board.put_piece_on(Piece::BLACK_BISHOP, Square::H8);
 
-        assert_eq!(board.role_on(square).unwrap(), piece.role);
+        assert_eq!(board.role_on(Square::H8).unwrap(), Role::Bishop);
     }
 
     #[test]
     fn make_move_no_capture() {
         let mut board = Board::empty();
-        let piece = Piece {
-            color: Color::White,
-            role: Role::Queen,
-        };
-        board.put_piece_on(piece, Square::A1);
+        board.put_piece_on(Piece::WHITE_QUEEN, Square::A1);
 
         board.make_move(
             Color::White,
@@ -374,22 +427,14 @@ mod tests {
         );
 
         assert_eq!(board.piece_on(Square::A1), None);
-        assert_eq!(board.piece_on(Square::A8), Some(piece));
+        assert_eq!(board.piece_on(Square::A8), Some(Piece::WHITE_QUEEN));
     }
 
     #[test]
     fn make_move_capture() {
         let mut board = Board::empty();
-        let piece_white = Piece {
-            color: Color::White,
-            role: Role::Queen,
-        };
-        let piece_black = Piece {
-            color: Color::Black,
-            role: Role::Queen,
-        };
-        board.put_piece_on(piece_white, Square::A1);
-        board.put_piece_on(piece_black, Square::A8);
+        board.put_piece_on(Piece::WHITE_QUEEN, Square::A1);
+        board.put_piece_on(Piece::BLACK_QUEEN, Square::A8);
 
         board.make_move(
             Color::White,
@@ -404,23 +449,14 @@ mod tests {
         );
 
         assert_eq!(board.piece_on(Square::A1), None);
-        assert_eq!(board.piece_on(Square::A8), Some(piece_white));
+        assert_eq!(board.piece_on(Square::A8), Some(Piece::WHITE_QUEEN));
     }
 
     #[test]
     fn make_move_en_passant() {
         let mut board = Board::empty();
-        let piece_white = Piece {
-            color: Color::White,
-            role: Role::Pawn,
-        };
-        let piece_black = Piece {
-            color: Color::Black,
-            role: Role::Pawn,
-        };
-
-        board.put_piece_on(piece_white, Square::D5);
-        board.put_piece_on(piece_black, Square::C5);
+        board.put_piece_on(Piece::WHITE_PAWN, Square::D5);
+        board.put_piece_on(Piece::BLACK_PAWN, Square::C5);
 
         board.make_move(
             Color::White,
@@ -432,17 +468,69 @@ mod tests {
         );
 
         assert_eq!(board.piece_on(Square::C5), None);
-        assert_eq!(board.piece_on(Square::C6), Some(piece_white));
+        assert_eq!(board.piece_on(Square::C6), Some(Piece::WHITE_PAWN));
+    }
+
+    #[test]
+    fn make_move_castle_short_white() {
+        let mut board = Board::empty();
+        board.put_piece_on(Piece::WHITE_KING, Square::E1);
+        board.put_piece_on(Piece::WHITE_ROOK, Square::H1);
+
+        board.make_move(Color::White, Move::CastleShort);
+
+        assert_eq!(board.piece_on(Square::E1), None);
+        assert_eq!(board.piece_on(Square::G1), Some(Piece::WHITE_KING));
+        assert_eq!(board.piece_on(Square::H1), None);
+        assert_eq!(board.piece_on(Square::F1), Some(Piece::WHITE_ROOK));
+    }
+
+    #[test]
+    fn make_move_castle_short_black() {
+        let mut board = Board::empty();
+        board.put_piece_on(Piece::BLACK_KING, Square::E8);
+        board.put_piece_on(Piece::BLACK_ROOK, Square::H8);
+
+        board.make_move(Color::Black, Move::CastleShort);
+
+        assert_eq!(board.piece_on(Square::E8), None);
+        assert_eq!(board.piece_on(Square::G8), Some(Piece::BLACK_KING));
+        assert_eq!(board.piece_on(Square::H8), None);
+        assert_eq!(board.piece_on(Square::F8), Some(Piece::BLACK_ROOK));
+    }
+
+    #[test]
+    fn make_move_castle_long_white() {
+        let mut board = Board::empty();
+        board.put_piece_on(Piece::WHITE_KING, Square::E1);
+        board.put_piece_on(Piece::WHITE_ROOK, Square::A1);
+
+        board.make_move(Color::White, Move::CastleLong);
+
+        assert_eq!(board.piece_on(Square::E1), None);
+        assert_eq!(board.piece_on(Square::C1), Some(Piece::WHITE_KING));
+        assert_eq!(board.piece_on(Square::A1), None);
+        assert_eq!(board.piece_on(Square::D1), Some(Piece::WHITE_ROOK));
+    }
+
+    #[test]
+    fn make_move_castle_long_black() {
+        let mut board = Board::empty();
+        board.put_piece_on(Piece::BLACK_KING, Square::E8);
+        board.put_piece_on(Piece::BLACK_ROOK, Square::A8);
+
+        board.make_move(Color::Black, Move::CastleLong);
+
+        assert_eq!(board.piece_on(Square::E8), None);
+        assert_eq!(board.piece_on(Square::C8), Some(Piece::BLACK_KING));
+        assert_eq!(board.piece_on(Square::A8), None);
+        assert_eq!(board.piece_on(Square::D8), Some(Piece::BLACK_ROOK));
     }
 
     #[test]
     fn unmake_move_no_capture() {
         let mut board = Board::empty();
-        let piece = Piece {
-            color: Color::White,
-            role: Role::Queen,
-        };
-        board.put_piece_on(piece, Square::A1);
+        board.put_piece_on(Piece::WHITE_QUEEN, Square::A1);
 
         let chess_move = Move::Standard {
             from: Square::A1,
@@ -457,22 +545,14 @@ mod tests {
         board.unmake_move(Color::White, chess_move);
 
         assert_eq!(board.piece_on(Square::A8), None);
-        assert_eq!(board.piece_on(Square::A1), Some(piece));
+        assert_eq!(board.piece_on(Square::A1), Some(Piece::WHITE_QUEEN));
     }
 
     #[test]
     fn unmake_move_capture() {
         let mut board = Board::empty();
-        let piece_white = Piece {
-            color: Color::White,
-            role: Role::Queen,
-        };
-        let piece_black = Piece {
-            color: Color::Black,
-            role: Role::Queen,
-        };
-        board.put_piece_on(piece_white, Square::A1);
-        board.put_piece_on(piece_black, Square::A8);
+        board.put_piece_on(Piece::WHITE_QUEEN, Square::A1);
+        board.put_piece_on(Piece::BLACK_QUEEN, Square::A8);
 
         let chess_move = Move::Standard {
             from: Square::A1,
@@ -485,23 +565,14 @@ mod tests {
         board.make_move(Color::White, chess_move);
         board.unmake_move(Color::White, chess_move);
 
-        assert_eq!(board.piece_on(Square::A8), Some(piece_black));
-        assert_eq!(board.piece_on(Square::A1), Some(piece_white));
+        assert_eq!(board.piece_on(Square::A8), Some(Piece::BLACK_QUEEN));
+        assert_eq!(board.piece_on(Square::A1), Some(Piece::WHITE_QUEEN));
     }
 
     #[test]
     fn unmake_move_en_passant() {
         let mut board = Board::empty();
-        let piece_white = Piece {
-            color: Color::White,
-            role: Role::Pawn,
-        };
-        let piece_black = Piece {
-            color: Color::Black,
-            role: Role::Pawn,
-        };
-
-        board.put_piece_on(piece_white, Square::C6);
+        board.put_piece_on(Piece::WHITE_PAWN, Square::C6);
 
         board.unmake_move(
             Color::White,
@@ -512,7 +583,63 @@ mod tests {
             },
         );
 
-        assert_eq!(board.piece_on(Square::D5), Some(piece_white));
-        assert_eq!(board.piece_on(Square::C5), Some(piece_black));
+        assert_eq!(board.piece_on(Square::D5), Some(Piece::WHITE_PAWN));
+        assert_eq!(board.piece_on(Square::C5), Some(Piece::BLACK_PAWN));
+    }
+
+    #[test]
+    fn unmake_move_castle_short_white() {
+        let mut board = Board::empty();
+        board.put_piece_on(Piece::WHITE_KING, Square::G1);
+        board.put_piece_on(Piece::WHITE_ROOK, Square::F1);
+
+        board.unmake_move(Color::White, Move::CastleShort);
+
+        assert_eq!(board.piece_on(Square::G1), None);
+        assert_eq!(board.piece_on(Square::E1), Some(Piece::WHITE_KING));
+        assert_eq!(board.piece_on(Square::F1), None);
+        assert_eq!(board.piece_on(Square::H1), Some(Piece::WHITE_ROOK));
+    }
+
+    #[test]
+    fn unmake_move_castle_short_black() {
+        let mut board = Board::empty();
+        board.put_piece_on(Piece::BLACK_KING, Square::G8);
+        board.put_piece_on(Piece::BLACK_ROOK, Square::F8);
+
+        board.unmake_move(Color::Black, Move::CastleShort);
+
+        assert_eq!(board.piece_on(Square::G8), None);
+        assert_eq!(board.piece_on(Square::E8), Some(Piece::BLACK_KING));
+        assert_eq!(board.piece_on(Square::F8), None);
+        assert_eq!(board.piece_on(Square::H8), Some(Piece::BLACK_ROOK));
+    }
+
+    #[test]
+    fn unmake_move_castle_long_white() {
+        let mut board = Board::empty();
+        board.put_piece_on(Piece::WHITE_KING, Square::C1);
+        board.put_piece_on(Piece::WHITE_ROOK, Square::D1);
+
+        board.unmake_move(Color::White, Move::CastleLong);
+
+        assert_eq!(board.piece_on(Square::C1), None);
+        assert_eq!(board.piece_on(Square::E1), Some(Piece::WHITE_KING));
+        assert_eq!(board.piece_on(Square::D1), None);
+        assert_eq!(board.piece_on(Square::A1), Some(Piece::WHITE_ROOK));
+    }
+
+    #[test]
+    fn unmake_move_castle_long_black() {
+        let mut board = Board::empty();
+        board.put_piece_on(Piece::BLACK_KING, Square::C8);
+        board.put_piece_on(Piece::BLACK_ROOK, Square::D8);
+
+        board.unmake_move(Color::Black, Move::CastleLong);
+
+        assert_eq!(board.piece_on(Square::C8), None);
+        assert_eq!(board.piece_on(Square::E8), Some(Piece::BLACK_KING));
+        assert_eq!(board.piece_on(Square::D8), None);
+        assert_eq!(board.piece_on(Square::A8), Some(Piece::BLACK_ROOK));
     }
 }

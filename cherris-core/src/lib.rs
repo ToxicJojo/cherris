@@ -25,6 +25,9 @@ pub use crate::bitboard::*;
 mod board;
 pub use crate::board::*;
 
+mod castling_rights;
+pub use crate::castling_rights::*;
+
 mod position;
 pub use crate::position::*;
 

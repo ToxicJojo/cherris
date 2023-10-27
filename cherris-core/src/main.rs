@@ -7,7 +7,8 @@ use cherris_core::{
 };
 
 fn main() {
-    // TODO make sure unmaking en passant works correctly
+    // TODO implement castling
+    // TODO implement promotion
     // TODO make sure when the king is double checked only the king can move
     unsafe {
         ROOK_ATTACKS = generate_attacks_fast();
@@ -17,11 +18,12 @@ fn main() {
     };
 
     let mut position =
-        Position::from_str("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1").unwrap();
+        Position::from_str("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1")
+            .unwrap();
 
     divide(1, &mut position);
     let before = Instant::now();
-    let p = perft(6, &mut position);
+    let p = perft(1, &mut position);
     println!("Elapsed time: {:.2?}", before.elapsed());
     println!("Nodes: {}", p);
 }
