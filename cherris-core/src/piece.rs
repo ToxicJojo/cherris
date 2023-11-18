@@ -81,3 +81,25 @@ impl Display for Piece {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn display() {
+        assert_eq!(Piece::WHITE_PAWN.to_string(), "P");
+        assert_eq!(Piece::WHITE_KNIGHT.to_string(), "N");
+        assert_eq!(Piece::WHITE_BISHOP.to_string(), "B");
+        assert_eq!(Piece::WHITE_ROOK.to_string(), "R");
+        assert_eq!(Piece::WHITE_QUEEN.to_string(), "Q");
+        assert_eq!(Piece::WHITE_KING.to_string(), "K");
+
+        assert_eq!(Piece::BLACK_PAWN.to_string(), "p");
+        assert_eq!(Piece::BLACK_KNIGHT.to_string(), "n");
+        assert_eq!(Piece::BLACK_BISHOP.to_string(), "b");
+        assert_eq!(Piece::BLACK_ROOK.to_string(), "r");
+        assert_eq!(Piece::BLACK_QUEEN.to_string(), "q");
+        assert_eq!(Piece::BLACK_KING.to_string(), "k");
+    }
+}
