@@ -12,12 +12,11 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn empty() -> Board {
-        Board {
-            role: [Bitboard::EMPTY; Role::COUNT],
-            color: [Bitboard::EMPTY; Color::COUNT],
-        }
-    }
+    /// An empty board with no pieces on it.
+    pub const EMPTY: Board = Board {
+        role: [Bitboard::EMPTY; Role::COUNT],
+        color: [Bitboard::EMPTY; Color::COUNT],
+    };
 
     /// Return the `Role` on a given `Sqaure`.
     pub fn role_on(&self, sqaure: Square) -> Option<Role> {
@@ -405,7 +404,7 @@ mod tests {
 
     #[test]
     fn piece_on() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::WHITE_PAWN, Square::D5);
 
         assert_eq!(board.piece_on(Square::D5).unwrap(), Piece::WHITE_PAWN);
@@ -413,7 +412,7 @@ mod tests {
 
     #[test]
     fn color_on() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::BLACK_PAWN, Square::C4);
 
         assert_eq!(board.color_on(Square::C4).unwrap(), Color::Black);
@@ -421,7 +420,7 @@ mod tests {
 
     #[test]
     fn role_on() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::BLACK_BISHOP, Square::H8);
 
         assert_eq!(board.role_on(Square::H8).unwrap(), Role::Bishop);
@@ -429,7 +428,7 @@ mod tests {
 
     #[test]
     fn make_move_no_capture() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::WHITE_QUEEN, Square::A1);
 
         board.make_move(
@@ -450,7 +449,7 @@ mod tests {
 
     #[test]
     fn make_move_capture() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::WHITE_QUEEN, Square::A1);
         board.put_piece_on(Piece::BLACK_QUEEN, Square::A8);
 
@@ -472,7 +471,7 @@ mod tests {
 
     #[test]
     fn make_move_promotion() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::WHITE_PAWN, Square::A7);
 
         board.make_move(
@@ -493,7 +492,7 @@ mod tests {
 
     #[test]
     fn make_move_en_passant() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::WHITE_PAWN, Square::D5);
         board.put_piece_on(Piece::BLACK_PAWN, Square::C5);
 
@@ -512,7 +511,7 @@ mod tests {
 
     #[test]
     fn make_move_castle_short_white() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::WHITE_KING, Square::E1);
         board.put_piece_on(Piece::WHITE_ROOK, Square::H1);
 
@@ -526,7 +525,7 @@ mod tests {
 
     #[test]
     fn make_move_castle_short_black() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::BLACK_KING, Square::E8);
         board.put_piece_on(Piece::BLACK_ROOK, Square::H8);
 
@@ -540,7 +539,7 @@ mod tests {
 
     #[test]
     fn make_move_castle_long_white() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::WHITE_KING, Square::E1);
         board.put_piece_on(Piece::WHITE_ROOK, Square::A1);
 
@@ -554,7 +553,7 @@ mod tests {
 
     #[test]
     fn make_move_castle_long_black() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::BLACK_KING, Square::E8);
         board.put_piece_on(Piece::BLACK_ROOK, Square::A8);
 
@@ -568,7 +567,7 @@ mod tests {
 
     #[test]
     fn unmake_move_no_capture() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::WHITE_QUEEN, Square::A1);
 
         let chess_move = Move::Standard {
@@ -589,7 +588,7 @@ mod tests {
 
     #[test]
     fn unmake_move_capture() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::WHITE_QUEEN, Square::A1);
         board.put_piece_on(Piece::BLACK_QUEEN, Square::A8);
 
@@ -610,7 +609,7 @@ mod tests {
 
     #[test]
     fn unmake_move_promotion() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::WHITE_QUEEN, Square::A8);
 
         board.unmake_move(
@@ -631,7 +630,7 @@ mod tests {
 
     #[test]
     fn unmake_move_en_passant() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::WHITE_PAWN, Square::C6);
 
         board.unmake_move(
@@ -649,7 +648,7 @@ mod tests {
 
     #[test]
     fn unmake_move_castle_short_white() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::WHITE_KING, Square::G1);
         board.put_piece_on(Piece::WHITE_ROOK, Square::F1);
 
@@ -663,7 +662,7 @@ mod tests {
 
     #[test]
     fn unmake_move_castle_short_black() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::BLACK_KING, Square::G8);
         board.put_piece_on(Piece::BLACK_ROOK, Square::F8);
 
@@ -677,7 +676,7 @@ mod tests {
 
     #[test]
     fn unmake_move_castle_long_white() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::WHITE_KING, Square::C1);
         board.put_piece_on(Piece::WHITE_ROOK, Square::D1);
 
@@ -691,7 +690,7 @@ mod tests {
 
     #[test]
     fn unmake_move_castle_long_black() {
-        let mut board = Board::empty();
+        let mut board = Board::EMPTY;
         board.put_piece_on(Piece::BLACK_KING, Square::C8);
         board.put_piece_on(Piece::BLACK_ROOK, Square::D8);
 

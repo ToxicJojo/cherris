@@ -3,14 +3,14 @@ use std::{str::FromStr, time::Instant};
 use cherris_core::{generate_lookup_tables, generate_moves, Position};
 
 fn main() {
-    // TODO handle ep check
     generate_lookup_tables();
 
-    let mut position = Position::from_str("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1").unwrap();
+    let mut position =
+        Position::from_str("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1").unwrap();
 
-    divide(2, &mut position);
+    divide(1, &mut position);
     let before = Instant::now();
-    let p = perft(1, &mut position);
+    let p = perft(3, &mut position);
     println!("Elapsed time: {:.2?}", before.elapsed());
     println!("Nodes: {}", p);
 }

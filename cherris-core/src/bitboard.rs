@@ -8,12 +8,17 @@ use crate::{Color, File, Rank, Square};
 pub struct Bitboard(pub u64);
 
 impl Bitboard {
+    /// A Bitboard with no squares set.
     pub const EMPTY: Bitboard = Bitboard(0);
+    /// A Bitboard with all squares set.
     pub const FULL: Bitboard = Bitboard(u64::MAX);
 
     pub const FIRST_RANK: Bitboard = Bitboard(0x00000000000000FF);
     pub const SECOND_RANK: Bitboard = Bitboard(0x000000000000FF00);
     pub const THIRD_RANK: Bitboard = Bitboard(0x0000000000FF0000);
+    pub const FOURTH_RANK: Bitboard = Bitboard(0x00000000FF000000);
+    pub const FIFTH_RANK: Bitboard = Bitboard(0x000000FF00000000);
+    pub const SIXTH_RANK: Bitboard = Bitboard(0x0000FF0000000000);
     pub const SEVENTH_RANK: Bitboard = Bitboard(0x00FF000000000000);
     pub const EIGTH_RANK: Bitboard = Bitboard(0xFF00000000000000);
 

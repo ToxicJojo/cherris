@@ -93,13 +93,11 @@ impl Position {
                     }
                     Color::Black => {
                         if to == Square::A8 {
-                            println!("Removing queenside caslint rights");
                             self.castling_rights[(!self.color_to_move).to_index()]
                                 .remove_queen_side();
                         }
 
                         if to == Square::H8 {
-                            println!("Removing kingside caslint rights");
                             self.castling_rights[(!self.color_to_move).to_index()]
                                 .remove_king_side();
                         }
