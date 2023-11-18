@@ -1,23 +1,5 @@
 use crate::{Bitboard, Square};
 
-pub enum Direction {
-    Up,
-    Right,
-    Down,
-    Left,
-}
-
-impl Direction {
-    pub const fn to_offset(&self) -> i8 {
-        match self {
-            Self::Up => 8,
-            Self::Right => 1,
-            Self::Down => -8,
-            Self::Left => -1,
-        }
-    }
-}
-
 pub static RAYS: [[Bitboard; Square::COUNT]; 8] = generate_rays();
 pub const DIRECTIONS: [i8; 8] = [8, 9, 1, -7, -8, -9, -1, 7];
 
