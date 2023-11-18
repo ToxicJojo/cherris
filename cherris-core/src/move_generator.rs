@@ -1,6 +1,6 @@
 use crate::{
     bishop_attacks, king_attacks, knight_attacks, pawn_attacks, queen_attacks, rook_attacks,
-    Bitboard, Color, Move, Position, Role, Square,
+    Bitboard, CastlingRights, Color, Move, Position, Role, Square,
 };
 
 pub fn generate_moves(position: &Position) -> Vec<Move> {
@@ -49,20 +49,24 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
     for from in pawns_attack_unpinned {
         let attacks = pawn_attacks(from, position.color_to_move) & check_mask;
 
-        let attacks_en_passant = attacks & en_passant_bb;
+        let attacks_en_passant = attacks & en_passant_bb & !diag_ping;
         let attacks = attacks & position.board.color[!position.color_to_move];
 
         for to in attacks {
-            let mv = Move::Standard {
-                role: Role::Pawn,
-                from,
-                to,
-                capture: position.board.piece_on(to).map(|piece| piece.role),
-                promotion: None,
-                en_passant_square: None,
-            };
+            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move.to_index()]).is_empty() {
+                generate_promotion_move(from, to, position, &mut moves)
+            } else {
+                let mv = Move::Standard {
+                    role: Role::Pawn,
+                    from,
+                    to,
+                    capture: position.board.piece_on(to).map(|piece| piece.role),
+                    promotion: None,
+                    en_passant_square: None,
+                };
 
-            moves.push(mv);
+                moves.push(mv);
+            }
         }
 
         for to in attacks_en_passant {
@@ -70,6 +74,19 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
                 Color::White => Square(to.0 - 8),
                 Color::Black => Square(to.0 + 8),
             };
+
+            let from_bb = Bitboard::from(from);
+            let target_bb = Bitboard::from(target);
+
+            let occ = blockers & !from_bb & !target_bb;
+            let king_sees = rook_attacks(king, occ);
+            if !(king_sees
+                & position.board.color[!position.color_to_move]
+                & (position.board.role[Role::Rook] | position.board.role[Role::Queen]))
+                .is_empty()
+            {
+                continue;
+            }
 
             let mv = Move::EnPassant { from, to, target };
 
@@ -80,20 +97,24 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
     for from in pawns_pinned_diag {
         let attacks = pawn_attacks(from, position.color_to_move) & diag_ping & check_mask;
 
-        let attacks_en_passant = attacks & en_passant_bb;
+        let attacks_en_passant = attacks & en_passant_bb & !diag_ping;
         let attacks = attacks & position.board.color[!position.color_to_move];
 
         for to in attacks {
-            let mv = Move::Standard {
-                role: Role::Pawn,
-                from,
-                to,
-                capture: position.board.piece_on(to).map(|piece| piece.role),
-                promotion: None,
-                en_passant_square: None,
-            };
+            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move.to_index()]).is_empty() {
+                generate_promotion_move(from, to, position, &mut moves)
+            } else {
+                let mv = Move::Standard {
+                    role: Role::Pawn,
+                    from,
+                    to,
+                    capture: position.board.piece_on(to).map(|piece| piece.role),
+                    promotion: None,
+                    en_passant_square: None,
+                };
 
-            moves.push(mv);
+                moves.push(mv);
+            }
         }
 
         for to in attacks_en_passant {
@@ -101,6 +122,19 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
                 Color::White => Square(to.0 - 8),
                 Color::Black => Square(to.0 + 8),
             };
+
+            let from_bb = Bitboard::from(from);
+            let target_bb = Bitboard::from(target);
+
+            let occ = blockers & !from_bb & !target_bb;
+            let king_sees = rook_attacks(king, occ);
+            if !(king_sees
+                & position.board.color[!position.color_to_move]
+                & (position.board.role[Role::Rook] | position.board.role[Role::Queen]))
+                .is_empty()
+            {
+                continue;
+            }
 
             let mv = Move::EnPassant { from, to, target };
 
@@ -121,16 +155,20 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         } & check_mask;
 
         for to in attacks {
-            let mv = Move::Standard {
-                role: Role::Pawn,
-                from,
-                to,
-                capture: position.board.piece_on(to).map(|piece| piece.role),
-                promotion: None,
-                en_passant_square: None,
-            };
+            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move.to_index()]).is_empty() {
+                generate_promotion_move(from, to, position, &mut moves)
+            } else {
+                let mv = Move::Standard {
+                    role: Role::Pawn,
+                    from,
+                    to,
+                    capture: position.board.piece_on(to).map(|piece| piece.role),
+                    promotion: None,
+                    en_passant_square: None,
+                };
 
-            moves.push(mv);
+                moves.push(mv);
+            }
         }
     }
 
@@ -148,16 +186,20 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
             & hv_pins;
 
         for to in attacks {
-            let mv = Move::Standard {
-                role: Role::Pawn,
-                from,
-                to,
-                capture: position.board.piece_on(to).map(|piece| piece.role),
-                promotion: None,
-                en_passant_square: None,
-            };
+            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move.to_index()]).is_empty() {
+                generate_promotion_move(from, to, position, &mut moves)
+            } else {
+                let mv = Move::Standard {
+                    role: Role::Pawn,
+                    from,
+                    to,
+                    capture: position.board.piece_on(to).map(|piece| piece.role),
+                    promotion: None,
+                    en_passant_square: None,
+                };
 
-            moves.push(mv);
+                moves.push(mv);
+            }
         }
     }
 
@@ -413,5 +455,69 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         }
     }
 
+    let castle_path_short = match position.color_to_move {
+        Color::White => Bitboard::from(Square::F1) | Bitboard::from(Square::G1),
+        Color::Black => Bitboard::from(Square::F8) | Bitboard::from(Square::G8),
+    };
+
+    let castle_path_long = match position.color_to_move {
+        Color::White => {
+            Bitboard::from(Square::B1) | Bitboard::from(Square::C1) | Bitboard::from(Square::D1)
+        }
+        Color::Black => {
+            Bitboard::from(Square::B8) | Bitboard::from(Square::C8) | Bitboard::from(Square::D8)
+        }
+    };
+
+    let castle_path_long_attacks = match position.color_to_move {
+        Color::White => Bitboard::from(Square::D1) | Bitboard::from(Square::C1),
+        Color::Black => Bitboard::from(Square::D8) | Bitboard::from(Square::C8),
+    };
+
+    let path_empty = (castle_path_short & blockers).is_empty();
+    let is_not_in_check = (kings & attacked_squares).is_empty();
+    let path_unattacked = (castle_path_short & attacked_squares).is_empty();
+    let castling_rights = position.castling_rights[position.color_to_move.to_index()];
+
+    if path_empty
+        && is_not_in_check
+        && path_unattacked
+        && (castling_rights == CastlingRights::KingSide
+            || castling_rights == CastlingRights::BothSides)
+    {
+        let mv = Move::CastleShort;
+        moves.push(mv);
+    }
+
+    let path_empty = (castle_path_long & blockers).is_empty();
+    let is_not_in_check = (kings & attacked_squares).is_empty();
+    let path_unattacked = (castle_path_long_attacks & attacked_squares).is_empty();
+    let castling_rights = position.castling_rights[position.color_to_move.to_index()];
+
+    if path_empty
+        && is_not_in_check
+        && path_unattacked
+        && (castling_rights == CastlingRights::QueenSide
+            || castling_rights == CastlingRights::BothSides)
+    {
+        let mv = Move::CastleLong;
+        moves.push(mv);
+    }
+
     moves
+}
+
+fn generate_promotion_move(from: Square, to: Square, position: &Position, moves: &mut Vec<Move>) {
+    for role in Role::iter().skip(1).take(4) {
+        let mv = Move::Standard {
+            role: Role::Pawn,
+            from,
+            to,
+            capture: position.board.piece_on(to).map(|piece| piece.role),
+            promotion: Some(*role),
+            en_passant_square: None,
+        };
+
+        moves.push(mv);
+    }
 }

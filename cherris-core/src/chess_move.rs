@@ -26,10 +26,20 @@ impl Display for Move {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Move::Standard {
-                from, to, capture, ..
+                from,
+                to,
+                capture,
+                promotion,
+                ..
             } => {
                 if capture.is_some() {
-                    write!(f, "{}x{}", from, to)
+                    if let Some(promotion) = promotion {
+                        write!(f, "{}x{}={}", from, to, promotion)
+                    } else {
+                        write!(f, "{}x{}", from, to)
+                    }
+                } else if let Some(promotion) = promotion {
+                    write!(f, "{}-{}={}", from, to, promotion)
                 } else {
                     write!(f, "{}-{}", from, to)
                 }

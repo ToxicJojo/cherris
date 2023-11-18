@@ -1,4 +1,5 @@
 use std::{
+    fmt::Display,
     ops::{Index, IndexMut},
     slice::Iter,
 };
@@ -38,6 +39,19 @@ impl Role {
     /// Converts a `Piece` to a `usize`.
     pub fn to_index(&self) -> usize {
         *self as usize
+    }
+}
+
+impl Display for Role {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Role::Pawn => write!(f, "p"),
+            Role::Knight => write!(f, "n"),
+            Role::Bishop => write!(f, "b"),
+            Role::Rook => write!(f, "r"),
+            Role::Queen => write!(f, "q"),
+            Role::King => write!(f, "k"),
+        }
     }
 }
 

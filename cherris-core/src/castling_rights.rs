@@ -12,16 +12,6 @@ pub enum CastlingRights {
 
 impl CastlingRights {
     /// Converts a `&str` to `CastlingRights` for a specific `Color`.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use cherris_core::{CastlingRights, Color};
-    ///
-    /// let both_sides =  CastlingRights::from_str("KQ", Color::White);
-    ///
-    /// assert_eq!(both_sides, CastlingRights::BothSides);
-    /// ```
     pub fn from_str(input: &str, color: Color) -> CastlingRights {
         let mut castling = CastlingRights::NoSide;
         match color {
@@ -45,6 +35,24 @@ impl CastlingRights {
             }
         }
         castling
+    }
+
+    pub fn remove_king_side(&mut self) {
+        *self = match self {
+            CastlingRights::NoSide => CastlingRights::NoSide,
+            CastlingRights::KingSide => CastlingRights::NoSide,
+            CastlingRights::QueenSide => CastlingRights::QueenSide,
+            CastlingRights::BothSides => CastlingRights::QueenSide,
+        }
+    }
+
+    pub fn remove_queen_side(&mut self) {
+        *self = match self {
+            CastlingRights::NoSide => CastlingRights::NoSide,
+            CastlingRights::KingSide => CastlingRights::KingSide,
+            CastlingRights::QueenSide => CastlingRights::NoSide,
+            CastlingRights::BothSides => CastlingRights::KingSide,
+        }
     }
 }
 
@@ -87,5 +95,41 @@ mod tests {
         assert_eq!(king_side, CastlingRights::KingSide);
         assert_eq!(queen_side, CastlingRights::QueenSide);
         assert_eq!(both_sides, CastlingRights::BothSides);
+    }
+
+    #[test]
+    fn remove_king_side() {
+        let mut both = CastlingRights::BothSides;
+        let mut king = CastlingRights::KingSide;
+        let mut queen = CastlingRights::QueenSide;
+        let mut no = CastlingRights::NoSide;
+
+        both.remove_king_side();
+        king.remove_king_side();
+        queen.remove_king_side();
+        no.remove_king_side();
+
+        assert_eq!(both, CastlingRights::QueenSide);
+        assert_eq!(king, CastlingRights::NoSide);
+        assert_eq!(queen, CastlingRights::QueenSide);
+        assert_eq!(no, CastlingRights::NoSide);
+    }
+
+    #[test]
+    fn remove_queen_side() {
+        let mut both = CastlingRights::BothSides;
+        let mut king = CastlingRights::KingSide;
+        let mut queen = CastlingRights::QueenSide;
+        let mut no = CastlingRights::NoSide;
+
+        both.remove_queen_side();
+        king.remove_queen_side();
+        queen.remove_queen_side();
+        no.remove_queen_side();
+
+        assert_eq!(both, CastlingRights::KingSide);
+        assert_eq!(king, CastlingRights::KingSide);
+        assert_eq!(queen, CastlingRights::NoSide);
+        assert_eq!(no, CastlingRights::NoSide);
     }
 }

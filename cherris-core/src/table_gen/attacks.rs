@@ -22,6 +22,15 @@ pub static BISHOP_OFFSETS: [u64; Square::COUNT] = generate_bishop_offsets();
 pub static mut BISHOP_ATTACKS: [Bitboard; 5248] = [Bitboard::EMPTY; 5248];
 pub static mut BISHOP_XRAY_ATTACKS: [Bitboard; 5248] = [Bitboard::EMPTY; 5248];
 
+pub fn generate_lookup_tables() {
+    unsafe {
+        ROOK_ATTACKS = generate_attacks_fast();
+        ROOK_XRAY_ATTACKS = generate_rook_xray_attacks();
+        BISHOP_ATTACKS = generate_bishop_attacks();
+        BISHOP_XRAY_ATTACKS = generate_bishop_xray_attacks();
+    };
+}
+
 pub fn pawn_attacks(square: Square, color: Color) -> Bitboard {
     match color {
         Color::White => PAWN_MOVES_WHITE[square.to_index()],

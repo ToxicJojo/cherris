@@ -79,6 +79,7 @@ impl Board {
                 to,
                 role,
                 capture,
+                promotion,
                 ..
             } => {
                 let from_bb = Bitboard::from(from);
@@ -91,6 +92,11 @@ impl Board {
                 if let Some(capture) = capture {
                     self.color[!color] ^= to_bb;
                     self.role[capture] ^= to_bb;
+                }
+
+                if let Some(promotion) = promotion {
+                    self.role[role] ^= to_bb;
+                    self.role[promotion] ^= to_bb;
                 }
             }
             Move::EnPassant { from, to, target } => {
@@ -154,11 +160,17 @@ impl Board {
                 to,
                 role,
                 capture,
+                promotion,
                 ..
             } => {
                 let from_bb = Bitboard::from(from);
                 let to_bb = Bitboard::from(to);
                 let from_to_bb = from_bb ^ to_bb;
+
+                if let Some(promotion) = promotion {
+                    self.role[role] ^= to_bb;
+                    self.role[promotion] ^= to_bb;
+                }
 
                 self.color[color] ^= from_to_bb;
                 self.role[role] ^= from_to_bb;
@@ -321,6 +333,8 @@ impl Board {
 
         if check_mask.is_empty() {
             Bitboard::FULL
+        } else if (check_mask & self.color[!color]).population_count() > 1 {
+            Bitboard::EMPTY
         } else {
             check_mask
         }
@@ -348,6 +362,10 @@ impl Board {
         }
 
         pin_mask
+    }
+
+    pub fn occupied(&self) -> Bitboard {
+        self.color[Color::White] | self.color[Color::Black]
     }
 }
 
@@ -449,6 +467,27 @@ mod tests {
         );
 
         assert_eq!(board.piece_on(Square::A1), None);
+        assert_eq!(board.piece_on(Square::A8), Some(Piece::WHITE_QUEEN));
+    }
+
+    #[test]
+    fn make_move_promotion() {
+        let mut board = Board::empty();
+        board.put_piece_on(Piece::WHITE_PAWN, Square::A7);
+
+        board.make_move(
+            Color::White,
+            Move::Standard {
+                from: Square::A7,
+                to: Square::A8,
+                role: Role::Pawn,
+                capture: None,
+                promotion: Some(Role::Queen),
+                en_passant_square: None,
+            },
+        );
+
+        assert_eq!(board.piece_on(Square::A7), None);
         assert_eq!(board.piece_on(Square::A8), Some(Piece::WHITE_QUEEN));
     }
 
@@ -567,6 +606,27 @@ mod tests {
 
         assert_eq!(board.piece_on(Square::A8), Some(Piece::BLACK_QUEEN));
         assert_eq!(board.piece_on(Square::A1), Some(Piece::WHITE_QUEEN));
+    }
+
+    #[test]
+    fn unmake_move_promotion() {
+        let mut board = Board::empty();
+        board.put_piece_on(Piece::WHITE_QUEEN, Square::A8);
+
+        board.unmake_move(
+            Color::White,
+            Move::Standard {
+                from: Square::A7,
+                to: Square::A8,
+                role: Role::Pawn,
+                capture: None,
+                promotion: Some(Role::Queen),
+                en_passant_square: None,
+            },
+        );
+
+        assert_eq!(board.piece_on(Square::A7), Some(Piece::WHITE_PAWN));
+        assert_eq!(board.piece_on(Square::A8), None);
     }
 
     #[test]

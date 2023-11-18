@@ -73,14 +73,7 @@ impl Piece {
 
 impl Display for Piece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let role = match self.role {
-            Role::Pawn => "p",
-            Role::Knight => "n",
-            Role::Bishop => "b",
-            Role::Rook => "r",
-            Role::Queen => "q",
-            Role::King => "k",
-        };
+        let role = self.role.to_string();
 
         match self.color {
             Color::White => write!(f, "{}", role.to_uppercase()),

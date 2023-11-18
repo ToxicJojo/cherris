@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Not, Shl, Shr};
 
-use crate::{File, Rank, Square};
+use crate::{Color, File, Rank, Square};
 
 /// A bitboard where each bit represents a square on a chess board.
 #[derive(Clone, Copy, PartialEq)]
@@ -15,6 +15,10 @@ impl Bitboard {
     pub const SECOND_RANK: Bitboard = Bitboard(0x000000000000FF00);
     pub const THIRD_RANK: Bitboard = Bitboard(0x0000000000FF0000);
     pub const SEVENTH_RANK: Bitboard = Bitboard(0x00FF000000000000);
+    pub const EIGTH_RANK: Bitboard = Bitboard(0xFF00000000000000);
+
+    pub const PROMOTION_RANK: [Bitboard; Color::COUNT] =
+        [Bitboard::EIGTH_RANK, Bitboard::FIRST_RANK];
 
     pub const fn new(value: u64) -> Bitboard {
         Bitboard(value)
@@ -23,6 +27,11 @@ impl Bitboard {
     /// Determines whether the bitboard is empty or not.
     pub fn is_empty(&self) -> bool {
         self.0 == 0
+    }
+
+    /// Determines the total amount of occupied squares on this bitboard.
+    pub fn population_count(&self) -> u32 {
+        self.0.count_ones()
     }
 }
 
@@ -171,5 +180,19 @@ mod tests {
         assert_eq!(iter.next(), Some(Square::A1));
         assert_eq!(iter.next(), Some(Square::H8));
         assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    fn population_count_empty() {
+        let pop_count = Bitboard::EMPTY.population_count();
+
+        assert_eq!(pop_count, 0);
+    }
+
+    #[test]
+    fn population_count_full() {
+        let pop_count = Bitboard::FULL.population_count();
+
+        assert_eq!(pop_count, 64);
     }
 }

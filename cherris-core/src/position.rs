@@ -15,7 +15,6 @@ pub struct Position {
 impl Position {
     pub fn make_move(&mut self, chess_move: Move) {
         self.board.make_move(self.color_to_move, chess_move);
-        self.color_to_move = !self.color_to_move;
 
         self.en_passant_square = match chess_move {
             Move::Standard {
@@ -24,7 +23,7 @@ impl Position {
             _ => None,
         };
 
-        if self.color_to_move == Color::White {
+        if self.color_to_move == Color::Black {
             self.fullmove_number += 1;
         }
 
@@ -33,6 +32,83 @@ impl Position {
                 self.halfmove_clock += 1;
             }
         }
+
+        self.castling_rights[self.color_to_move.to_index()] = match chess_move {
+            Move::Standard { from, role, .. } => {
+                if role == Role::King {
+                    self.castling_rights[self.color_to_move.to_index()] = CastlingRights::NoSide;
+                }
+                if role == Role::Rook {
+                    match self.color_to_move {
+                        Color::White => {
+                            if from == Square::A1 {
+                                self.castling_rights[self.color_to_move.to_index()]
+                                    .remove_queen_side();
+                            }
+
+                            if from == Square::H1 {
+                                self.castling_rights[self.color_to_move.to_index()]
+                                    .remove_king_side();
+                            }
+                        }
+                        Color::Black => {
+                            if from == Square::A8 {
+                                self.castling_rights[self.color_to_move.to_index()]
+                                    .remove_queen_side();
+                            }
+
+                            if from == Square::H8 {
+                                self.castling_rights[self.color_to_move.to_index()]
+                                    .remove_king_side();
+                            }
+                        }
+                    }
+                };
+
+                self.castling_rights[self.color_to_move.to_index()]
+            }
+            Move::EnPassant { .. } => self.castling_rights[self.color_to_move.to_index()],
+            Move::CastleLong => CastlingRights::NoSide,
+            Move::CastleShort => CastlingRights::NoSide,
+        };
+
+        if let Move::Standard {
+            to,
+            capture: Some(role),
+            ..
+        } = chess_move
+        {
+            if role == Role::Rook {
+                match !self.color_to_move {
+                    Color::White => {
+                        if to == Square::A1 {
+                            self.castling_rights[(!self.color_to_move).to_index()]
+                                .remove_queen_side();
+                        }
+
+                        if to == Square::H1 {
+                            self.castling_rights[(!self.color_to_move).to_index()]
+                                .remove_king_side();
+                        }
+                    }
+                    Color::Black => {
+                        if to == Square::A8 {
+                            println!("Removing queenside caslint rights");
+                            self.castling_rights[(!self.color_to_move).to_index()]
+                                .remove_queen_side();
+                        }
+
+                        if to == Square::H8 {
+                            println!("Removing kingside caslint rights");
+                            self.castling_rights[(!self.color_to_move).to_index()]
+                                .remove_king_side();
+                        }
+                    }
+                }
+            }
+        }
+
+        self.color_to_move = !self.color_to_move;
     }
 
     pub fn unmake_move(&mut self, chess_move: Move) {
