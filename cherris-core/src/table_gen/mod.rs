@@ -4,8 +4,8 @@ pub use knights::*;
 mod king;
 pub use king::*;
 
-mod attacks;
-pub use attacks::*;
+mod sliders;
+pub use sliders::*;
 
 mod pawns;
 pub use pawns::*;

@@ -42,3 +42,6 @@ pub use crate::move_generator::*;
 
 mod rays;
 pub use crate::rays::*;
+
+mod attacks;
+pub use crate::attacks::*;
