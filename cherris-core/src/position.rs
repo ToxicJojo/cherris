@@ -218,7 +218,11 @@ impl FromStr for Position {
             file = file.right();
         }
 
-        let board = Board { role, color };
+        let board = Board {
+            role,
+            color,
+            occupied: color[Color::White] | color[Color::Black],
+        };
 
         let color_to_move = Color::from_str(color_to_move)?;
 

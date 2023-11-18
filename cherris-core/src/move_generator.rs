@@ -5,8 +5,8 @@ use crate::{
 
 pub fn generate_moves(position: &Position) -> Vec<Move> {
     let mut moves = Vec::with_capacity(256);
-    let blockers = position.board.color[Color::White] | position.board.color[Color::Black];
-    let empty = !(position.board.color[Color::White] | position.board.color[Color::Black]);
+    let blockers = position.board.occupied;
+    let empty = !blockers;
 
     let attacked_squares = position.board.attacked_sqaures(!position.color_to_move);
     let check_mask = position.board.check_mask(position.color_to_move);
@@ -277,18 +277,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         attacks &= !position.board.color[position.color_to_move];
         attacks &= !attacked_squares;
 
-        for to in attacks {
-            let mv = Move::Standard {
-                role: Role::King,
-                from,
-                to,
-                capture: position.board.piece_on(to).map(|piece| piece.role),
-                promotion: None,
-                en_passant_square: None,
-            };
-
-            moves.push(mv);
-        }
+        add_attacks(attacks, from, Role::King, position, &mut moves);
     }
 
     let knights = position.board.role[Role::Knight] & position.board.color[position.color_to_move];
@@ -298,18 +287,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         let mut attacks = knight_attacks(from);
         attacks &= !position.board.color[position.color_to_move] & check_mask;
 
-        for to in attacks {
-            let mv = Move::Standard {
-                role: Role::Knight,
-                from,
-                to,
-                capture: position.board.piece_on(to).map(|piece| piece.role),
-                promotion: None,
-                en_passant_square: None,
-            };
-
-            moves.push(mv);
-        }
+        add_attacks(attacks, from, Role::Knight, position, &mut moves);
     }
 
     let rooks = position.board.role[Role::Rook] & position.board.color[position.color_to_move];
@@ -321,18 +299,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         let mut attacks = rook_attacks(from, blockers);
         attacks &= !position.board.color[position.color_to_move] & check_mask;
 
-        for to in attacks {
-            let mv = Move::Standard {
-                role: Role::Rook,
-                from,
-                to,
-                capture: position.board.piece_on(to).map(|piece| piece.role),
-                promotion: None,
-                en_passant_square: None,
-            };
-
-            moves.push(mv);
-        }
+        add_attacks(attacks, from, Role::Rook, position, &mut moves);
     }
 
     for from in rooks_pinned {
@@ -340,18 +307,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         attacks &= !position.board.color[position.color_to_move] & check_mask;
         attacks &= hv_pins;
 
-        for to in attacks {
-            let mv = Move::Standard {
-                role: Role::Rook,
-                from,
-                to,
-                capture: position.board.piece_on(to).map(|piece| piece.role),
-                promotion: None,
-                en_passant_square: None,
-            };
-
-            moves.push(mv);
-        }
+        add_attacks(attacks, from, Role::Rook, position, &mut moves);
     }
 
     let bishops = position.board.role[Role::Bishop] & position.board.color[position.color_to_move];
@@ -363,18 +319,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         let mut attacks = bishop_attacks(from, blockers);
         attacks &= !position.board.color[position.color_to_move] & check_mask;
 
-        for to in attacks {
-            let mv = Move::Standard {
-                role: Role::Bishop,
-                from,
-                to,
-                capture: position.board.piece_on(to).map(|piece| piece.role),
-                promotion: None,
-                en_passant_square: None,
-            };
-
-            moves.push(mv);
-        }
+        add_attacks(attacks, from, Role::Bishop, position, &mut moves);
     }
 
     for from in bishops_pinned {
@@ -382,18 +327,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         attacks &= !position.board.color[position.color_to_move] & check_mask;
         attacks &= diag_ping;
 
-        for to in attacks {
-            let mv = Move::Standard {
-                role: Role::Bishop,
-                from,
-                to,
-                capture: position.board.piece_on(to).map(|piece| piece.role),
-                promotion: None,
-                en_passant_square: None,
-            };
-
-            moves.push(mv);
-        }
+        add_attacks(attacks, from, Role::Bishop, position, &mut moves);
     }
 
     let queens = position.board.role[Role::Queen] & position.board.color[position.color_to_move];
@@ -405,54 +339,21 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
         let mut attacks = queen_attacks(from, blockers);
         attacks &= !position.board.color[position.color_to_move] & check_mask;
 
-        for to in attacks {
-            let mv = Move::Standard {
-                role: Role::Queen,
-                from,
-                to,
-                capture: position.board.piece_on(to).map(|piece| piece.role),
-                promotion: None,
-                en_passant_square: None,
-            };
-
-            moves.push(mv);
-        }
+        add_attacks(attacks, from, Role::Queen, position, &mut moves);
     }
 
     for from in queens_pinned_diag {
         let mut attacks = queen_attacks(from, blockers);
         attacks &= !position.board.color[position.color_to_move] & check_mask & diag_ping;
 
-        for to in attacks {
-            let mv = Move::Standard {
-                role: Role::Queen,
-                from,
-                to,
-                capture: position.board.piece_on(to).map(|piece| piece.role),
-                promotion: None,
-                en_passant_square: None,
-            };
-
-            moves.push(mv);
-        }
+        add_attacks(attacks, from, Role::Queen, position, &mut moves);
     }
 
     for from in queens_pinned_hv {
         let mut attacks = queen_attacks(from, blockers);
         attacks &= !position.board.color[position.color_to_move] & check_mask & hv_pins;
 
-        for to in attacks {
-            let mv = Move::Standard {
-                role: Role::Queen,
-                from,
-                to,
-                capture: position.board.piece_on(to).map(|piece| piece.role),
-                promotion: None,
-                en_passant_square: None,
-            };
-
-            moves.push(mv);
-        }
+        add_attacks(attacks, from, Role::Queen, position, &mut moves);
     }
 
     let castle_path_short = match position.color_to_move {
@@ -505,6 +406,27 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
     }
 
     moves
+}
+
+fn add_attacks(
+    attacks: Bitboard,
+    from: Square,
+    role: Role,
+    position: &Position,
+    moves: &mut Vec<Move>,
+) {
+    for to in attacks {
+        let mv = Move::Standard {
+            role,
+            from,
+            to,
+            capture: position.board.piece_on(to).map(|piece| piece.role),
+            promotion: None,
+            en_passant_square: None,
+        };
+
+        moves.push(mv);
+    }
 }
 
 fn generate_promotion_move(from: Square, to: Square, position: &Position, moves: &mut Vec<Move>) {

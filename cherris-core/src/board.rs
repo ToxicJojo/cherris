@@ -9,6 +9,7 @@ use crate::{
 pub struct Board {
     pub role: [Bitboard; Role::COUNT],
     pub color: [Bitboard; Color::COUNT],
+    pub occupied: Bitboard,
 }
 
 impl Board {
@@ -16,6 +17,7 @@ impl Board {
     pub const EMPTY: Board = Board {
         role: [Bitboard::EMPTY; Role::COUNT],
         color: [Bitboard::EMPTY; Color::COUNT],
+        occupied: Bitboard::EMPTY,
     };
 
     /// Return the `Role` on a given `Sqaure`.
@@ -147,6 +149,8 @@ impl Board {
                 }
             },
         }
+
+        self.occupied = self.color[Color::White] | self.color[Color::Black];
     }
 
     /// Reverts a move for a color.
@@ -228,6 +232,8 @@ impl Board {
                 }
             },
         }
+
+        self.occupied = self.color[Color::White] | self.color[Color::Black];
     }
 
     pub fn attacks_on_square(&self, square: Square, color: Color) -> bool {
@@ -238,7 +244,7 @@ impl Board {
             return true;
         }
 
-        let blocker = self.color[Color::White] | self.color[Color::Black];
+        let blocker = self.occupied;
         let bishops_queens = (self.role[Role::Bishop] | self.role[Role::Queen]) & self.color[color];
         let bishop_queen_attacks = bishop_attacks(square, blocker);
         if !(bishop_queen_attacks & bishops_queens).is_empty() {
@@ -262,8 +268,7 @@ impl Board {
 
     pub fn attacked_sqaures(&self, color: Color) -> Bitboard {
         let mut attacks = Bitboard::EMPTY;
-        let blocker = (self.color[Color::White] | self.color[Color::Black])
-            ^ (self.color[!color] & self.role[Role::King]);
+        let blocker = self.occupied ^ (self.color[!color] & self.role[Role::King]);
 
         let kings = self.role[Role::King] & self.color[color];
         for from in kings {
@@ -303,7 +308,7 @@ impl Board {
         let kings = self.role[Role::King] & self.color[color];
         let king_sqaure = Square(kings.0.trailing_zeros() as u8);
 
-        let blocker = self.color[Color::White] | self.color[Color::Black];
+        let blocker = self.occupied;
 
         let rook_queens = (self.role[Role::Rook] | self.role[Role::Queen]) & self.color[!color];
         let attackers = rook_attacks(king_sqaure, blocker) & rook_queens;
@@ -341,7 +346,7 @@ impl Board {
 
     pub fn horizontal_vertical_pinmask(&self, square: Square, color: Color) -> Bitboard {
         let mut pin_mask = Bitboard::EMPTY;
-        let blocker = self.color[Color::White] | self.color[Color::Black];
+        let blocker = self.occupied;
         let rook_queens = (self.role[Role::Rook] | self.role[Role::Queen]) & self.color[color];
         let pinners = rook_xray_attacks(square, blocker) & rook_queens;
         for pinner in pinners {
@@ -353,7 +358,7 @@ impl Board {
 
     pub fn diagonal_pinmask(&self, square: Square, color: Color) -> Bitboard {
         let mut pin_mask = Bitboard::EMPTY;
-        let blocker = self.color[Color::White] | self.color[Color::Black];
+        let blocker = self.occupied;
         let bishops_queens = (self.role[Role::Bishop] | self.role[Role::Queen]) & self.color[color];
         let pinners = bishop_xray_attacks(square, blocker) & bishops_queens;
         for pinner in pinners {
@@ -361,10 +366,6 @@ impl Board {
         }
 
         pin_mask
-    }
-
-    pub fn occupied(&self) -> Bitboard {
-        self.color[Color::White] | self.color[Color::Black]
     }
 }
 

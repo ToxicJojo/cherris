@@ -10,7 +10,7 @@ fn main() {
 
     divide(1, &mut position);
     let before = Instant::now();
-    let p = perft(3, &mut position);
+    let p = perft(6, &mut position);
     println!("Elapsed time: {:.2?}", before.elapsed());
     println!("Nodes: {}", p);
 }
