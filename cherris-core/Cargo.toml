@@ -7,3 +7,13 @@ edition = "2021"
 
 [dependencies]
 
+[dev-dependencies]
+criterion = "0.5.1"
+
+[profile.release]
+codegen-units = 1
+
+[[bench]]
+name = "perft"
+harness = false
+

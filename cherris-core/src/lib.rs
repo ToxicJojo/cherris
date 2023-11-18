@@ -45,3 +45,6 @@ pub use crate::rays::*;
 
 mod attacks;
 pub use crate::attacks::*;
+
+mod perft;
+pub use crate::perft::*;

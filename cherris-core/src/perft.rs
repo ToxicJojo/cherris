@@ -1,47 +1,29 @@
-use std::{str::FromStr, time::Instant};
+use crate::{generate_moves, Position};
 
-use cherris_core::{generate_lookup_tables, generate_moves, perft, Position};
-
-fn main() {
-    generate_lookup_tables();
-
-    let mut position =
-        Position::from_str("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1").unwrap();
-
-    divide(1, &mut position);
-    let before = Instant::now();
-    let p = perft(6, &mut position);
-    println!("Elapsed time: {:.2?}", before.elapsed());
-    println!("Nodes: {}", p);
-}
-
-fn divide(depth: u64, position: &mut Position) {
+pub fn perft(depth: u64, position: &mut Position) -> u64 {
+    let mut nodes = 0;
     let moves = generate_moves(position);
-    let mut total = 0;
 
-    for mv in moves {
-        if depth == 1 {
-            println!("{}: {}", mv, 1);
-            total += 1;
-        } else {
+    if depth == 1 {
+        moves.len() as u64
+    } else {
+        for mv in moves {
             let castling_rights = position.castling_rights;
             position.make_move(mv);
-            let nodes = perft(depth - 1, position);
-            total += nodes;
+            nodes += perft(depth - 1, position);
             position.unmake_move(mv);
             position.castling_rights = castling_rights;
-            println!("{}: {}", mv, nodes);
         }
-    }
 
-    println!("Total: {}", total);
+        nodes
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use cherris_core::perft;
-
     use super::*;
+    use crate::generate_lookup_tables;
+    use std::str::FromStr;
 
     #[test]
     fn perft_starting_pos() {
