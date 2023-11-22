@@ -1,21 +1,6 @@
-use std::{str::FromStr, time::Instant};
+use crate::{generate_moves, perft, Position};
 
-use cherris_core::{generate_lookup_tables, generate_moves, perft, Position};
-
-fn main() {
-    generate_lookup_tables();
-
-    let mut position =
-        Position::from_str("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1").unwrap();
-
-    divide(1, &mut position);
-    let before = Instant::now();
-    let p = perft(6, &mut position);
-    println!("Elapsed time: {:.2?}", before.elapsed());
-    println!("Nodes: {}", p);
-}
-
-fn divide(depth: u64, position: &mut Position) {
+pub fn divide(depth: u64, position: &mut Position) {
     let moves = generate_moves(position);
     let mut total = 0;
 

@@ -1,6 +1,8 @@
 use std::str::FromStr;
 
-use crate::{Bitboard, Board, CastlingRights, Color, Error, File, Move, Rank, Role, Square};
+use crate::{
+    generate_moves, Bitboard, Board, CastlingRights, Color, Error, File, Move, Rank, Role, Square,
+};
 
 /// Represents a chess position.
 pub struct Position {
@@ -124,6 +126,10 @@ impl Position {
                 self.halfmove_clock -= 1;
             }
         }
+    }
+
+    pub fn legal_moves(&self) -> Vec<Move> {
+        generate_moves(self)
     }
 }
 

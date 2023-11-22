@@ -48,3 +48,9 @@ pub use crate::attacks::*;
 
 mod perft;
 pub use crate::perft::*;
+
+mod game;
+pub use crate::game::*;
+
+mod divide;
+pub use crate::divide::*;
