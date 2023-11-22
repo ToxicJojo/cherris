@@ -36,7 +36,8 @@ impl Role {
         Role::ALL.iter()
     }
 
-    /// Converts a `Piece` to a `usize`.
+    /// Converts a `Role` to a `usize`.
+    #[inline]
     pub fn to_index(&self) -> usize {
         *self as usize
     }

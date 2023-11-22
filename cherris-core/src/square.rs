@@ -24,6 +24,7 @@ impl Square {
     ];
 
     /// Converts a `Square` to a `usize`.
+    #[inline]
     pub const fn to_index(&self) -> usize {
         self.0 as usize
     }

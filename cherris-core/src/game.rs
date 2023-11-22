@@ -1,5 +1,7 @@
 use std::str::FromStr;
 
+use arrayvec::ArrayVec;
+
 use crate::{Color, Move, Position};
 
 pub struct Game {
@@ -20,11 +22,17 @@ impl Game {
         self.position.color_to_move
     }
 
-    pub fn legal_moves(&self) -> Vec<Move> {
+    pub fn legal_moves(&self) -> ArrayVec<Move, 256> {
         self.position.legal_moves()
     }
 
     pub fn make_move(&mut self, chess_move: Move) {
         self.position.make_move(chess_move);
+    }
+}
+
+impl Default for Game {
+    fn default() -> Self {
+        Self::new()
     }
 }

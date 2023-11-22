@@ -26,6 +26,7 @@ impl Color {
     }
 
     /// Converts the `Color` to a usize.
+    #[inline]
     pub fn to_index(&self) -> usize {
         *self as usize
     }

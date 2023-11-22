@@ -1,10 +1,12 @@
+use arrayvec::ArrayVec;
+
 use crate::{
     bishop_attacks, king_attacks, knight_attacks, pawn_attacks, queen_attacks, rook_attacks,
     Bitboard, CastlingRights, Color, Move, Position, Role, Square,
 };
 
-pub fn generate_moves(position: &Position) -> Vec<Move> {
-    let mut moves = Vec::with_capacity(256);
+pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
+    let mut moves = ArrayVec::<Move, 256>::new();
     let blockers = position.board.occupied;
     let empty = !blockers;
 
@@ -60,7 +62,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
                     role: Role::Pawn,
                     from,
                     to,
-                    capture: position.board.piece_on(to).map(|piece| piece.role),
+                    capture: position.board.role_on(to),
                     promotion: None,
                     en_passant_square: None,
                 };
@@ -108,7 +110,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
                     role: Role::Pawn,
                     from,
                     to,
-                    capture: position.board.piece_on(to).map(|piece| piece.role),
+                    capture: position.board.role_on(to),
                     promotion: None,
                     en_passant_square: None,
                 };
@@ -162,7 +164,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
                     role: Role::Pawn,
                     from,
                     to,
-                    capture: position.board.piece_on(to).map(|piece| piece.role),
+                    capture: position.board.role_on(to),
                     promotion: None,
                     en_passant_square: None,
                 };
@@ -193,7 +195,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
                     role: Role::Pawn,
                     from,
                     to,
-                    capture: position.board.piece_on(to).map(|piece| piece.role),
+                    capture: position.board.role_on(to),
                     promotion: None,
                     en_passant_square: None,
                 };
@@ -227,7 +229,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
                 role: Role::Pawn,
                 from,
                 to,
-                capture: position.board.piece_on(to).map(|piece| piece.role),
+                capture: position.board.role_on(to),
                 promotion: None,
                 en_passant_square: Some(Square::ALL[en_passant]),
             };
@@ -261,7 +263,7 @@ pub fn generate_moves(position: &Position) -> Vec<Move> {
                 role: Role::Pawn,
                 from,
                 to,
-                capture: position.board.piece_on(to).map(|piece| piece.role),
+                capture: position.board.role_on(to),
                 promotion: None,
                 en_passant_square: Some(Square::ALL[en_passant]),
             };
@@ -413,14 +415,14 @@ fn add_attacks(
     from: Square,
     role: Role,
     position: &Position,
-    moves: &mut Vec<Move>,
+    moves: &mut ArrayVec<Move, 256>,
 ) {
     for to in attacks {
         let mv = Move::Standard {
             role,
             from,
             to,
-            capture: position.board.piece_on(to).map(|piece| piece.role),
+            capture: position.board.role_on(to),
             promotion: None,
             en_passant_square: None,
         };
@@ -429,13 +431,18 @@ fn add_attacks(
     }
 }
 
-fn generate_promotion_move(from: Square, to: Square, position: &Position, moves: &mut Vec<Move>) {
+fn generate_promotion_move(
+    from: Square,
+    to: Square,
+    position: &Position,
+    moves: &mut ArrayVec<Move, 256>,
+) {
     for role in Role::iter().skip(1).take(4) {
         let mv = Move::Standard {
             role: Role::Pawn,
             from,
             to,
-            capture: position.board.piece_on(to).map(|piece| piece.role),
+            capture: position.board.role_on(to),
             promotion: Some(*role),
             en_passant_square: None,
         };

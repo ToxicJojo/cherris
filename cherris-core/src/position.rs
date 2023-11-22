@@ -1,5 +1,7 @@
 use std::str::FromStr;
 
+use arrayvec::ArrayVec;
+
 use crate::{
     generate_moves, Bitboard, Board, CastlingRights, Color, Error, File, Move, Rank, Role, Square,
 };
@@ -128,7 +130,7 @@ impl Position {
         }
     }
 
-    pub fn legal_moves(&self) -> Vec<Move> {
+    pub fn legal_moves(&self) -> ArrayVec<Move, 256> {
         generate_moves(self)
     }
 }
