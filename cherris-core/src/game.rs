@@ -29,6 +29,10 @@ impl Game {
     pub fn make_move(&mut self, chess_move: Move) {
         self.position.make_move(chess_move);
     }
+
+    pub fn position(&self) -> &Position {
+        &self.position
+    }
 }
 
 impl Default for Game {
