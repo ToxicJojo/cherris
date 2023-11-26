@@ -45,5 +45,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Run tests
-      run: RUST_MIN_STACK=8388608 cargo test --verbose
+      run: |
+        sudo apt install libsdl2-dev libsdl2-image-dev
+        RUST_MIN_STACK=8388608 cargo test --verbose
   
