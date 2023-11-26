@@ -16,8 +16,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build
-      run: sudo apt install libsdl2-dev libsdl2-image-dev
-      run: cargo build --verbose
+      run: |
+        sudo apt install libsdl2-dev libsdl2-image-dev
+        cargo build --verbose
 
   formatter:
     runs-on: ubuntu-latest
