@@ -30,6 +30,7 @@ impl Square {
     }
 
     /// Returns an iterator over all sqaures starting from A1 going file by file up to H8.
+    #[inline]
     pub fn iter() -> Iter<'static, Square> {
         Square::ALL.iter()
     }
@@ -127,6 +128,7 @@ impl From<&Square> for (File, Rank) {
 impl Index<Square> for [Bitboard; Square::COUNT] {
     type Output = Bitboard;
 
+    #[inline]
     fn index(&self, index: Square) -> &Self::Output {
         &self[index.to_index()]
     }
@@ -135,6 +137,7 @@ impl Index<Square> for [Bitboard; Square::COUNT] {
 impl Index<Square> for [u64; Square::COUNT] {
     type Output = u64;
 
+    #[inline]
     fn index(&self, index: Square) -> &Self::Output {
         &self[index.to_index()]
     }

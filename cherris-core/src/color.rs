@@ -21,6 +21,7 @@ impl Color {
     pub const ALL: [Color; Color::COUNT] = [Color::White, Color::Black];
 
     /// An iterator over all colors starting with white.
+    #[inline]
     pub fn iter() -> Iter<'static, Color> {
         Color::ALL.iter()
     }
@@ -35,12 +36,14 @@ impl Color {
 impl Index<Color> for [Bitboard; Color::COUNT] {
     type Output = Bitboard;
 
+    #[inline]
     fn index(&self, index: Color) -> &Self::Output {
         &self[index.to_index()]
     }
 }
 
 impl IndexMut<Color> for [Bitboard; Color::COUNT] {
+    #[inline]
     fn index_mut(&mut self, index: Color) -> &mut Self::Output {
         &mut self[index.to_index()]
     }
@@ -49,6 +52,7 @@ impl IndexMut<Color> for [Bitboard; Color::COUNT] {
 impl Not for Color {
     type Output = Color;
 
+    #[inline]
     fn not(self) -> Self::Output {
         match self {
             Color::White => Color::Black,

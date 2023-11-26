@@ -146,17 +146,8 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
 
     for from in pawns_forward_unpinned {
         let attacks = match position.color_to_move {
-            Color::White => {
-                Bitboard::from(from) << 8
-                //let next = from.to_index() + 8;
-
-                //Bitboard(1 << next)
-            }
-            Color::Black => {
-                Bitboard::from(from) >> 8
-                //let next = from.to_index() as i64 - 8;
-                //Bitboard(1 << next)
-            }
+            Color::White => Bitboard::from(from) << 8,
+            Color::Black => Bitboard::from(from) >> 8,
         } & check_mask;
 
         for to in attacks {
@@ -179,14 +170,8 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
 
     for from in pawns_forward_pinned {
         let attacks = match position.color_to_move {
-            Color::White => {
-                let next = from.to_index() + 8;
-                Bitboard(1 << next)
-            }
-            Color::Black => {
-                let next = from.to_index() as i64 - 8;
-                Bitboard(1 << next)
-            }
+            Color::White => Bitboard::from(from) << 8,
+            Color::Black => Bitboard::from(from) >> 8,
         } & check_mask
             & hv_pins;
 
@@ -210,16 +195,8 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
 
     for from in pawns_push_unpinned {
         let attacks = match position.color_to_move {
-            Color::White => {
-                let next = from.to_index() + 16;
-
-                Bitboard(1 << next)
-            }
-            Color::Black => {
-                let next = from.to_index() as i64 - 16;
-
-                Bitboard(1 << next)
-            }
+            Color::White => Bitboard::from(from) << 16,
+            Color::Black => Bitboard::from(from) >> 16,
         } & check_mask;
 
         let en_passant = match position.color_to_move {
@@ -243,16 +220,8 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
 
     for from in pawns_push_pinned {
         let attacks = match position.color_to_move {
-            Color::White => {
-                let next = from.to_index() + 16;
-
-                Bitboard(1 << next)
-            }
-            Color::Black => {
-                let next = from.to_index() as i64 - 16;
-
-                Bitboard(1 << next)
-            }
+            Color::White => Bitboard::from(from) << 16,
+            Color::Black => Bitboard::from(from) >> 16,
         } & check_mask
             & hv_pins;
 
