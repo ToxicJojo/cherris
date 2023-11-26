@@ -236,36 +236,6 @@ impl Board {
         self.occupied = self.color[Color::White] | self.color[Color::Black];
     }
 
-    pub fn attacks_on_square(&self, square: Square, color: Color) -> bool {
-        let knights = self.role[Role::Knight] & self.color[color];
-        let knight_attacks = knight_attacks(square);
-
-        if !(knight_attacks & knights).is_empty() {
-            return true;
-        }
-
-        let blocker = self.occupied;
-        let bishops_queens = (self.role[Role::Bishop] | self.role[Role::Queen]) & self.color[color];
-        let bishop_queen_attacks = bishop_attacks(square, blocker);
-        if !(bishop_queen_attacks & bishops_queens).is_empty() {
-            return true;
-        }
-
-        let rook_queens = (self.role[Role::Rook] | self.role[Role::Queen]) & self.color[color];
-        let rook_queen_attacks = rook_attacks(square, blocker);
-        if !(rook_queen_attacks & rook_queens).is_empty() {
-            return true;
-        }
-
-        let pawns = self.role[Role::Pawn] & self.color[color];
-        let pawn_attacks = pawn_attacks(square, !color);
-        if !(pawn_attacks & pawns).is_empty() {
-            return true;
-        }
-
-        false
-    }
-
     pub fn attacked_sqaures(&self, color: Color) -> Bitboard {
         let mut attacks = Bitboard::EMPTY;
         let blocker = self.occupied ^ (self.color[!color] & self.role[Role::King]);
