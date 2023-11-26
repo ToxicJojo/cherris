@@ -1,7 +1,7 @@
 use std::str::FromStr;
-use std::{fmt::Display, slice::Iter};
+use std::{fmt::Display, ops::Index, slice::Iter};
 
-use crate::{Error, File, Rank};
+use crate::{Bitboard, Error, File, Rank};
 
 /// Represents a single sqaure on a chess board.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -121,6 +121,22 @@ impl From<&Square> for (File, Rank) {
         let rank = value.0 / 8;
 
         (File::from_index(file.into()), Rank::from_index(rank.into()))
+    }
+}
+
+impl Index<Square> for [Bitboard; Square::COUNT] {
+    type Output = Bitboard;
+
+    fn index(&self, index: Square) -> &Self::Output {
+        &self[index.to_index()]
+    }
+}
+
+impl Index<Square> for [u64; Square::COUNT] {
+    type Output = u64;
+
+    fn index(&self, index: Square) -> &Self::Output {
+        &self[index.to_index()]
     }
 }
 
