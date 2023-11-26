@@ -54,3 +54,6 @@ pub use crate::game::*;
 
 mod divide;
 pub use crate::divide::*;
+
+mod game_action;
+pub use crate::game_action::*;
