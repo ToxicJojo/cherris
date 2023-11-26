@@ -7,6 +7,7 @@ use crate::{
 
 pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
     let mut moves = ArrayVec::<Move, 256>::new();
+
     let blockers = position.board.occupied;
     let empty = !blockers;
 
@@ -25,7 +26,7 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
     let pawns = position.board.role[Role::Pawn] & position.board.color[position.color_to_move];
     let pawns_attack = pawns & !hv_pins;
     let pawns_pinned_diag = pawns_attack & diag_ping;
-    let pawns_attack_unpinned = pawns_attack & !pawns_pinned_diag;
+    let pawns_attack_unpinned = pawns_attack ^ pawns_pinned_diag;
 
     let pawns_walk = pawns & !diag_ping;
     let pawns_forward = match position.color_to_move {
@@ -34,7 +35,16 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
     };
     let pawns_pinned_hv = pawns_forward & hv_pins;
     let pawns_forward_pinned = pawns_forward & pawns_pinned_hv;
-    let pawns_forward_unpinned = pawns_forward & !pawns_forward_pinned;
+    let pawns_forward_unpinned = pawns_forward ^ pawns_forward_pinned;
+
+    let pawns_fw = match position.color_to_move {
+        Color::White => (pawns_forward_unpinned << 8) | (pawns_forward_pinned << 8 & hv_pins),
+        Color::Black => (pawns_forward_unpinned >> 8) | (pawns_forward_pinned >> 8 & hv_pins),
+    } & empty
+        & check_mask;
+
+    let pawns_fw_promotion = pawns_fw & Bitboard::PROMOTION_RANK[position.color_to_move];
+    let pawns_fw_no_promotion = pawns_fw & !Bitboard::PROMOTION_RANK[position.color_to_move];
 
     let pawns_push = match position.color_to_move {
         Color::White => pawns_forward & Bitboard::SECOND_RANK & (empty >> 16),
@@ -42,7 +52,12 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
     };
 
     let pawns_push_pinned = pawns_push & pawns_pinned_hv;
-    let pawns_push_unpinned = pawns_push & !pawns_push_pinned;
+    let pawns_push_unpinned = pawns_push ^ pawns_push_pinned;
+    let pawns_push = match position.color_to_move {
+        Color::White => (pawns_push_unpinned << 16) | (pawns_push_pinned << 16 & hv_pins),
+        Color::Black => (pawns_push_unpinned >> 16) | (pawns_push_pinned >> 16 & hv_pins),
+    } & empty
+        & check_mask;
 
     let en_passant_bb = position
         .en_passant_square
@@ -144,104 +159,54 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
         }
     }
 
-    for from in pawns_forward_unpinned {
-        let attacks = match position.color_to_move {
-            Color::White => Bitboard::from(from) << 8,
-            Color::Black => Bitboard::from(from) >> 8,
-        } & check_mask;
-
-        for to in attacks {
-            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move]).is_empty() {
-                generate_promotion_move(from, to, position, &mut moves)
-            } else {
-                let mv = Move::Standard {
-                    role: Role::Pawn,
-                    from,
-                    to,
-                    capture: position.board.role_on(to),
-                    promotion: None,
-                    en_passant_square: None,
-                };
-
-                moves.push(mv);
-            }
-        }
-    }
-
-    for from in pawns_forward_pinned {
-        let attacks = match position.color_to_move {
-            Color::White => Bitboard::from(from) << 8,
-            Color::Black => Bitboard::from(from) >> 8,
-        } & check_mask
-            & hv_pins;
-
-        for to in attacks {
-            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move]).is_empty() {
-                generate_promotion_move(from, to, position, &mut moves)
-            } else {
-                let mv = Move::Standard {
-                    role: Role::Pawn,
-                    from,
-                    to,
-                    capture: position.board.role_on(to),
-                    promotion: None,
-                    en_passant_square: None,
-                };
-
-                moves.push(mv);
-            }
-        }
-    }
-
-    for from in pawns_push_unpinned {
-        let attacks = match position.color_to_move {
-            Color::White => Bitboard::from(from) << 16,
-            Color::Black => Bitboard::from(from) >> 16,
-        } & check_mask;
-
-        let en_passant = match position.color_to_move {
-            Color::White => from.to_index() + 8,
-            Color::Black => from.to_index() - 8,
+    for to in pawns_fw_no_promotion {
+        let from = match position.color_to_move {
+            Color::White => Square(to.to_index() as u8 - 8),
+            Color::Black => Square(to.to_index() as u8 + 8),
         };
 
-        for to in attacks {
-            let mv = Move::Standard {
-                role: Role::Pawn,
-                from,
-                to,
-                capture: position.board.role_on(to),
-                promotion: None,
-                en_passant_square: Some(Square::ALL[en_passant]),
-            };
-
-            moves.push(mv);
-        }
-    }
-
-    for from in pawns_push_pinned {
-        let attacks = match position.color_to_move {
-            Color::White => Bitboard::from(from) << 16,
-            Color::Black => Bitboard::from(from) >> 16,
-        } & check_mask
-            & hv_pins;
-
-        let en_passant = match position.color_to_move {
-            Color::White => from.to_index() + 8,
-            Color::Black => from.to_index() - 8,
+        let mv = Move::Standard {
+            role: Role::Pawn,
+            from,
+            to,
+            capture: position.board.role_on(to),
+            promotion: None,
+            en_passant_square: None,
         };
 
-        for to in attacks {
-            let mv = Move::Standard {
-                role: Role::Pawn,
-                from,
-                to,
-                capture: position.board.role_on(to),
-                promotion: None,
-                en_passant_square: Some(Square::ALL[en_passant]),
-            };
+        moves.push(mv);
+    }
 
-            moves.push(mv);
-        }
+    for to in pawns_fw_promotion {
+        let from = match position.color_to_move {
+            Color::White => Square(to.to_index() as u8 - 8),
+            Color::Black => Square(to.to_index() as u8 + 8),
+        };
+
+        generate_promotion_move(from, to, position, &mut moves);
+    }
+
+    for to in pawns_push {
+        let from = match position.color_to_move {
+            Color::White => Square(to.to_index() as u8 - 16),
+            Color::Black => Square(to.to_index() as u8 + 16),
+        };
+
+        let en_passant = match position.color_to_move {
+            Color::White => Square(from.to_index() as u8 + 8),
+            Color::Black => Square(from.to_index() as u8 - 8),
+        };
+
+        let mv = Move::Standard {
+            role: Role::Pawn,
+            from,
+            to,
+            capture: position.board.role_on(to),
+            promotion: None,
+            en_passant_square: Some(en_passant),
+        };
+
+        moves.push(mv);
     }
 
     let kings = position.board.role[Role::King] & position.board.color[position.color_to_move];
@@ -267,7 +232,7 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
     let rooks = position.board.role[Role::Rook] & position.board.color[position.color_to_move];
     let rooks = rooks & !diag_ping;
     let rooks_pinned = rooks & hv_pins;
-    let rooks_unpinned = rooks & !rooks_pinned;
+    let rooks_unpinned = rooks ^ rooks_pinned;
 
     for from in rooks_unpinned {
         let mut attacks = rook_attacks(from, blockers);
@@ -287,7 +252,7 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
     let bishops = position.board.role[Role::Bishop] & position.board.color[position.color_to_move];
     let bishops = bishops & !hv_pins;
     let bishops_pinned = bishops & diag_ping;
-    let bishops_unpinned = bishops & !bishops_pinned;
+    let bishops_unpinned = bishops ^ bishops_pinned;
 
     for from in bishops_unpinned {
         let mut attacks = bishop_attacks(from, blockers);
@@ -307,7 +272,7 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
     let queens = position.board.role[Role::Queen] & position.board.color[position.color_to_move];
     let queens_pinned_hv = queens & hv_pins;
     let queens_pinned_diag = queens & diag_ping;
-    let queens_unpinned = queens & !(queens_pinned_hv | queens_pinned_diag);
+    let queens_unpinned = queens ^ (queens_pinned_hv | queens_pinned_diag);
 
     for from in queens_unpinned {
         let mut attacks = queen_attacks(from, blockers);
