@@ -37,6 +37,7 @@ impl Rank {
     }
 
     /// Converts a `Rank` to a `usize`.
+    #[inline]
     pub fn to_index(&self) -> usize {
         *self as usize
     }

@@ -32,6 +32,7 @@ impl Role {
     ];
 
     /// Returns an iterator over all roles.
+    #[inline]
     pub fn iter() -> Iter<'static, Role> {
         Role::ALL.iter()
     }

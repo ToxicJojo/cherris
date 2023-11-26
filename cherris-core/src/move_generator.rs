@@ -55,7 +55,7 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
         let attacks = attacks & position.board.color[!position.color_to_move];
 
         for to in attacks {
-            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move.to_index()]).is_empty() {
+            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move]).is_empty() {
                 generate_promotion_move(from, to, position, &mut moves)
             } else {
                 let mv = Move::Standard {
@@ -103,7 +103,7 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
         let attacks = attacks & position.board.color[!position.color_to_move];
 
         for to in attacks {
-            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move.to_index()]).is_empty() {
+            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move]).is_empty() {
                 generate_promotion_move(from, to, position, &mut moves)
             } else {
                 let mv = Move::Standard {
@@ -147,17 +147,20 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
     for from in pawns_forward_unpinned {
         let attacks = match position.color_to_move {
             Color::White => {
-                let next = from.to_index() + 8;
-                Bitboard(1 << next)
+                Bitboard::from(from) << 8
+                //let next = from.to_index() + 8;
+
+                //Bitboard(1 << next)
             }
             Color::Black => {
-                let next = from.to_index() as i64 - 8;
-                Bitboard(1 << next)
+                Bitboard::from(from) >> 8
+                //let next = from.to_index() as i64 - 8;
+                //Bitboard(1 << next)
             }
         } & check_mask;
 
         for to in attacks {
-            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move.to_index()]).is_empty() {
+            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move]).is_empty() {
                 generate_promotion_move(from, to, position, &mut moves)
             } else {
                 let mv = Move::Standard {
@@ -188,7 +191,7 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
             & hv_pins;
 
         for to in attacks {
-            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move.to_index()]).is_empty() {
+            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move]).is_empty() {
                 generate_promotion_move(from, to, position, &mut moves)
             } else {
                 let mv = Move::Standard {
@@ -358,58 +361,58 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
         add_attacks(attacks, from, Role::Queen, position, &mut moves);
     }
 
-    let castle_path_short = match position.color_to_move {
-        Color::White => Bitboard::from(Square::F1) | Bitboard::from(Square::G1),
-        Color::Black => Bitboard::from(Square::F8) | Bitboard::from(Square::G8),
-    };
-
-    let castle_path_long = match position.color_to_move {
-        Color::White => {
-            Bitboard::from(Square::B1) | Bitboard::from(Square::C1) | Bitboard::from(Square::D1)
-        }
-        Color::Black => {
-            Bitboard::from(Square::B8) | Bitboard::from(Square::C8) | Bitboard::from(Square::D8)
-        }
-    };
-
-    let castle_path_long_attacks = match position.color_to_move {
-        Color::White => Bitboard::from(Square::D1) | Bitboard::from(Square::C1),
-        Color::Black => Bitboard::from(Square::D8) | Bitboard::from(Square::C8),
-    };
-
-    let path_empty = (castle_path_short & blockers).is_empty();
     let is_not_in_check = (kings & attacked_squares).is_empty();
-    let path_unattacked = (castle_path_short & attacked_squares).is_empty();
-    let castling_rights = position.castling_rights[position.color_to_move.to_index()];
+    if is_not_in_check {
+        let castle_path_short = match position.color_to_move {
+            Color::White => Bitboard::from(Square::F1) | Bitboard::from(Square::G1),
+            Color::Black => Bitboard::from(Square::F8) | Bitboard::from(Square::G8),
+        };
 
-    if path_empty
-        && is_not_in_check
-        && path_unattacked
-        && (castling_rights == CastlingRights::KingSide
-            || castling_rights == CastlingRights::BothSides)
-    {
-        let mv = Move::CastleShort;
-        moves.push(mv);
-    }
+        let castle_path_long = match position.color_to_move {
+            Color::White => {
+                Bitboard::from(Square::B1) | Bitboard::from(Square::C1) | Bitboard::from(Square::D1)
+            }
+            Color::Black => {
+                Bitboard::from(Square::B8) | Bitboard::from(Square::C8) | Bitboard::from(Square::D8)
+            }
+        };
 
-    let path_empty = (castle_path_long & blockers).is_empty();
-    let is_not_in_check = (kings & attacked_squares).is_empty();
-    let path_unattacked = (castle_path_long_attacks & attacked_squares).is_empty();
-    let castling_rights = position.castling_rights[position.color_to_move.to_index()];
+        let castle_path_long_attacks = match position.color_to_move {
+            Color::White => Bitboard::from(Square::D1) | Bitboard::from(Square::C1),
+            Color::Black => Bitboard::from(Square::D8) | Bitboard::from(Square::C8),
+        };
 
-    if path_empty
-        && is_not_in_check
-        && path_unattacked
-        && (castling_rights == CastlingRights::QueenSide
-            || castling_rights == CastlingRights::BothSides)
-    {
-        let mv = Move::CastleLong;
-        moves.push(mv);
+        let path_empty = (castle_path_short & blockers).is_empty();
+        let path_unattacked = (castle_path_short & attacked_squares).is_empty();
+        let castling_rights = position.castling_rights[position.color_to_move.to_index()];
+
+        if path_empty
+            && path_unattacked
+            && (castling_rights == CastlingRights::KingSide
+                || castling_rights == CastlingRights::BothSides)
+        {
+            let mv = Move::CastleShort;
+            moves.push(mv);
+        }
+
+        let path_empty = (castle_path_long & blockers).is_empty();
+        let path_unattacked = (castle_path_long_attacks & attacked_squares).is_empty();
+        let castling_rights = position.castling_rights[position.color_to_move.to_index()];
+
+        if path_empty
+            && path_unattacked
+            && (castling_rights == CastlingRights::QueenSide
+                || castling_rights == CastlingRights::BothSides)
+        {
+            let mv = Move::CastleLong;
+            moves.push(mv);
+        }
     }
 
     moves
 }
 
+#[inline]
 fn add_attacks(
     attacks: Bitboard,
     from: Square,
