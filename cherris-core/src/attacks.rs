@@ -35,13 +35,13 @@ pub fn bishop_xray_attacks(square: Square, blocker: Bitboard) -> Bitboard {
 pub fn rook_attacks(square: Square, blocker: Bitboard) -> Bitboard {
     let mask = ROOK_MAKS[square];
     let index = unsafe { _pext_u64(blocker.0, mask) + ROOK_OFFSETS[square] };
-    unsafe { Bitboard(ROOK_ATTACKS[index as usize]) }
+    unsafe { ROOK_ATTACKS[index as usize] }
 }
 
 pub fn rook_xray_attacks(square: Square, blocker: Bitboard) -> Bitboard {
     let mask = ROOK_MAKS[square];
     let index = unsafe { _pext_u64(blocker.0, mask) + ROOK_OFFSETS[square] };
-    unsafe { Bitboard(ROOK_XRAY_ATTACKS[index as usize]) }
+    unsafe { ROOK_XRAY_ATTACKS[index as usize] }
 }
 
 pub fn queen_attacks(square: Square, blocker: Bitboard) -> Bitboard {

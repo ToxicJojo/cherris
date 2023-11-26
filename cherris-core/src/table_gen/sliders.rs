@@ -8,8 +8,8 @@ const EIGHT_RANK: u64 = 0xFF00000000000000;
 
 pub static ROOK_MAKS: [u64; Square::COUNT] = generate_rook_masks();
 pub static ROOK_OFFSETS: [u64; Square::COUNT] = generate_rook_offsets();
-pub static mut ROOK_ATTACKS: [u64; 102400] = [0; 102400];
-pub static mut ROOK_XRAY_ATTACKS: [u64; 102400] = [0; 102400];
+pub static mut ROOK_ATTACKS: [Bitboard; 102400] = [Bitboard::EMPTY; 102400];
+pub static mut ROOK_XRAY_ATTACKS: [Bitboard; 102400] = [Bitboard::EMPTY; 102400];
 
 pub static BISHOP_MASKS: [u64; Square::COUNT] = generate_bishop_masks();
 pub static BISHOP_OFFSETS: [u64; Square::COUNT] = generate_bishop_offsets();
@@ -18,7 +18,7 @@ pub static mut BISHOP_XRAY_ATTACKS: [Bitboard; 5248] = [Bitboard::EMPTY; 5248];
 
 pub fn generate_lookup_tables() {
     unsafe {
-        ROOK_ATTACKS = generate_attacks_fast();
+        ROOK_ATTACKS = generate_rook_attacks();
         ROOK_XRAY_ATTACKS = generate_rook_xray_attacks();
         BISHOP_ATTACKS = generate_bishop_attacks();
         BISHOP_XRAY_ATTACKS = generate_bishop_xray_attacks();
@@ -166,24 +166,8 @@ pub const fn generate_rook_offsets() -> [u64; Square::COUNT] {
     generate_offsets(rook_masks)
 }
 
-const fn pdep(value: u64, mut mask: u64) -> u64 {
-    let mut res = 0;
-    let mut bb = 1;
-    loop {
-        if mask == 0 {
-            break;
-        }
-        if (value & bb) != 0 {
-            res |= mask & mask.wrapping_neg();
-        }
-        mask &= mask - 1;
-        bb += bb;
-    }
-    res
-}
-
-pub fn generate_rook_xray_attacks() -> [u64; 102400] {
-    let mut attacks = [0; 102400];
+pub fn generate_rook_xray_attacks() -> [Bitboard; 102400] {
+    let mut attacks = [Bitboard::EMPTY; 102400];
     let rook_masks = generate_rook_masks();
 
     let mut square = 0;
@@ -207,8 +191,8 @@ pub fn generate_rook_xray_attacks() -> [u64; 102400] {
     attacks
 }
 
-pub fn generate_attacks_fast() -> [u64; 102400] {
-    let mut attacks = [0; 102400];
+pub fn generate_rook_attacks() -> [Bitboard; 102400] {
+    let mut attacks = [Bitboard::EMPTY; 102400];
     let rook_masks = generate_rook_masks();
 
     let mut square = 0;
@@ -219,31 +203,6 @@ pub fn generate_attacks_fast() -> [u64; 102400] {
         let max = 1 << mask.count_ones();
         while index < max {
             let occupants = unsafe { _pdep_u64(index, mask) };
-
-            attacks[base] = generate_rook_attack(square as i8, occupants);
-
-            index += 1;
-            base += 1;
-        }
-
-        square += 1;
-    }
-
-    attacks
-}
-
-pub const fn generate_attacks() -> [u64; 102400] {
-    let mut attacks = [0; 102400];
-    let rook_masks = generate_rook_masks();
-
-    let mut square = 0;
-    let mut base = 0;
-    while square < 64 {
-        let mut index = 0;
-        let mask = rook_masks[square];
-        let max = 1 << mask.count_ones();
-        while index < max {
-            let occupants = pdep(index, mask);
 
             attacks[base] = generate_rook_attack(square as i8, occupants);
 
@@ -291,7 +250,7 @@ pub const fn generate_rook_mask(square: i8) -> u64 {
     attacks
 }
 
-pub const fn generate_rook_attack(square: i8, occupants: u64) -> u64 {
+pub const fn generate_rook_attack(square: i8, occupants: u64) -> Bitboard {
     let mut attacks = 0;
     let mut direction = 0;
 
@@ -302,10 +261,10 @@ pub const fn generate_rook_attack(square: i8, occupants: u64) -> u64 {
         direction += 2;
     }
 
-    attacks
+    Bitboard(attacks)
 }
 
-pub const fn generate_rook_xray_attack(square: i8, occupants: u64) -> u64 {
+pub const fn generate_rook_xray_attack(square: i8, occupants: u64) -> Bitboard {
     let mut attacks = 0;
     let mut direction = 0;
 
@@ -316,5 +275,5 @@ pub const fn generate_rook_xray_attack(square: i8, occupants: u64) -> u64 {
         direction += 2;
     }
 
-    attacks
+    Bitboard(attacks)
 }
