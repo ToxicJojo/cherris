@@ -41,10 +41,6 @@ impl Bitboard {
     pub fn population_count(&self) -> u32 {
         self.0.count_ones()
     }
-
-    pub const fn from_square(square: Square) -> Bitboard {
-        Bitboard(1 << square.to_index())
-    }
 }
 
 impl Iterator for Bitboard {
