@@ -26,7 +26,18 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
     let pawns = position.board.role[Role::Pawn] & position.board.color[position.color_to_move];
     let pawns_attack = pawns & !hv_pins;
     let pawns_pinned_diag = pawns_attack & diag_ping;
+
+    let pawns_pinned_promotion =
+        pawns_pinned_diag & Bitboard::PRE_PROMOTION_RANK[position.color_to_move];
+
+    let pawns_pinned_no_promotion =
+        pawns_pinned_diag & !Bitboard::PRE_PROMOTION_RANK[position.color_to_move];
+
     let pawns_attack_unpinned = pawns_attack ^ pawns_pinned_diag;
+    let pawns_attack_unpinned_promotion =
+        pawns_attack_unpinned & Bitboard::PRE_PROMOTION_RANK[position.color_to_move];
+    let pawns_attack_unpinned_no_promotion =
+        pawns_attack_unpinned & !Bitboard::PRE_PROMOTION_RANK[position.color_to_move];
 
     let pawns_walk = pawns & !diag_ping;
     let pawns_forward = match position.color_to_move {
@@ -63,28 +74,13 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
         .en_passant_square
         .map_or(Bitboard::EMPTY, Bitboard::from);
 
-    for from in pawns_attack_unpinned {
+    for from in pawns_attack_unpinned_no_promotion {
         let attacks = pawn_attacks(from, position.color_to_move) & check_mask;
 
         let attacks_en_passant = attacks & en_passant_bb & !diag_ping;
         let attacks = attacks & position.board.color[!position.color_to_move];
 
-        for to in attacks {
-            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move]).is_empty() {
-                generate_promotion_move(from, to, position, &mut moves)
-            } else {
-                let mv = Move::Standard {
-                    role: Role::Pawn,
-                    from,
-                    to,
-                    capture: position.board.role_on(to),
-                    promotion: None,
-                    en_passant_square: None,
-                };
-
-                moves.push(mv);
-            }
-        }
+        add_attacks(attacks, from, Role::Pawn, position, &mut moves);
 
         for to in attacks_en_passant {
             let target = match position.color_to_move {
@@ -111,28 +107,23 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
         }
     }
 
-    for from in pawns_pinned_diag {
+    for from in pawns_attack_unpinned_promotion {
+        let attacks = pawn_attacks(from, position.color_to_move) & check_mask;
+
+        let attacks = attacks & position.board.color[!position.color_to_move];
+
+        for to in attacks {
+            generate_promotion_move(from, to, position, &mut moves);
+        }
+    }
+
+    for from in pawns_pinned_no_promotion {
         let attacks = pawn_attacks(from, position.color_to_move) & diag_ping & check_mask;
 
         let attacks_en_passant = attacks & en_passant_bb & !diag_ping;
         let attacks = attacks & position.board.color[!position.color_to_move];
 
-        for to in attacks {
-            if !(attacks & Bitboard::PROMOTION_RANK[position.color_to_move]).is_empty() {
-                generate_promotion_move(from, to, position, &mut moves)
-            } else {
-                let mv = Move::Standard {
-                    role: Role::Pawn,
-                    from,
-                    to,
-                    capture: position.board.role_on(to),
-                    promotion: None,
-                    en_passant_square: None,
-                };
-
-                moves.push(mv);
-            }
-        }
+        add_attacks(attacks, from, Role::Pawn, position, &mut moves);
 
         for to in attacks_en_passant {
             let target = match position.color_to_move {
@@ -156,6 +147,15 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
             let mv = Move::EnPassant { from, to, target };
 
             moves.push(mv);
+        }
+    }
+
+    for from in pawns_pinned_promotion {
+        let attacks = pawn_attacks(from, position.color_to_move) & diag_ping & check_mask;
+
+        let attacks = attacks & position.board.color[!position.color_to_move];
+        for to in attacks {
+            generate_promotion_move(from, to, position, &mut moves);
         }
     }
 
@@ -368,6 +368,7 @@ fn add_attacks(
     }
 }
 
+#[inline]
 fn generate_promotion_move(
     from: Square,
     to: Square,

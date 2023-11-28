@@ -25,6 +25,9 @@ impl Bitboard {
     pub const PROMOTION_RANK: [Bitboard; Color::COUNT] =
         [Bitboard::EIGTH_RANK, Bitboard::FIRST_RANK];
 
+    pub const PRE_PROMOTION_RANK: [Bitboard; Color::COUNT] =
+        [Bitboard::SEVENTH_RANK, Bitboard::SECOND_RANK];
+
     #[inline]
     pub const fn new(value: u64) -> Bitboard {
         Bitboard(value)
