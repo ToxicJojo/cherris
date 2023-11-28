@@ -9,3 +9,6 @@ pub use sliders::*;
 
 mod pawns;
 pub use pawns::*;
+
+mod rays;
+pub use rays::*;

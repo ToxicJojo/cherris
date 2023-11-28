@@ -173,8 +173,8 @@ mod tests {
 
     #[test]
     fn to_index() {
-        let a1 = Square(0).to_index();
-        let h8 = Square(63).to_index();
+        let a1 = Square::A1.to_index();
+        let h8 = Square::H8.to_index();
 
         assert_eq!(a1, 0);
         assert_eq!(h8, 63);
