@@ -1,11 +1,11 @@
 use crate::{generate_moves, Position};
 
-pub fn perft(depth: u64, position: &mut Position) -> u64 {
+pub fn perft(depth: u64, position: &mut Position) -> usize {
     let mut nodes = 0;
     let moves = generate_moves(position);
 
     if depth == 1 {
-        moves.len() as u64
+        moves.len()
     } else {
         for mv in moves {
             let castling_rights = position.castling_rights;

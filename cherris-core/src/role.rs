@@ -60,12 +60,14 @@ impl Display for Role {
 impl Index<Role> for [Bitboard; Role::COUNT] {
     type Output = Bitboard;
 
+    #[inline]
     fn index(&self, index: Role) -> &Self::Output {
         &self[index.to_index()]
     }
 }
 
 impl IndexMut<Role> for [Bitboard; Role::COUNT] {
+    #[inline]
     fn index_mut(&mut self, index: Role) -> &mut Self::Output {
         &mut self[index.to_index()]
     }

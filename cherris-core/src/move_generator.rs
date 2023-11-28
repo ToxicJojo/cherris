@@ -161,8 +161,8 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
 
     for to in pawns_fw_no_promotion {
         let from = match position.color_to_move {
-            Color::White => Square(to.to_index() as u8 - 8),
-            Color::Black => Square(to.to_index() as u8 + 8),
+            Color::White => Square(to.0 - 8),
+            Color::Black => Square(to.0 + 8),
         };
 
         let mv = Move::Standard {
@@ -179,8 +179,8 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
 
     for to in pawns_fw_promotion {
         let from = match position.color_to_move {
-            Color::White => Square(to.to_index() as u8 - 8),
-            Color::Black => Square(to.to_index() as u8 + 8),
+            Color::White => Square(to.0 - 8),
+            Color::Black => Square(to.0 + 8),
         };
 
         generate_promotion_move(from, to, position, &mut moves);
@@ -188,13 +188,13 @@ pub fn generate_moves(position: &Position) -> ArrayVec<Move, 256> {
 
     for to in pawns_push {
         let from = match position.color_to_move {
-            Color::White => Square(to.to_index() as u8 - 16),
-            Color::Black => Square(to.to_index() as u8 + 16),
+            Color::White => Square(to.0 - 16),
+            Color::Black => Square(to.0 + 16),
         };
 
         let en_passant = match position.color_to_move {
-            Color::White => Square(from.to_index() as u8 + 8),
-            Color::Black => Square(from.to_index() as u8 - 8),
+            Color::White => Square(from.0 + 8),
+            Color::Black => Square(from.0 - 8),
         };
 
         let mv = Move::Standard {
