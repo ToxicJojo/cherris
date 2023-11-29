@@ -1,8 +1,11 @@
-use crate::{generate_moves, Position};
+use arrayvec::ArrayVec;
+
+use crate::{generate_moves, Move, Position};
 
 pub fn perft(depth: u64, position: &mut Position) -> usize {
     let mut nodes = 0;
-    let moves = generate_moves(position);
+    let mut moves = ArrayVec::<Move, 256>::new();
+    generate_moves(position, &mut moves);
 
     if depth == 1 {
         moves.len()

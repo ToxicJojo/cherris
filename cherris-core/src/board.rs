@@ -21,16 +21,27 @@ impl Board {
     };
 
     /// Return the `Role` on a given `Sqaure`.
+    #[inline]
     pub fn role_on(&self, sqaure: Square) -> Option<Role> {
         let square_bb = Bitboard::from(sqaure);
 
-        for role in Role::iter() {
-            if !(self.role[*role] & square_bb).is_empty() {
-                return Some(*role);
+        if (self.occupied & square_bb).is_empty() {
+            None
+        } else {
+            if !(self.role[Role::Pawn] & square_bb).is_empty() {
+                Some(Role::Pawn)
+            } else if !(self.role[Role::Knight] & square_bb).is_empty() {
+                Some(Role::Knight)
+            } else if !(self.role[Role::Bishop] & square_bb).is_empty() {
+                Some(Role::Bishop)
+            } else if !(self.role[Role::Rook] & square_bb).is_empty() {
+                Some(Role::Rook)
+            } else if !(self.role[Role::Queen] & square_bb).is_empty() {
+                Some(Role::Queen)
+            } else {
+                Some(Role::King)
             }
         }
-
-        None
     }
 
     /// Return the `Color` on a given `Sqaure`.
@@ -68,6 +79,7 @@ impl Board {
         self.color[!piece.color] &= !square_bb;
 
         self.role[piece.role] |= square_bb;
+        self.occupied |= square_bb;
     }
 
     /// Executes a move for a color.
@@ -307,10 +319,10 @@ impl Board {
 
         if check_mask.is_empty() {
             Bitboard::FULL
-        } else if (check_mask & self.color[!color]).population_count() > 1 {
-            Bitboard::EMPTY
-        } else {
+        } else if (check_mask & self.color[!color]).population_count() == 1 {
             check_mask
+        } else {
+            Bitboard::EMPTY
         }
     }
 

@@ -130,7 +130,7 @@ impl Index<Square> for [Bitboard; Square::COUNT] {
 
     #[inline]
     fn index(&self, index: Square) -> &Self::Output {
-        &self[index.to_index()]
+        unsafe { self.get_unchecked(index.to_index()) }
     }
 }
 
@@ -139,7 +139,7 @@ impl Index<Square> for [u64; Square::COUNT] {
 
     #[inline]
     fn index(&self, index: Square) -> &Self::Output {
-        &self[index.to_index()]
+        unsafe { self.get_unchecked(index.to_index()) }
     }
 }
 

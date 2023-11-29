@@ -10,3 +10,6 @@ members = [
 [profile.release]
 codegen-units = 1
 lto = "fat"
+
+[profile.bench]
+debug = true

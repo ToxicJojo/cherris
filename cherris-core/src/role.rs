@@ -62,14 +62,14 @@ impl Index<Role> for [Bitboard; Role::COUNT] {
 
     #[inline]
     fn index(&self, index: Role) -> &Self::Output {
-        &self[index.to_index()]
+        unsafe { self.get_unchecked(index.to_index()) }
     }
 }
 
 impl IndexMut<Role> for [Bitboard; Role::COUNT] {
     #[inline]
     fn index_mut(&mut self, index: Role) -> &mut Self::Output {
-        &mut self[index.to_index()]
+        unsafe { self.get_unchecked_mut(index.to_index()) }
     }
 }
 

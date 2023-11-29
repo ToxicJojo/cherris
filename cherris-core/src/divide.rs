@@ -1,7 +1,10 @@
-use crate::{generate_moves, perft, Position};
+use arrayvec::ArrayVec;
+
+use crate::{generate_moves, perft, Move, Position};
 
 pub fn divide(depth: u64, position: &mut Position) {
-    let moves = generate_moves(position);
+    let mut moves = ArrayVec::<Move, 256>::new();
+    generate_moves(position, &mut moves);
     let mut total = 0;
 
     for mv in moves {

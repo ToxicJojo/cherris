@@ -131,7 +131,9 @@ impl Position {
     }
 
     pub fn legal_moves(&self) -> ArrayVec<Move, 256> {
-        generate_moves(self)
+        let mut moves = ArrayVec::<Move, 256>::new();
+        generate_moves(self, &mut moves);
+        moves
     }
 }
 

@@ -38,14 +38,14 @@ impl Index<Color> for [Bitboard; Color::COUNT] {
 
     #[inline]
     fn index(&self, index: Color) -> &Self::Output {
-        &self[index.to_index()]
+        unsafe { self.get_unchecked(index.to_index()) }
     }
 }
 
 impl IndexMut<Color> for [Bitboard; Color::COUNT] {
     #[inline]
     fn index_mut(&mut self, index: Color) -> &mut Self::Output {
-        &mut self[index.to_index()]
+        unsafe { self.get_unchecked_mut(index.to_index()) }
     }
 }
 
