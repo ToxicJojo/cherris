@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use cherris_core::{generate_lookup_tables, generate_moves, perft, Position};
+use cherris_core::{generate_lookup_tables, perft, Position};
 
 fn main() {
     generate_lookup_tables();

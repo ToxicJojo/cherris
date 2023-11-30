@@ -27,20 +27,18 @@ impl Board {
 
         if (self.occupied & square_bb).is_empty() {
             None
+        } else if !(self.role[Role::Pawn] & square_bb).is_empty() {
+            Some(Role::Pawn)
+        } else if !(self.role[Role::Knight] & square_bb).is_empty() {
+            Some(Role::Knight)
+        } else if !(self.role[Role::Bishop] & square_bb).is_empty() {
+            Some(Role::Bishop)
+        } else if !(self.role[Role::Rook] & square_bb).is_empty() {
+            Some(Role::Rook)
+        } else if !(self.role[Role::Queen] & square_bb).is_empty() {
+            Some(Role::Queen)
         } else {
-            if !(self.role[Role::Pawn] & square_bb).is_empty() {
-                Some(Role::Pawn)
-            } else if !(self.role[Role::Knight] & square_bb).is_empty() {
-                Some(Role::Knight)
-            } else if !(self.role[Role::Bishop] & square_bb).is_empty() {
-                Some(Role::Bishop)
-            } else if !(self.role[Role::Rook] & square_bb).is_empty() {
-                Some(Role::Rook)
-            } else if !(self.role[Role::Queen] & square_bb).is_empty() {
-                Some(Role::Queen)
-            } else {
-                Some(Role::King)
-            }
+            Some(Role::King)
         }
     }
 
