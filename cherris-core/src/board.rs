@@ -76,6 +76,10 @@ impl Board {
         self.color[piece.color] |= square_bb;
         self.color[!piece.color] &= !square_bb;
 
+        if let Some(role) = self.role_on(sqaure) {
+            self.role[role] &= !square_bb;
+        }
+
         self.role[piece.role] |= square_bb;
         self.occupied |= square_bb;
     }
@@ -246,6 +250,8 @@ impl Board {
         self.occupied = self.color[Color::White] | self.color[Color::Black];
     }
 
+    /// Returns a `Bitboard` that indicates which sqaures are currently attacked by the pieces of
+    /// the given color.
     pub fn attacked_sqaures(&self, color: Color) -> Bitboard {
         let mut attacks = Bitboard::EMPTY;
         let blocker = self.occupied ^ (self.color[!color] & self.role[Role::King]);
@@ -283,6 +289,16 @@ impl Board {
         attacks
     }
 
+    /// Returns a `Bitboard` indicating on which squares pieces can move to avoid check.
+    /// There are 3 possible cases for this:
+    /// 1. There currently is no check. A full `Bitboard` will be returned as pieces can move
+    ///    anywhere.
+    /// 2. The king is in check by a single piece. A `Bitboard` will be returned that contains all
+    ///    sqaures a piece could move to to prevent the ceck. This includes the checker itself.
+    /// 3. The king is in check by two pieces. A empty `Bitboard` will be returned as only the king
+    ///    can move.
+    /// Any move can now be & with the returned bitboard to prune all illegal moves in regard to
+    /// checks.
     pub fn check_mask(&self, color: Color) -> Bitboard {
         let mut check_mask = Bitboard::EMPTY;
         let kings = self.role[Role::King] & self.color[color];
@@ -324,6 +340,8 @@ impl Board {
         }
     }
 
+    /// Returns a `Bitboard` representing all squares that contain pieces that are pinned on the
+    /// horizontal.
     pub fn horizontal_vertical_pinmask(&self, square: Square, color: Color) -> Bitboard {
         let mut pin_mask = Bitboard::EMPTY;
         let blocker = self.occupied;
@@ -336,6 +354,8 @@ impl Board {
         pin_mask
     }
 
+    /// Returns a `Bitboard` representing all squares that contain pieces that are pinned on the
+    /// diagonal.
     pub fn diagonal_pinmask(&self, square: Square, color: Color) -> Bitboard {
         let mut pin_mask = Bitboard::EMPTY;
         let blocker = self.occupied;
@@ -405,6 +425,15 @@ mod tests {
         board.put_piece_on(Piece::BLACK_BISHOP, Square::H8);
 
         assert_eq!(board.role_on(Square::H8).unwrap(), Role::Bishop);
+    }
+
+    #[test]
+    fn put_piece_on() {
+        let mut board = Board::EMPTY;
+        board.put_piece_on(Piece::WHITE_ROOK, Square::D4);
+        board.put_piece_on(Piece::BLACK_QUEEN, Square::D4);
+
+        assert_eq!(board.piece_on(Square::D4).unwrap(), Piece::BLACK_QUEEN);
     }
 
     #[test]
