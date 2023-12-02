@@ -84,6 +84,10 @@ impl Board {
         self.occupied |= square_bb;
     }
 
+    pub fn count_roles(&self, role: Role, color: Color) -> u32 {
+        (self.role[role] & self.color[color]).population_count()
+    }
+
     /// Executes a move for a color.
     /// This function doesn't check for the legality of the move. If an illegal move is made with
     /// this function it may panic now or cause a panic later.
