@@ -163,7 +163,7 @@ pub fn generate_moves(position: &Position, moves: &mut ArrayVec<Move, 256>) {
             role: Role::Pawn,
             from,
             to,
-            capture: position.board.role_on(to),
+            capture: None,
             promotion: None,
             en_passant_square: None,
         };
@@ -197,7 +197,7 @@ pub fn generate_moves(position: &Position, moves: &mut ArrayVec<Move, 256>) {
             role: Role::Pawn,
             from,
             to,
-            capture: position.board.role_on(to),
+            capture: None,
             promotion: None,
             en_passant_square: Some(en_passant),
         };
