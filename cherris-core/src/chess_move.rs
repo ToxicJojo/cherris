@@ -3,7 +3,7 @@ use std::fmt::{Debug, Display};
 use crate::{Role, Square};
 
 /// Represents a move in a chess game.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum Move {
     Standard {
         from: Square,
@@ -32,16 +32,10 @@ impl Display for Move {
                 promotion,
                 ..
             } => {
-                if capture.is_some() {
-                    if let Some(promotion) = promotion {
-                        write!(f, "{}x{}={}", from, to, promotion)
-                    } else {
-                        write!(f, "{}x{}", from, to)
-                    }
-                } else if let Some(promotion) = promotion {
-                    write!(f, "{}-{}={}", from, to, promotion)
+                if let Some(promotion) = promotion {
+                    write!(f, "{}{}{}", from, to, promotion)
                 } else {
-                    write!(f, "{}-{}", from, to)
+                    write!(f, "{}{}", from, to)
                 }
             }
             Move::EnPassant { from, to, .. } => {

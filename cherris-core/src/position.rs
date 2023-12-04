@@ -7,6 +7,7 @@ use crate::{
 };
 
 /// Represents a chess position.
+#[derive(Debug, PartialEq)]
 pub struct Position {
     pub board: Board,
     pub color_to_move: Color,
@@ -261,5 +262,11 @@ impl FromStr for Position {
             fullmove_number,
             castling_rights: [white_castling, black_castling],
         })
+    }
+}
+
+impl Default for Position {
+    fn default() -> Self {
+        Position::from_str("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1").unwrap()
     }
 }

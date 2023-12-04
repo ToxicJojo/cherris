@@ -6,6 +6,7 @@ use crate::{
 };
 
 /// Represents a chess board.
+#[derive(Debug, PartialEq)]
 pub struct Board {
     pub role: [Bitboard; Role::COUNT],
     pub color: [Bitboard; Color::COUNT],
