@@ -7,7 +7,7 @@ use crate::{
 };
 
 /// Represents a chess position.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Position {
     pub board: Board,
     pub color_to_move: Color,
@@ -112,23 +112,6 @@ impl Position {
         }
 
         self.color_to_move = !self.color_to_move;
-    }
-
-    pub fn unmake_move(&mut self, chess_move: Move) {
-        self.color_to_move = !self.color_to_move;
-        self.board.unmake_move(self.color_to_move, chess_move);
-
-        self.en_passant_square = None;
-
-        if self.color_to_move == Color::Black {
-            self.fullmove_number -= 1;
-        }
-
-        if let Move::Standard { role, capture, .. } = chess_move {
-            if role != Role::Pawn && capture.is_some() {
-                self.halfmove_clock -= 1;
-            }
-        }
     }
 
     pub fn legal_moves(&self) -> ArrayVec<Move, 256> {

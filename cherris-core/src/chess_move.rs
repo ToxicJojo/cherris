@@ -28,7 +28,6 @@ impl Display for Move {
             Move::Standard {
                 from,
                 to,
-                capture,
                 promotion,
                 ..
             } => {

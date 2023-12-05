@@ -3,7 +3,7 @@ use cherris_core::{generate_moves, Move, Position};
 
 use crate::eval;
 
-pub fn alpha_beta_max(alpha: f32, beta: f32, depth: u8, position: &mut Position) -> f32 {
+pub fn alpha_beta_max(alpha: f32, beta: f32, depth: u8, position: &Position) -> f32 {
     let mut moves = ArrayVec::<Move, 256>::new();
     generate_moves(position, &mut moves);
 
@@ -17,11 +17,9 @@ pub fn alpha_beta_max(alpha: f32, beta: f32, depth: u8, position: &mut Position)
     }
 
     for mv in moves {
-        let castling_rights = position.castling_rights;
-        position.make_move(mv);
-        let score = alpha_beta_min(alpha, beta, depth - 1, position);
-        position.unmake_move(mv);
-        position.castling_rights = castling_rights;
+        let mut next_position = position.clone();
+        next_position.make_move(mv);
+        let score = alpha_beta_min(alpha, beta, depth - 1, &next_position);
 
         if score >= beta {
             return beta;
@@ -35,7 +33,7 @@ pub fn alpha_beta_max(alpha: f32, beta: f32, depth: u8, position: &mut Position)
     alpha
 }
 
-pub fn alpha_beta_min(alpha: f32, beta: f32, depth: u8, position: &mut Position) -> f32 {
+pub fn alpha_beta_min(alpha: f32, beta: f32, depth: u8, position: &Position) -> f32 {
     let mut moves = ArrayVec::<Move, 256>::new();
     generate_moves(position, &mut moves);
 
@@ -49,11 +47,9 @@ pub fn alpha_beta_min(alpha: f32, beta: f32, depth: u8, position: &mut Position)
     }
 
     for mv in moves {
-        let castling_rights = position.castling_rights;
-        position.make_move(mv);
-        let score = alpha_beta_max(alpha, beta, depth - 1, position);
-        position.unmake_move(mv);
-        position.castling_rights = castling_rights;
+        let mut next_position = position.clone();
+        next_position.make_move(mv);
+        let score = alpha_beta_max(alpha, beta, depth - 1, &next_position);
 
         if score <= alpha {
             return alpha;
