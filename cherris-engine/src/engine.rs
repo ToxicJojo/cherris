@@ -53,3 +53,9 @@ impl Engine {
         print!("{}", command);
     }
 }
+
+impl Default for Engine {
+    fn default() -> Self {
+        Self::new()
+    }
+}

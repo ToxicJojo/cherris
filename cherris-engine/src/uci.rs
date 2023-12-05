@@ -28,7 +28,7 @@ impl FromStr for UCIEngineCommand {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let command = s.trim();
-        let parts: Vec<&str> = command.split(" ").collect();
+        let parts: Vec<&str> = command.split(' ').collect();
 
         match parts[0] {
             "uci" => Ok(UCIEngineCommand::Uci),
@@ -121,9 +121,9 @@ impl Display for UCIGuiCommand {
                     write!(f, " max {}", max)?;
                 }
 
-                write!(f, "\n")
+                writeln!(f)
             }
-            _ => writeln!(f, ""),
+            _ => writeln!(f),
         }
     }
 }

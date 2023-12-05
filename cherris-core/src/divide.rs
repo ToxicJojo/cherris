@@ -12,7 +12,7 @@ pub fn divide(depth: u64, position: &Position) {
             println!("{}: {}", mv, 1);
             total += 1;
         } else {
-            let mut next_position = position.clone();
+            let mut next_position = *position;
             next_position.make_move(mv);
 
             let nodes = perft(depth - 1, &next_position);

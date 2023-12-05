@@ -11,7 +11,7 @@ pub fn perft(depth: u64, position: &Position) -> usize {
         moves.len()
     } else {
         for mv in moves {
-            let mut next_position = position.clone();
+            let mut next_position = *position;
             next_position.make_move(mv);
             nodes += perft(depth - 1, &next_position);
         }

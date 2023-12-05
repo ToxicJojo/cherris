@@ -17,7 +17,7 @@ pub fn alpha_beta_max(alpha: f32, beta: f32, depth: u8, position: &Position) -> 
     }
 
     for mv in moves {
-        let mut next_position = position.clone();
+        let mut next_position = *position;
         next_position.make_move(mv);
         let score = alpha_beta_min(alpha, beta, depth - 1, &next_position);
 
@@ -47,7 +47,7 @@ pub fn alpha_beta_min(alpha: f32, beta: f32, depth: u8, position: &Position) -> 
     }
 
     for mv in moves {
-        let mut next_position = position.clone();
+        let mut next_position = *position;
         next_position.make_move(mv);
         let score = alpha_beta_max(alpha, beta, depth - 1, &next_position);
 
