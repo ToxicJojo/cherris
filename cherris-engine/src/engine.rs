@@ -1,17 +1,19 @@
 use std::str::FromStr;
 
-use cherris_core::{generate_lookup_tables, Position};
+use cherris_core::{generate_lookup_tables, Color, Move, Position, LAN};
 
-use crate::{UCIEngineCommand, UCIGuiCommand};
+use crate::{alpha_beta_max, UCIEngineCommand, UCIGuiCommand, UCISearchParams};
 
 pub struct Engine {
     position: Position,
+    uci_search_params: UCISearchParams,
 }
 
 impl Engine {
     pub fn new() -> Engine {
         Engine {
             position: Position::default(),
+            uci_search_params: UCISearchParams::default(),
         }
     }
 
@@ -33,11 +35,36 @@ impl Engine {
                         self.send_command(UCIGuiCommand::IdAuthor("Johannes Thiel".to_string()));
                         self.send_command(UCIGuiCommand::UciOk);
                     }
-                    UCIEngineCommand::Position(position, moves) => {
-                        self.position = position;
+                    UCIEngineCommand::Position(fen, moves) => {
+                        self.position = Position::from_str(&fen).unwrap();
                         for mv in moves {
-                            self.position.make_move(mv)
+                            if let Ok(lan) = LAN::from_str(&mv) {
+                                if let Ok(mv) = Move::from_lan(&lan, &self.position) {
+                                    self.position.make_move(mv);
+                                }
+                            }
                         }
+                    }
+                    UCIEngineCommand::Go(search_params) => {
+                        self.uci_search_params = search_params;
+                        let moves = self.position.legal_moves();
+                        let mut best_move = moves[0];
+                        let mut best_val = f32::MIN;
+                        for mv in moves {
+                            let mut position = self.position;
+                            position.make_move(mv);
+                            let mut eval = alpha_beta_max(f32::MIN, f32::MAX, 5, &position);
+                            if self.position.color_to_move == Color::Black {
+                                eval *= -1.0;
+                            }
+
+                            if eval > best_val {
+                                best_move = mv;
+                                best_val = eval;
+                            }
+                        }
+
+                        self.send_command(UCIGuiCommand::BestMove(best_move.to_string()));
                     }
                     UCIEngineCommand::IsReady => self.send_command(UCIGuiCommand::ReadyOk),
                     UCIEngineCommand::Quit => break,

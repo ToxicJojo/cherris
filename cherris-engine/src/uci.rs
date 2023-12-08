@@ -1,6 +1,27 @@
 use std::{fmt::Display, str::FromStr};
 
-use cherris_core::{Move, Position};
+use cherris_core::Position;
+
+#[derive(Debug, PartialEq, Eq, Default)]
+pub struct UCISearchParams {
+    pub search_moves: Vec<String>,
+    pub ponder: bool,
+    pub w_time: Option<u64>,
+    pub b_time: Option<u64>,
+    pub w_inc: Option<u64>,
+    pub b_inc: Option<u64>,
+    pub moves_to_go: Option<u64>,
+    pub depth: Option<u64>,
+    pub nodes: Option<u64>,
+    pub mate: Option<u64>,
+    pub movetime: Option<u64>,
+    pub infinite: bool,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum UCIEngineCommandParseError {
+    InvalidCommand,
+}
 
 /// Represents all UCI commands that can be sent to an engine.
 #[derive(Debug, PartialEq)]
@@ -11,16 +32,102 @@ pub enum UCIEngineCommand {
     SetOption,
     Register,
     UciNewGame,
-    Position(Position, Vec<Move>),
-    Go,
+    Position(String, Vec<String>),
+    Go(UCISearchParams),
     Stop,
     PonderHit,
     Quit,
 }
 
-#[derive(Debug, PartialEq)]
-pub enum UCIEngineCommandParseError {
-    InvalidCommand,
+impl UCIEngineCommand {
+    fn parse_position(parts: Vec<&str>) -> Result<UCIEngineCommand, UCIEngineCommandParseError> {
+        let mut reading_fen = false;
+        let mut reading_moves = false;
+        let mut fen = String::new();
+        let mut moves = Vec::new();
+
+        for part in parts {
+            match part {
+                "position" => continue,
+                "startpos" => continue,
+                "fen" => reading_fen = true,
+                "moves" => {
+                    reading_moves = true;
+                    reading_fen = false
+                }
+                _ => {
+                    if reading_fen {
+                        fen.push_str(part);
+                        fen.push(' ');
+                    } else if reading_moves {
+                        moves.push(part.to_string());
+                    }
+                }
+            }
+        }
+
+        if fen.is_empty() {
+            fen = Position::STARTING_FEN.to_string();
+        } else {
+            fen = fen.trim().to_string();
+        }
+
+        Ok(UCIEngineCommand::Position(fen, moves))
+    }
+
+    fn parse_go(parts: Vec<&str>) -> Result<UCIEngineCommand, UCIEngineCommandParseError> {
+        enum Token {
+            Empty,
+            SearchMoves,
+            WTime,
+            BTime,
+            BInc,
+            WInc,
+            MovesToGo,
+            Depth,
+            Mate,
+            Nodes,
+            MoveTime,
+        }
+
+        let mut token = Token::Empty;
+        let mut search_params = UCISearchParams::default();
+
+        for part in parts {
+            match part {
+                "go" => continue,
+                "searchmoves" => token = Token::SearchMoves,
+                "ponder" => search_params.ponder = true,
+                "wtime" => token = Token::WTime,
+                "btime" => token = Token::BTime,
+                "winc" => token = Token::WInc,
+                "binc" => token = Token::BInc,
+                "movestogo" => token = Token::MovesToGo,
+                "depth" => token = Token::Depth,
+                "nodes" => token = Token::Nodes,
+                "mate" => token = Token::Mate,
+                "movetime" => token = Token::MoveTime,
+                "infinite" => search_params.infinite = true,
+                _ => match token {
+                    Token::WTime => search_params.w_time = Some(u64::from_str(part).unwrap()),
+                    Token::BTime => search_params.b_time = Some(u64::from_str(part).unwrap()),
+                    Token::WInc => search_params.w_inc = Some(u64::from_str(part).unwrap()),
+                    Token::BInc => search_params.b_inc = Some(u64::from_str(part).unwrap()),
+                    Token::MovesToGo => {
+                        search_params.moves_to_go = Some(u64::from_str(part).unwrap())
+                    }
+                    Token::Depth => search_params.depth = Some(u64::from_str(part).unwrap()),
+                    Token::Nodes => search_params.nodes = Some(u64::from_str(part).unwrap()),
+                    Token::Mate => search_params.mate = Some(u64::from_str(part).unwrap()),
+                    Token::MoveTime => search_params.movetime = Some(u64::from_str(part).unwrap()),
+                    Token::SearchMoves => search_params.search_moves.push(part.to_string()),
+                    Token::Empty => (),
+                },
+            }
+        }
+
+        Ok(UCIEngineCommand::Go(search_params))
+    }
 }
 
 impl FromStr for UCIEngineCommand {
@@ -34,26 +141,11 @@ impl FromStr for UCIEngineCommand {
             "uci" => Ok(UCIEngineCommand::Uci),
             "isready" => Ok(UCIEngineCommand::IsReady),
             "ucinewgame" => Ok(UCIEngineCommand::UciNewGame),
-            "stop" => Ok(UCIEngineCommand::Stop),
             "ponderhit" => Ok(UCIEngineCommand::PonderHit),
+            "position" => UCIEngineCommand::parse_position(parts),
+            "go" => UCIEngineCommand::parse_go(parts),
+            "stop" => Ok(UCIEngineCommand::Stop),
             "quit" => Ok(UCIEngineCommand::Quit),
-            "position" => {
-                let position = match parts[1] {
-                    "startpos" => Position::default(),
-                    "fen" => {
-                        let fen: Vec<String> = parts
-                            .iter()
-                            .skip(2)
-                            .take(6)
-                            .map(|&s| s.to_owned())
-                            .collect();
-                        Position::from_str(&fen.join(" ")).unwrap()
-                    }
-                    _ => return Err(UCIEngineCommandParseError::InvalidCommand),
-                };
-
-                Ok(UCIEngineCommand::Position(position, Vec::new()))
-            }
             _ => Err(UCIEngineCommandParseError::InvalidCommand),
         }
     }
@@ -65,7 +157,7 @@ pub enum UCIGuiCommand {
     IdAuthor(String),
     UciOk,
     ReadyOk,
-    BestMove,
+    BestMove(String),
     CopyProtection,
     Registration,
     Info,
@@ -107,6 +199,7 @@ impl Display for UCIGuiCommand {
             UCIGuiCommand::IdAuthor(author) => writeln!(f, "id author {}", author),
             UCIGuiCommand::UciOk => writeln!(f, "uciok"),
             UCIGuiCommand::ReadyOk => writeln!(f, "readyok"),
+            UCIGuiCommand::BestMove(mv) => writeln!(f, "bestmove {}", mv),
             UCIGuiCommand::Option(option) => {
                 write!(f, "option name {} type {}", option.id, option.r#type)?;
                 if let Some(default) = &option.default {
@@ -130,6 +223,8 @@ impl Display for UCIGuiCommand {
 
 #[cfg(test)]
 mod tests {
+    use std::vec;
+
     use super::*;
 
     #[test]
@@ -176,29 +271,53 @@ mod tests {
 
     #[test]
     fn parse_engine_position_startpos() {
-        let command = UCIEngineCommand::from_str("position startpos").unwrap();
+        let command = UCIEngineCommand::from_str("position startpos moves e2e4").unwrap();
 
         assert_eq!(
             command,
-            UCIEngineCommand::Position(Position::default(), Vec::new())
+            UCIEngineCommand::Position(
+                Position::STARTING_FEN.to_string(),
+                vec!["e2e4".to_string()]
+            )
         );
     }
 
     #[test]
     fn parse_engine_position_fen() {
         let command = UCIEngineCommand::from_str(
-            "position fen rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+            "position fen rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1 moves e2e4",
         )
         .unwrap();
 
         assert_eq!(
             command,
             UCIEngineCommand::Position(
-                Position::from_str("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1")
-                    .unwrap(),
-                Vec::new()
+                "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1".to_string(),
+                vec!["e2e4".to_string()]
             )
         );
+    }
+
+    #[test]
+    fn parse_engine_go() {
+        let search_params = UCISearchParams {
+            search_moves: vec!["e2e4".to_string()],
+            ponder: true,
+            w_time: Some(1),
+            b_time: Some(2),
+            w_inc: Some(3),
+            b_inc: Some(4),
+            moves_to_go: Some(5),
+            depth: Some(6),
+            nodes: Some(7),
+            mate: Some(8),
+            movetime: Some(9),
+            infinite: true,
+        };
+
+        let command = UCIEngineCommand::from_str("go searchmoves e2e4 ponder wtime 1 btime 2 winc 3 binc 4 movestogo 5 depth 6 nodes 7 mate 8 movetime 9 infinite").unwrap();
+
+        assert_eq!(command, UCIEngineCommand::Go(search_params))
     }
 
     #[test]

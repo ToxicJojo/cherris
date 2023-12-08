@@ -2,9 +2,10 @@ use std::{
     fmt::Display,
     ops::{Index, IndexMut},
     slice::Iter,
+    str::FromStr,
 };
 
-use crate::Bitboard;
+use crate::{Bitboard, Error};
 
 /// Represents the role of a chess piece.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -57,6 +58,22 @@ impl Display for Role {
     }
 }
 
+impl FromStr for Role {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "p" => Ok(Role::Pawn),
+            "n" => Ok(Role::Knight),
+            "b" => Ok(Role::Bishop),
+            "r" => Ok(Role::Rook),
+            "q" => Ok(Role::Queen),
+            "k" => Ok(Role::King),
+            _ => Err(Error::ParseRole),
+        }
+    }
+}
+
 impl Index<Role> for [Bitboard; Role::COUNT] {
     type Output = Bitboard;
 
@@ -104,5 +121,39 @@ mod tests {
         assert_eq!(rook, 3);
         assert_eq!(queen, 4);
         assert_eq!(king, 5);
+    }
+
+    #[test]
+    fn to_string() {
+        let pawn = Role::Pawn.to_string();
+        let knight = Role::Knight.to_string();
+        let bishop = Role::Bishop.to_string();
+        let rook = Role::Rook.to_string();
+        let queen = Role::Queen.to_string();
+        let king = Role::King.to_string();
+
+        assert_eq!(pawn, "p");
+        assert_eq!(knight, "n");
+        assert_eq!(bishop, "b");
+        assert_eq!(rook, "r");
+        assert_eq!(queen, "q");
+        assert_eq!(king, "k");
+    }
+
+    #[test]
+    fn from_string() {
+        let pawn = Role::from_str("p").unwrap();
+        let knight = Role::from_str("n").unwrap();
+        let bishop = Role::from_str("b").unwrap();
+        let rook = Role::from_str("r").unwrap();
+        let queen = Role::from_str("q").unwrap();
+        let king = Role::from_str("k").unwrap();
+
+        assert_eq!(pawn, Role::Pawn);
+        assert_eq!(knight, Role::Knight);
+        assert_eq!(bishop, Role::Bishop);
+        assert_eq!(rook, Role::Rook);
+        assert_eq!(queen, Role::Queen);
+        assert_eq!(king, Role::King);
     }
 }

@@ -18,6 +18,9 @@ pub struct Position {
 }
 
 impl Position {
+    pub const STARTING_FEN: &'static str =
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
     pub fn make_move(&mut self, chess_move: Move) {
         self.board.make_move(self.color_to_move, chess_move);
 
@@ -250,6 +253,6 @@ impl FromStr for Position {
 
 impl Default for Position {
     fn default() -> Self {
-        Position::from_str("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1").unwrap()
+        Position::from_str(Position::STARTING_FEN).unwrap()
     }
 }

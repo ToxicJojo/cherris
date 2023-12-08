@@ -4,7 +4,7 @@ use std::{fmt::Display, ops::Index, slice::Iter};
 use crate::{Bitboard, Error, File, Rank};
 
 /// Represents a single sqaure on a chess board.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Square(pub u8);
 
 impl Square {
