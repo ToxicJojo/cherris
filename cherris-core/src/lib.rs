@@ -54,3 +54,6 @@ pub use crate::divide::*;
 
 mod game_action;
 pub use crate::game_action::*;
+
+mod zobrist;
+pub use crate::zobrist::*;

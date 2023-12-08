@@ -11,6 +11,11 @@ pub enum CastlingRights {
 }
 
 impl CastlingRights {
+    /// Converts the `CastlingRights` to a usize.
+    pub fn to_index(&self) -> usize {
+        *self as usize
+    }
+
     /// Converts a `&str` to `CastlingRights` for a specific `Color`.
     pub fn from_str(input: &str, color: Color) -> CastlingRights {
         let mut castling = CastlingRights::NoSide;

@@ -57,9 +57,9 @@ impl Board {
     }
 
     /// Return the `Piece` on a given `Sqaure`.
-    pub fn piece_on(&self, sqaure: Square) -> Option<Piece> {
-        let color = self.color_on(sqaure);
-        let role = self.role_on(sqaure);
+    pub fn piece_on(&self, square: Square) -> Option<Piece> {
+        let color = self.color_on(square);
+        let role = self.role_on(square);
 
         match (color, role) {
             (Some(color), Some(role)) => Some(Piece { color, role }),
