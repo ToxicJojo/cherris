@@ -3,12 +3,12 @@ use cherris_core::{generate_moves, Move, Position};
 
 use crate::eval;
 
-pub fn alpha_beta_max(alpha: f32, beta: f32, depth: u8, position: &Position) -> f32 {
+pub fn alpha_beta_max(alpha: i16, beta: i16, depth: u8, position: &Position) -> i16 {
     let mut moves = ArrayVec::<Move, 256>::new();
     generate_moves(position, &mut moves);
 
     if moves.is_empty() {
-        return f32::MIN;
+        return i16::MIN;
     }
 
     let mut alpha = alpha;
@@ -33,12 +33,12 @@ pub fn alpha_beta_max(alpha: f32, beta: f32, depth: u8, position: &Position) -> 
     alpha
 }
 
-pub fn alpha_beta_min(alpha: f32, beta: f32, depth: u8, position: &Position) -> f32 {
+pub fn alpha_beta_min(alpha: i16, beta: i16, depth: u8, position: &Position) -> i16 {
     let mut moves = ArrayVec::<Move, 256>::new();
     generate_moves(position, &mut moves);
 
     if moves.is_empty() {
-        return f32::MAX;
+        return i16::MAX;
     }
 
     let mut beta = beta;

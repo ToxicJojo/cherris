@@ -49,13 +49,13 @@ impl Engine {
                         self.uci_search_params = search_params;
                         let moves = self.position.legal_moves();
                         let mut best_move = moves[0];
-                        let mut best_val = f32::MIN;
+                        let mut best_val = i16::MIN;
                         for mv in moves {
                             let mut position = self.position;
                             position.make_move(mv);
-                            let mut eval = alpha_beta_max(f32::MIN, f32::MAX, 5, &position);
+                            let mut eval = alpha_beta_max(i16::MIN, i16::MAX, 5, &position);
                             if self.position.color_to_move == Color::Black {
-                                eval *= -1.0;
+                                eval *= -1;
                             }
 
                             if eval > best_val {

@@ -1,17 +1,17 @@
 use cherris_core::{Color, Position, Role};
 
-const ROLE_VALUE: [f32; Role::COUNT] = [1.0, 3.0, 3.0, 5.0, 8.0, 100.0];
+const ROLE_VALUE: [i16; Role::COUNT] = [100, 300, 300, 500, 800, 10000];
 
-pub fn eval(position: &Position) -> f32 {
+pub fn eval(position: &Position) -> i16 {
     eval_material(position)
 }
 
-fn eval_material(position: &Position) -> f32 {
-    let mut eval = 0.0;
+fn eval_material(position: &Position) -> i16 {
+    let mut eval = 0;
 
     for role in Role::iter() {
-        let role_count_white = position.board.count_roles(*role, Color::White) as f32;
-        let role_count_black = position.board.count_roles(*role, Color::Black) as f32;
+        let role_count_white = position.board.count_roles(*role, Color::White) as i16;
+        let role_count_black = position.board.count_roles(*role, Color::Black) as i16;
 
         let role_diff = role_count_white - role_count_black;
         eval += role_diff * ROLE_VALUE[role.to_index()];
@@ -32,7 +32,7 @@ mod tests {
 
         let result = eval_material(&position);
 
-        assert_eq!(result, ROLE_VALUE[Role::Pawn.to_index()] * 2.0);
+        assert_eq!(result, ROLE_VALUE[Role::Pawn.to_index()] * 2);
     }
 
     #[test]
@@ -42,6 +42,6 @@ mod tests {
 
         let result = eval_material(&position);
 
-        assert_eq!(result, ROLE_VALUE[Role::Pawn.to_index()] * -2.0);
+        assert_eq!(result, ROLE_VALUE[Role::Pawn.to_index()] * -2);
     }
 }
