@@ -83,6 +83,15 @@ impl Index<Role> for [Bitboard; Role::COUNT] {
     }
 }
 
+impl Index<&Role> for [Bitboard; Role::COUNT] {
+    type Output = Bitboard;
+
+    #[inline]
+    fn index(&self, index: &Role) -> &Self::Output {
+        unsafe { self.get_unchecked(index.to_index()) }
+    }
+}
+
 impl IndexMut<Role> for [Bitboard; Role::COUNT] {
     #[inline]
     fn index_mut(&mut self, index: Role) -> &mut Self::Output {

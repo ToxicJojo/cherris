@@ -53,7 +53,7 @@ impl Engine {
                         for mv in moves {
                             let mut position = self.position;
                             position.make_move(mv);
-                            let mut eval = alpha_beta_max(i16::MIN, i16::MAX, 5, &position);
+                            let mut eval = alpha_beta_max(i16::MIN, i16::MAX, 3, &position);
                             if self.position.color_to_move == Color::Black {
                                 eval *= -1;
                             }
