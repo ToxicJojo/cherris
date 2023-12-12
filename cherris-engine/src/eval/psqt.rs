@@ -1,7 +1,7 @@
 use cherris_core::{Color, Position, Role, Square};
 
 #[rustfmt::skip]
-const PAWN_PSQT: [i16; Square::COUNT] = flip([
+const PAWN_PSQT: [i16; Square::COUNT] =[
      0,   0,   0,   0,   0,   0,   0,   0,
     60,  60,  60,  60,  70,  60,  60,  60,
     40,  40,  40,  50,  60,  40,  40,  40,
@@ -10,10 +10,10 @@ const PAWN_PSQT: [i16; Square::COUNT] = flip([
      5,   5,  10,  20,  30,   5,   5,   5,
      5,   5,   5, -30, -30,   5,   5,   5,
      0,   0,   0,   0,   0,   0,   0,   0
-]);
+];
 
 #[rustfmt::skip]
-const KNIGHT_PSQT: [i16; Square::COUNT] = flip([
+const KNIGHT_PSQT: [i16; Square::COUNT] =[
     -20, -10,  -10,  -10,  -10,  -10,  -10,  -20,
     -10,  -5,   -5,   -5,   -5,   -5,   -5,  -10,
     -10,  -5,   15,   15,   15,   15,   -5,  -10,
@@ -22,10 +22,10 @@ const KNIGHT_PSQT: [i16; Square::COUNT] = flip([
     -10,  -5,   10,   15,   15,   15,   -5,  -10,
     -10,  -5,   -5,   -5,   -5,   -5,   -5,  -10,
     -20,   0,  -10,  -10,  -10,  -10,    0,  -20
-]);
+];
 
 #[rustfmt::skip]
-const BISHOP_PSQT: [i16; Square::COUNT] = flip([
+const BISHOP_PSQT: [i16; Square::COUNT] =[
     -20,    0,    0,    0,    0,    0,    0,  -20,
     -15,    0,    0,    0,    0,    0,    0,  -15,
     -10,    0,    0,    5,    5,    0,    0,  -10,
@@ -34,10 +34,10 @@ const BISHOP_PSQT: [i16; Square::COUNT] = flip([
       5,    5,    5,   10,   10,    5,    5,    5,
     -10,    5,    5,   10,   10,    5,    5,  -10,
     -20,  -10,  -10,  -10,  -10,  -10,  -10,  -20
-]);
+];
 
 #[rustfmt::skip]
-const ROOK_PSQT: [i16; Square::COUNT] = flip([
+const ROOK_PSQT: [i16; Square::COUNT] = [
     0,   0,   0,   0,   0,   0,   0,   0,
    15,  15,  15,  20,  20,  15,  15,  15,
     0,   0,   0,   0,   0,   0,   0,   0,
@@ -46,10 +46,10 @@ const ROOK_PSQT: [i16; Square::COUNT] = flip([
     0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,  10,  10,  10,   0,   0
-]);
+];
 
 #[rustfmt::skip]
-const QUEEN_PSQT: [i16; Square::COUNT] = flip([
+const QUEEN_PSQT: [i16; Square::COUNT] = [
     -30,  -20,  -10,  -10,  -10,  -10,  -20,  -30,
     -20,  -10,   -5,   -5,   -5,   -5,  -10,  -20,
     -10,   -5,   10,   10,   10,   10,   -5,  -10,
@@ -58,10 +58,10 @@ const QUEEN_PSQT: [i16; Square::COUNT] = flip([
     -10,   -5,   -5,   -5,   -5,   -5,   -5,  -10,
     -20,  -10,   -5,   -5,   -5,   -5,  -10,  -20,
     -30,  -20,  -10,  -10,  -10,  -10,  -20,  -30 
-]);
+];
 
 #[rustfmt::skip]
-const KING_PSQT: [i16; Square::COUNT] = flip([
+const KING_PSQT: [i16; Square::COUNT] = [
     0,    0,     0,     0,    0,    0,    0,    0,
     0,    0,     0,     0,    0,    0,    0,    0,
     0,    0,     0,     0,    0,    0,    0,    0,
@@ -70,7 +70,7 @@ const KING_PSQT: [i16; Square::COUNT] = flip([
     0,    0,     0,     0,    0,    0,    0,    0,
     0,    0,     0,   -10,  -10,    0,    0,    0,
     0,    0,    20,   -10,  -10,    0,   20,    0,
-]);
+];
 
 const PSQT: [[i16; Square::COUNT]; Role::COUNT] = [
     PAWN_PSQT,
@@ -93,18 +93,6 @@ pub const FLIP: [usize; 64] = [
      0,  1,  2,  3,  4,  5,  6,  7,
 ];
 
-const fn flip(psqt: [i16; Square::COUNT]) -> [i16; Square::COUNT] {
-    let mut result = [0; Square::COUNT];
-    let mut index = 0;
-
-    while index < Square::COUNT {
-        result[index] = psqt[FLIP[index]];
-        index += 1;
-    }
-
-    result
-}
-
 pub fn eval_psqt(position: &Position) -> i16 {
     let mut eval = 0;
 
@@ -116,7 +104,7 @@ pub fn eval_psqt(position: &Position) -> i16 {
         let black_role = black & position.board.role[role];
 
         for square_white in white_role {
-            eval += PSQT[role.to_index()][square_white.to_index()];
+            eval += PSQT[role.to_index()][FLIP[square_white.to_index()]];
         }
 
         for square_black in black_role {

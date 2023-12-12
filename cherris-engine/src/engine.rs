@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
-use cherris_core::{generate_lookup_tables, Color, Move, Position, LAN};
+use cherris_core::{generate_lookup_tables, Move, Position, LAN};
 
-use crate::{alpha_beta_max, UCIEngineCommand, UCIGuiCommand, UCISearchParams};
+use crate::{Search, UCIEngineCommand, UCIGuiCommand, UCISearchParams};
 
 pub struct Engine {
     position: Position,
@@ -47,24 +47,7 @@ impl Engine {
                     }
                     UCIEngineCommand::Go(search_params) => {
                         self.uci_search_params = search_params;
-                        let moves = self.position.legal_moves();
-                        let mut best_move = moves[0];
-                        let mut best_val = i16::MIN;
-                        for mv in moves {
-                            let mut position = self.position;
-                            position.make_move(mv);
-                            let mut eval = alpha_beta_max(i16::MIN, i16::MAX, 3, &position);
-                            if self.position.color_to_move == Color::Black {
-                                eval *= -1;
-                            }
-
-                            if eval > best_val {
-                                best_move = mv;
-                                best_val = eval;
-                            }
-                        }
-
-                        self.send_command(UCIGuiCommand::BestMove(best_move.to_string()));
+                        Search::run(self.position, &self.uci_search_params);
                     }
                     UCIEngineCommand::IsReady => self.send_command(UCIGuiCommand::ReadyOk),
                     UCIEngineCommand::Quit => break,

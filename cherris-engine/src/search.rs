@@ -1,64 +1,61 @@
-use arrayvec::ArrayVec;
-use cherris_core::{generate_moves, Move, Position};
+use std::thread;
 
-use crate::eval;
+use cherris_core::{Color, Move, Position};
 
-pub fn alpha_beta_max(alpha: i16, beta: i16, depth: u8, position: &Position) -> i16 {
-    let mut moves = ArrayVec::<Move, 256>::new();
-    generate_moves(position, &mut moves);
+use crate::{alpha_beta::alpha_beta_min, UCIGuiCommand, UCISearchParams};
 
-    if moves.is_empty() {
-        return i16::MIN;
-    }
+use self::alpha_beta::alpha_beta_max;
 
-    let mut alpha = alpha;
-    if depth == 0 {
-        return eval(position);
-    }
+pub mod alpha_beta;
 
-    for mv in moves {
-        let mut next_position = *position;
-        next_position.make_move(mv);
-        let score = alpha_beta_min(alpha, beta, depth - 1, &next_position);
-
-        if score >= beta {
-            return beta;
-        }
-
-        if score > alpha {
-            alpha = score
-        }
-    }
-
-    alpha
+pub struct SearchData {
+    pub nodes: u64,
+    pub pv: Vec<Move>,
 }
 
-pub fn alpha_beta_min(alpha: i16, beta: i16, depth: u8, position: &Position) -> i16 {
-    let mut moves = ArrayVec::<Move, 256>::new();
-    generate_moves(position, &mut moves);
+pub struct Search {}
 
-    if moves.is_empty() {
-        return i16::MAX;
+impl Search {
+    pub fn run(position: Position, _search_params: &UCISearchParams) {
+        thread::spawn(move || {
+            let mut depth = 1;
+
+            let mut pv = Vec::new();
+            while depth <= 5 {
+                let mut search_data = SearchData {
+                    nodes: 0,
+                    pv: Vec::new(),
+                };
+
+                pv.clear();
+
+                let eval = match position.color_to_move {
+                    Color::White => alpha_beta_max(
+                        i16::MIN,
+                        i16::MAX,
+                        depth,
+                        &mut pv,
+                        &position,
+                        &mut search_data,
+                    ),
+                    Color::Black => alpha_beta_min(
+                        i16::MIN,
+                        i16::MAX,
+                        depth,
+                        &mut pv,
+                        &position,
+                        &mut search_data,
+                    ),
+                };
+
+                println!(
+                    "info depth {} seldepth {} score {} nodes {} pv {:?}",
+                    depth, depth, eval, search_data.nodes, pv
+                );
+                depth += 1;
+            }
+
+            print!("{}", UCIGuiCommand::BestMove(pv[0].to_string()));
+        });
     }
-
-    let mut beta = beta;
-    if depth == 0 {
-        return eval(position);
-    }
-
-    for mv in moves {
-        let mut next_position = *position;
-        next_position.make_move(mv);
-        let score = alpha_beta_max(alpha, beta, depth - 1, &next_position);
-
-        if score <= alpha {
-            return alpha;
-        }
-
-        if score < beta {
-            beta = score
-        }
-    }
-
-    beta
 }
