@@ -2,7 +2,7 @@ use crate::{Color, Position, Role, Square};
 
 const ZOBRIST_SIZE: usize = Role::COUNT * Color::COUNT * Square::COUNT;
 static ZOBRIST_PIECES: [u64; ZOBRIST_SIZE] = generate_zobrist_pieces();
-static ZOBRIST_BLACK: u64 = PRNG::rand(353284).0;
+static ZOBRIST_BLACK: u64 = Prng::rand(353284).0;
 static ZOBRIST_CASTLING: [u64; 16] = generate_zobrist_castling();
 static ZOBRIST_EN_PASSANT: [u64; 8] = generate_zobrist_en_passant();
 
@@ -12,7 +12,7 @@ const fn generate_zobrist_pieces() -> [u64; ZOBRIST_SIZE] {
     let mut seed = 1070372;
 
     while index < ZOBRIST_SIZE {
-        let (key, next_seed) = PRNG::rand(seed);
+        let (key, next_seed) = Prng::rand(seed);
         zobrist_keys[index] = key;
         seed = next_seed;
         index += 1;
@@ -27,7 +27,7 @@ const fn generate_zobrist_castling() -> [u64; 16] {
     let mut seed = 832053;
 
     while index < 4 {
-        let (key, next_seed) = PRNG::rand(seed);
+        let (key, next_seed) = Prng::rand(seed);
         zobrist_keys[index] = key;
         seed = next_seed;
         index += 1;
@@ -42,7 +42,7 @@ const fn generate_zobrist_en_passant() -> [u64; 8] {
     let mut seed = 7234975;
 
     while index < 8 {
-        let (key, next_seed) = PRNG::rand(seed);
+        let (key, next_seed) = Prng::rand(seed);
         zobrist_keys[index] = key;
         seed = next_seed;
         index += 1;
@@ -76,9 +76,9 @@ pub fn zobrist_hash(position: &Position) -> u64 {
     hash
 }
 
-struct PRNG {}
+struct Prng {}
 
-impl PRNG {
+impl Prng {
     pub const fn rand(seed: u64) -> (u64, u64) {
         let mut s = seed;
         s ^= s >> 12;
