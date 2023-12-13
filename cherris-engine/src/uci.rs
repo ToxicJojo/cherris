@@ -1,6 +1,6 @@
 use std::{fmt::Display, str::FromStr};
 
-use cherris_core::Position;
+use cherris_core::{Move, Position};
 
 #[derive(Debug, PartialEq, Eq, Default)]
 pub struct UCISearchParams {
@@ -16,6 +16,15 @@ pub struct UCISearchParams {
     pub mate: Option<u64>,
     pub movetime: Option<u64>,
     pub infinite: bool,
+}
+
+pub struct UCISearchInfo {
+    pub depth: u8,
+    pub seldepth: u8,
+    pub time: u64,
+    pub nodes: u64,
+    pub score: i16,
+    pub pv: Vec<Move>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -160,7 +169,7 @@ pub enum UCIGuiCommand {
     BestMove(String),
     CopyProtection,
     Registration,
-    Info,
+    Info(UCISearchInfo),
     Option(EngineOption),
 }
 
@@ -212,6 +221,19 @@ impl Display for UCIGuiCommand {
 
                 if let Some(max) = &option.max {
                     write!(f, " max {}", max)?;
+                }
+
+                writeln!(f)
+            }
+            UCIGuiCommand::Info(info) => {
+                write!(
+                    f,
+                    "info depth {} seldepth {} score cp {} time {} nodes {} pv",
+                    info.depth, info.seldepth, info.score, info.time, info.nodes
+                )?;
+
+                for mv in info.pv.clone() {
+                    write!(f, " {}", mv)?;
                 }
 
                 writeln!(f)

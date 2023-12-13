@@ -2,7 +2,7 @@ use std::thread;
 
 use cherris_core::{Color, Move, Position};
 
-use crate::{alpha_beta::alpha_beta_min, UCIGuiCommand, UCISearchParams};
+use crate::{alpha_beta::alpha_beta_min, UCIGuiCommand, UCISearchInfo, UCISearchParams};
 
 use self::alpha_beta::alpha_beta_max;
 
@@ -48,10 +48,17 @@ impl Search {
                     ),
                 };
 
-                println!(
-                    "info depth {} seldepth {} score {} nodes {} pv {:?}",
-                    depth, depth, eval, search_data.nodes, pv
-                );
+                let search_info = UCISearchInfo {
+                    depth,
+                    seldepth: depth,
+                    time: 0,
+                    score: eval,
+                    nodes: search_data.nodes,
+                    pv: pv.clone(),
+                };
+                let info_command = UCIGuiCommand::Info(search_info);
+                print!("{}", info_command);
+
                 depth += 1;
             }
 
