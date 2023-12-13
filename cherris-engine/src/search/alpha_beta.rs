@@ -11,15 +11,15 @@ pub fn alpha_beta_max(
     position: &Position,
     search_data: &mut SearchData,
 ) -> i16 {
-    if depth == 0 {
-        return eval(position);
-    }
-
     let mut moves = ArrayVec::<Move, 256>::new();
     generate_moves(position, &mut moves);
 
     if moves.is_empty() {
-        return i16::MIN;
+        return i16::MIN + 1;
+    }
+
+    if depth == 0 {
+        return eval(position);
     }
 
     let mut alpha = alpha;
@@ -66,15 +66,15 @@ pub fn alpha_beta_min(
     position: &Position,
     search_data: &mut SearchData,
 ) -> i16 {
-    if depth == 0 {
-        return eval(position);
-    }
-
     let mut moves = ArrayVec::<Move, 256>::new();
     generate_moves(position, &mut moves);
 
     if moves.is_empty() {
-        return i16::MAX;
+        return i16::MAX - 1;
+    }
+
+    if depth == 0 {
+        return eval(position);
     }
 
     if search_data.pv.len() > 0 {

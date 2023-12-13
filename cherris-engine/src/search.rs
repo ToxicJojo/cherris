@@ -59,6 +59,10 @@ impl Search {
                 let info_command = UCIGuiCommand::Info(search_info);
                 print!("{}", info_command);
 
+                if eval == i16::MIN + 1 || eval == i16::MAX - 1 {
+                    break;
+                }
+
                 depth += 1;
             }
 
