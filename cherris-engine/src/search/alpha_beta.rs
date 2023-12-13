@@ -24,6 +24,11 @@ pub fn alpha_beta_max(
 
     let mut alpha = alpha;
 
+    if search_data.pv.len() > 0 {
+        moves.insert(0, search_data.pv[0]);
+        search_data.pv.remove(0);
+    }
+
     for mv in moves {
         let mut local_pv = Vec::new();
         search_data.nodes += 1;
@@ -70,6 +75,11 @@ pub fn alpha_beta_min(
 
     if moves.is_empty() {
         return i16::MAX;
+    }
+
+    if search_data.pv.len() > 0 {
+        moves.insert(0, search_data.pv[0]);
+        search_data.pv.remove(0);
     }
 
     let mut beta = beta;

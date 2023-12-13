@@ -21,10 +21,10 @@ impl Search {
             let mut depth = 1;
 
             let mut pv = Vec::new();
-            while depth <= 5 {
+            while depth <= 3 {
                 let mut search_data = SearchData {
                     nodes: 0,
-                    pv: Vec::new(),
+                    pv: pv.clone(),
                 };
 
                 pv.clear();
