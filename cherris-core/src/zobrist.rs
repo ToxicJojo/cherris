@@ -6,6 +6,46 @@ static ZOBRIST_BLACK: u64 = Prng::rand(353284).0;
 static ZOBRIST_CASTLING: [u64; 16] = generate_zobrist_castling();
 static ZOBRIST_EN_PASSANT: [u64; 8] = generate_zobrist_en_passant();
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+/// Represents a Zobrist key that can be used as a hash key to store and retrive information for a position.
+pub struct Zobrist(u64);
+
+impl Zobrist {
+    /// The Zobrist key for the starting `Position`.
+    pub const DEFAULT: Zobrist = Zobrist(3821593027773340683);
+
+    fn hash(position: &Position) -> Zobrist {
+        let mut hash = 0;
+        for square in position.board.occupied {
+            let piece = position.board.piece_on(square).unwrap();
+            let key =
+                ZOBRIST_PIECES[piece.color.to_index() * piece.role.to_index() + square.to_index()];
+
+            hash ^= key;
+        }
+
+        if position.color_to_move == Color::Black {
+            hash ^= ZOBRIST_BLACK;
+        }
+
+        hash ^= ZOBRIST_CASTLING
+            [position.castling_rights[0].to_index() + position.castling_rights[1].to_index()];
+
+        if let Some(en_passant_sqaure) = position.en_passant_square {
+            let file = en_passant_sqaure.to_index() % 8;
+            hash ^= ZOBRIST_EN_PASSANT[file];
+        }
+
+        Zobrist(hash)
+    }
+}
+
+impl From<&Position> for Zobrist {
+    fn from(value: &Position) -> Self {
+        Zobrist::hash(value)
+    }
+}
+
 const fn generate_zobrist_pieces() -> [u64; ZOBRIST_SIZE] {
     let mut zobrist_keys = [0; ZOBRIST_SIZE];
     let mut index = 0;
@@ -51,31 +91,6 @@ const fn generate_zobrist_en_passant() -> [u64; 8] {
     zobrist_keys
 }
 
-pub fn zobrist_hash(position: &Position) -> u64 {
-    let mut hash = 0;
-    for square in position.board.occupied {
-        let piece = position.board.piece_on(square).unwrap();
-        let key =
-            ZOBRIST_PIECES[piece.color.to_index() * piece.role.to_index() + square.to_index()];
-
-        hash ^= key;
-    }
-
-    if position.color_to_move == Color::Black {
-        hash ^= ZOBRIST_BLACK;
-    }
-
-    hash ^= ZOBRIST_CASTLING
-        [position.castling_rights[0].to_index() + position.castling_rights[1].to_index()];
-
-    if let Some(en_passant_sqaure) = position.en_passant_square {
-        let file = en_passant_sqaure.to_index() % 8;
-        hash ^= ZOBRIST_EN_PASSANT[file];
-    }
-
-    hash
-}
-
 struct Prng {}
 
 impl Prng {
@@ -99,17 +114,15 @@ mod tests {
     fn zobrist_start_pos() {
         let position = Position::default();
 
-        let hash = zobrist_hash(&position);
-
-        assert_eq!(hash, 3821593027773340683);
+        assert_eq!(position.zobrist.0, 3821593027773340683);
     }
 
     #[test]
     fn zobrist_diff_ep() {
         let mut position = Position::default();
-        let hash = zobrist_hash(&position);
+        let hash = Zobrist::from(&position);
         position.en_passant_square = Some(Square::E3);
-        let hash_ep = zobrist_hash(&position);
+        let hash_ep = Zobrist::from(&position);
 
         assert_ne!(hash, hash_ep);
     }
@@ -117,9 +130,9 @@ mod tests {
     #[test]
     fn zobrist_diff_castling() {
         let mut position = Position::default();
-        let hash = zobrist_hash(&position);
+        let hash = Zobrist::from(&position);
         position.castling_rights[0] = CastlingRights::NoSide;
-        let hash_castling = zobrist_hash(&position);
+        let hash_castling = Zobrist::from(&position);
 
         assert_ne!(hash, hash_castling);
     }
@@ -127,9 +140,9 @@ mod tests {
     #[test]
     fn zobrist_diff_color() {
         let mut position = Position::default();
-        let hash = zobrist_hash(&position);
+        let hash = Zobrist::from(&position);
         position.color_to_move = Color::Black;
-        let hash_color = zobrist_hash(&position);
+        let hash_color = Zobrist::from(&position);
 
         assert_ne!(hash, hash_color);
     }
@@ -137,9 +150,9 @@ mod tests {
     #[test]
     fn zobrist_diff_piece() {
         let mut position = Position::default();
-        let hash = zobrist_hash(&position);
+        let hash = Zobrist::from(&position);
         position.make_move(position.legal_moves()[0]);
-        let hash_piece = zobrist_hash(&position);
+        let hash_piece = Zobrist::from(&position);
 
         assert_ne!(hash, hash_piece);
     }

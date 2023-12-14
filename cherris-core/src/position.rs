@@ -4,6 +4,7 @@ use arrayvec::ArrayVec;
 
 use crate::{
     generate_moves, Bitboard, Board, CastlingRights, Color, Error, File, Move, Rank, Role, Square,
+    Zobrist,
 };
 
 /// Represents a chess position.
@@ -15,6 +16,7 @@ pub struct Position {
     pub halfmove_clock: u8,
     pub fullmove_number: usize,
     pub castling_rights: [CastlingRights; Color::COUNT],
+    pub zobrist: Zobrist,
 }
 
 impl Position {
@@ -115,6 +117,7 @@ impl Position {
         }
 
         self.color_to_move = !self.color_to_move;
+        self.zobrist = Zobrist::from(&*self);
     }
 
     pub fn legal_moves(&self) -> ArrayVec<Move, 256> {
@@ -247,6 +250,7 @@ impl FromStr for Position {
             halfmove_clock,
             fullmove_number,
             castling_rights: [white_castling, black_castling],
+            zobrist: Zobrist::DEFAULT,
         })
     }
 }
