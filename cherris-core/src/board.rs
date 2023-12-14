@@ -85,6 +85,7 @@ impl Board {
         self.occupied |= square_bb;
     }
 
+    /// Returns the number of pieces with the given `Role` and `Color`.
     pub fn count_roles(&self, role: Role, color: Color) -> u32 {
         (self.role[role] & self.color[color]).population_count()
     }
@@ -131,45 +132,53 @@ impl Board {
                 self.color[!color] ^= target_bb;
                 self.role[Role::Pawn] ^= target_bb;
             }
-            Move::CastleShort => match color {
-                Color::White => {
-                    let king_bb = Bitboard(1 << 4) | Bitboard(1 << 6);
-                    let rook_bb = Bitboard(1 << 5) | Bitboard(1 << 7);
-
-                    self.color[color] ^= king_bb | rook_bb;
-                    self.role[Role::King] ^= king_bb;
-                    self.role[Role::Rook] ^= rook_bb;
-                }
-                Color::Black => {
-                    let king_bb = Bitboard(1 << 60) | Bitboard(1 << 62);
-                    let rook_bb = Bitboard(1 << 61) | Bitboard(1 << 63);
-
-                    self.color[color] ^= king_bb | rook_bb;
-                    self.role[Role::King] ^= king_bb;
-                    self.role[Role::Rook] ^= rook_bb;
-                }
-            },
-            Move::CastleLong => match color {
-                Color::White => {
-                    let king_bb = Bitboard(1 << 4) | Bitboard(1 << 2);
-                    let rook_bb = Bitboard(1 << 0) | Bitboard(1 << 3);
-
-                    self.color[color] ^= king_bb | rook_bb;
-                    self.role[Role::King] ^= king_bb;
-                    self.role[Role::Rook] ^= rook_bb;
-                }
-                Color::Black => {
-                    let king_bb = Bitboard(1 << 60) | Bitboard(1 << 58);
-                    let rook_bb = Bitboard(1 << 56) | Bitboard(1 << 59);
-
-                    self.color[color] ^= king_bb | rook_bb;
-                    self.role[Role::King] ^= king_bb;
-                    self.role[Role::Rook] ^= rook_bb;
-                }
-            },
+            Move::CastleShort => self.castle_short(color),
+            Move::CastleLong => self.castle_long(color),
         }
 
         self.occupied = self.color[Color::White] | self.color[Color::Black];
+    }
+
+    fn castle_long(&mut self, color: Color) {
+        match color {
+            Color::White => {
+                let king_bb = Bitboard(1 << 4) | Bitboard(1 << 2);
+                let rook_bb = Bitboard(1 << 0) | Bitboard(1 << 3);
+
+                self.color[color] ^= king_bb | rook_bb;
+                self.role[Role::King] ^= king_bb;
+                self.role[Role::Rook] ^= rook_bb;
+            }
+            Color::Black => {
+                let king_bb = Bitboard(1 << 60) | Bitboard(1 << 58);
+                let rook_bb = Bitboard(1 << 56) | Bitboard(1 << 59);
+
+                self.color[color] ^= king_bb | rook_bb;
+                self.role[Role::King] ^= king_bb;
+                self.role[Role::Rook] ^= rook_bb;
+            }
+        }
+    }
+
+    fn castle_short(&mut self, color: Color) {
+        match color {
+            Color::White => {
+                let king_bb = Bitboard(1 << 4) | Bitboard(1 << 6);
+                let rook_bb = Bitboard(1 << 5) | Bitboard(1 << 7);
+
+                self.color[color] ^= king_bb | rook_bb;
+                self.role[Role::King] ^= king_bb;
+                self.role[Role::Rook] ^= rook_bb;
+            }
+            Color::Black => {
+                let king_bb = Bitboard(1 << 60) | Bitboard(1 << 62);
+                let rook_bb = Bitboard(1 << 61) | Bitboard(1 << 63);
+
+                self.color[color] ^= king_bb | rook_bb;
+                self.role[Role::King] ^= king_bb;
+                self.role[Role::Rook] ^= rook_bb;
+            }
+        }
     }
 
     /// Returns a `Bitboard` that indicates which sqaures are currently attacked by the pieces of
