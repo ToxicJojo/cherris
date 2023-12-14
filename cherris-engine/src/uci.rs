@@ -2,7 +2,7 @@ use std::{fmt::Display, str::FromStr};
 
 use cherris_core::{Move, Position};
 
-#[derive(Debug, PartialEq, Eq, Default)]
+#[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub struct UCISearchParams {
     pub search_moves: Vec<String>,
     pub ponder: bool,
@@ -11,7 +11,7 @@ pub struct UCISearchParams {
     pub w_inc: Option<u64>,
     pub b_inc: Option<u64>,
     pub moves_to_go: Option<u64>,
-    pub depth: Option<u64>,
+    pub depth: Option<u8>,
     pub nodes: Option<u64>,
     pub mate: Option<u64>,
     pub movetime: Option<u64>,
@@ -21,7 +21,7 @@ pub struct UCISearchParams {
 pub struct UCISearchInfo {
     pub depth: u8,
     pub seldepth: u8,
-    pub time: u64,
+    pub time: u128,
     pub nodes: u64,
     pub score: i16,
     pub pv: Vec<Move>,
@@ -125,7 +125,7 @@ impl UCIEngineCommand {
                     Token::MovesToGo => {
                         search_params.moves_to_go = Some(u64::from_str(part).unwrap())
                     }
-                    Token::Depth => search_params.depth = Some(u64::from_str(part).unwrap()),
+                    Token::Depth => search_params.depth = Some(u8::from_str(part).unwrap()),
                     Token::Nodes => search_params.nodes = Some(u64::from_str(part).unwrap()),
                     Token::Mate => search_params.mate = Some(u64::from_str(part).unwrap()),
                     Token::MoveTime => search_params.movetime = Some(u64::from_str(part).unwrap()),

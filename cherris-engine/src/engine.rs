@@ -47,7 +47,7 @@ impl Engine {
                     }
                     UCIEngineCommand::Go(search_params) => {
                         self.uci_search_params = search_params;
-                        Search::run(self.position, &self.uci_search_params);
+                        Search::run(self.position, self.uci_search_params.clone());
                     }
                     UCIEngineCommand::IsReady => self.send_command(UCIGuiCommand::ReadyOk),
                     UCIEngineCommand::Quit => break,
