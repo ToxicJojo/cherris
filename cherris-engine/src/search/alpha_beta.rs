@@ -24,7 +24,7 @@ pub fn alpha_beta_max(
 
     let mut alpha = alpha;
 
-    if search_data.pv.len() > 0 {
+    if !search_data.pv.is_empty() {
         moves.insert(0, search_data.pv[0]);
         search_data.pv.remove(0);
     }
@@ -77,7 +77,7 @@ pub fn alpha_beta_min(
         return eval(position);
     }
 
-    if search_data.pv.len() > 0 {
+    if !search_data.pv.is_empty() {
         moves.insert(0, search_data.pv[0]);
         search_data.pv.remove(0);
     }
