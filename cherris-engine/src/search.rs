@@ -4,15 +4,17 @@ use cherris_core::{Color, Move, Position};
 
 use crate::{alpha_beta::alpha_beta_min, UCIGuiCommand, UCISearchInfo, UCISearchParams};
 
-use self::alpha_beta::alpha_beta_max;
+use self::{alpha_beta::alpha_beta_max, transposition_table::TranspositionTable};
 
 pub mod alpha_beta;
+pub mod transposition_table;
 
 const DEFAULT_MAX_DEPTH: u8 = 5;
 
 pub struct SearchData {
     pub nodes: u64,
     pub pv: Vec<Move>,
+    pub transposition_table: TranspositionTable,
 }
 
 pub struct Search {}
@@ -30,6 +32,7 @@ impl Search {
                 let mut search_data = SearchData {
                     nodes: 0,
                     pv: pv.clone(),
+                    transposition_table: TranspositionTable::new(2_u64.pow(16)),
                 };
 
                 pv.clear();

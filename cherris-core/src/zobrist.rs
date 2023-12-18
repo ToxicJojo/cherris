@@ -38,6 +38,10 @@ impl Zobrist {
 
         Zobrist(hash)
     }
+
+    pub fn key(&self) -> u64 {
+        self.0
+    }
 }
 
 impl From<&Position> for Zobrist {
