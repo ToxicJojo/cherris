@@ -1,10 +1,10 @@
 use std::{thread, time::Instant};
 
-use cherris_core::{Color, Move, Position};
+use cherris_core::{Move, Position};
 
-use crate::{alpha_beta::alpha_beta_min, UCIGuiCommand, UCISearchInfo, UCISearchParams};
+use crate::{UCIGuiCommand, UCISearchInfo, UCISearchParams};
 
-use self::{alpha_beta::alpha_beta_max, transposition_table::TranspositionTable};
+use self::{alpha_beta::alpha_beta, transposition_table::TranspositionTable};
 
 pub mod alpha_beta;
 pub mod transposition_table;
@@ -37,24 +37,14 @@ impl Search {
 
                 pv.clear();
 
-                let eval = match position.color_to_move {
-                    Color::White => alpha_beta_max(
-                        i16::MIN,
-                        i16::MAX,
-                        depth,
-                        &mut pv,
-                        &position,
-                        &mut search_data,
-                    ),
-                    Color::Black => alpha_beta_min(
-                        i16::MIN,
-                        i16::MAX,
-                        depth,
-                        &mut pv,
-                        &position,
-                        &mut search_data,
-                    ),
-                };
+                let eval = alpha_beta(
+                    i16::MIN + 1,
+                    i16::MAX - 1,
+                    depth,
+                    &mut pv,
+                    &position,
+                    &mut search_data,
+                );
 
                 let search_info = UCISearchInfo {
                     depth,
@@ -67,7 +57,7 @@ impl Search {
                 let info_command = UCIGuiCommand::Info(search_info);
                 print!("{}", info_command);
 
-                if eval == i16::MIN + 1 || eval == i16::MAX - 1 {
+                if eval == i16::MIN + 2 || eval == i16::MAX - 2 {
                     break;
                 }
 
