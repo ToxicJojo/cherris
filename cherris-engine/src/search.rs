@@ -1,4 +1,8 @@
-use std::{thread, time::Instant};
+use std::{
+    sync::{Arc, Mutex},
+    thread,
+    time::Instant,
+};
 
 use cherris_core::{Move, Position};
 
@@ -14,7 +18,7 @@ const DEFAULT_MAX_DEPTH: u8 = 5;
 pub struct SearchData {
     pub nodes: u64,
     pub pv: Vec<Move>,
-    pub transposition_table: TranspositionTable,
+    pub transposition_table: Arc<Mutex<TranspositionTable>>,
 }
 
 pub struct Search {}
@@ -27,12 +31,14 @@ impl Search {
             let max_depth = search_params.depth.unwrap_or(DEFAULT_MAX_DEPTH);
 
             let mut pv = Vec::new();
+            let transposition_table = Arc::new(Mutex::new(TranspositionTable::new(2_u64.pow(16))));
+
             while depth <= max_depth {
                 let timer = Instant::now();
                 let mut search_data = SearchData {
                     nodes: 0,
                     pv: pv.clone(),
-                    transposition_table: TranspositionTable::new(2_u64.pow(16)),
+                    transposition_table: transposition_table.clone(),
                 };
 
                 pv.clear();

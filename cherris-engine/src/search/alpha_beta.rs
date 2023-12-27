@@ -1,7 +1,7 @@
 use arrayvec::ArrayVec;
 use cherris_core::{generate_moves, Color, Move, Position};
 
-use crate::{eval, SearchData};
+use crate::{eval, transposition_table::TranspositionEntryType, SearchData};
 
 pub fn alpha_beta(
     alpha: i16,
@@ -11,6 +11,26 @@ pub fn alpha_beta(
     position: &Position,
     search_data: &mut SearchData,
 ) -> i16 {
+    let tt_table = search_data.transposition_table.lock().unwrap();
+    if let Some(tt_entry) = tt_table.get(position.zobrist) {
+        if tt_entry.zobrist == position.zobrist && tt_entry.depth >= depth {
+            match tt_entry.entry_type {
+                TranspositionEntryType::Exact => return tt_entry.score,
+                TranspositionEntryType::UpperBound => {
+                    if tt_entry.score <= alpha {
+                        return tt_entry.score;
+                    }
+                }
+                TranspositionEntryType::LowerBound => {
+                    if tt_entry.score >= beta {
+                        return tt_entry.score;
+                    }
+                }
+            }
+        }
+    }
+    drop(tt_table);
+
     let mut moves = ArrayVec::<Move, 256>::new();
     generate_moves(position, &mut moves);
 
@@ -32,6 +52,8 @@ pub fn alpha_beta(
         search_data.pv.remove(0);
     }
 
+    let mut entry_type = TranspositionEntryType::UpperBound;
+
     for mv in moves {
         let mut local_pv = Vec::new();
         search_data.nodes += 1;
@@ -47,16 +69,33 @@ pub fn alpha_beta(
         );
 
         if score >= beta {
+            let mut tt_table = search_data.transposition_table.lock().unwrap();
+            tt_table.insert(crate::transposition_table::TranspositionEntry {
+                zobrist: position.zobrist,
+                score: beta,
+                depth,
+                entry_type: TranspositionEntryType::LowerBound,
+            });
             return beta;
         }
 
         if score > alpha {
+            entry_type = TranspositionEntryType::Exact;
+
             pv.clear();
             pv.push(mv);
             pv.append(&mut local_pv);
             alpha = score
         }
     }
+
+    let mut tt_table = search_data.transposition_table.lock().unwrap();
+    tt_table.insert(crate::transposition_table::TranspositionEntry {
+        zobrist: position.zobrist,
+        score: alpha,
+        depth,
+        entry_type,
+    });
 
     alpha
 }
