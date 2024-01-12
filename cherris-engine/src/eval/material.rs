@@ -10,7 +10,7 @@ pub fn eval_material(position: &Position) -> i16 {
         let role_count_black = position.board.count_roles(*role, Color::Black) as i16;
 
         let role_diff = role_count_white - role_count_black;
-        eval += role_diff * ROLE_VALUE[role.to_index()];
+        eval += role_diff * ROLE_VALUE[role];
     }
 
     eval

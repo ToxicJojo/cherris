@@ -104,11 +104,11 @@ pub fn eval_psqt(position: &Position) -> i16 {
         let black_role = black & position.board.role[role];
 
         for square_white in white_role {
-            eval += PSQT[role.to_index()][FLIP[square_white.to_index()]];
+            eval += PSQT[role][FLIP[square_white.to_index()]];
         }
 
         for square_black in black_role {
-            eval -= PSQT[role.to_index()][square_black.to_index()];
+            eval -= PSQT[role][square_black.to_index()];
         }
     }
 

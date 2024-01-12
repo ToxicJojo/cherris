@@ -5,7 +5,7 @@ use std::{
     str::FromStr,
 };
 
-use crate::{Bitboard, Error};
+use crate::Error;
 
 /// Represents the role of a chess piece.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -74,8 +74,8 @@ impl FromStr for Role {
     }
 }
 
-impl Index<Role> for [Bitboard; Role::COUNT] {
-    type Output = Bitboard;
+impl<T> Index<Role> for [T; Role::COUNT] {
+    type Output = T;
 
     #[inline]
     fn index(&self, index: Role) -> &Self::Output {
@@ -83,8 +83,8 @@ impl Index<Role> for [Bitboard; Role::COUNT] {
     }
 }
 
-impl Index<&Role> for [Bitboard; Role::COUNT] {
-    type Output = Bitboard;
+impl<T> Index<&Role> for [T; Role::COUNT] {
+    type Output = T;
 
     #[inline]
     fn index(&self, index: &Role) -> &Self::Output {
@@ -92,7 +92,7 @@ impl Index<&Role> for [Bitboard; Role::COUNT] {
     }
 }
 
-impl IndexMut<Role> for [Bitboard; Role::COUNT] {
+impl<T> IndexMut<Role> for [T; Role::COUNT] {
     #[inline]
     fn index_mut(&mut self, index: Role) -> &mut Self::Output {
         unsafe { self.get_unchecked_mut(index.to_index()) }
