@@ -25,6 +25,7 @@ impl Position {
 
     pub fn make_move(&mut self, chess_move: Move) {
         self.board.make_move(self.color_to_move, chess_move);
+        self.zobrist.update_castling_right(self.castling_rights);
 
         self.en_passant_square = match chess_move {
             Move::Standard {
@@ -116,8 +117,9 @@ impl Position {
             }
         }
 
+        self.zobrist.update_castling_right(self.castling_rights);
+        self.zobrist.update(chess_move, self.color_to_move);
         self.color_to_move = !self.color_to_move;
-        self.zobrist = Zobrist::from(&*self);
     }
 
     pub fn legal_moves(&self) -> ArrayVec<Move, 256> {

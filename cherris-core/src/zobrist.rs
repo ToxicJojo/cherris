@@ -1,4 +1,4 @@
-use crate::{Color, Position, Role, Square};
+use crate::{CastlingRights, Color, Move, Position, Role, Square};
 
 const ZOBRIST_SIZE: usize = Role::COUNT * Color::COUNT * Square::COUNT;
 static ZOBRIST_PIECES: [u64; ZOBRIST_SIZE] = generate_zobrist_pieces();
@@ -13,6 +13,10 @@ pub struct Zobrist(u64);
 impl Zobrist {
     /// The Zobrist key for the starting `Position`.
     pub const DEFAULT: Zobrist = Zobrist(3821593027773340683);
+
+    pub fn key(&self) -> u64 {
+        self.0
+    }
 
     fn hash(position: &Position) -> Zobrist {
         let mut hash = 0;
@@ -39,8 +43,95 @@ impl Zobrist {
         Zobrist(hash)
     }
 
-    pub fn key(&self) -> u64 {
-        self.0
+    pub fn update_castling_right(&mut self, castling_rights: [CastlingRights; Color::COUNT]) {
+        self.0 ^= ZOBRIST_CASTLING[castling_rights[0].to_index() + castling_rights[1].to_index()];
+    }
+
+    pub fn update(&mut self, chess_move: Move, color: Color) {
+        self.0 ^= ZOBRIST_BLACK;
+
+        match chess_move {
+            Move::Standard {
+                from,
+                to,
+                role,
+                capture,
+                promotion,
+                en_passant_square,
+            } => {
+                self.0 ^= ZOBRIST_PIECES[color.to_index() * role.to_index() + from.to_index()];
+                if let Some(role) = promotion {
+                    self.0 ^= ZOBRIST_PIECES[color.to_index() * role.to_index() + to.to_index()];
+                } else {
+                    self.0 ^= ZOBRIST_PIECES[color.to_index() * role.to_index() + to.to_index()];
+                }
+
+                if let Some(role) = capture {
+                    self.0 ^= ZOBRIST_PIECES[(!color).to_index() * role.to_index() + to.to_index()];
+                }
+
+                if let Some(en_passant_sqaure) = en_passant_square {
+                    let file = en_passant_sqaure.to_index() % 8;
+                    self.0 ^= ZOBRIST_EN_PASSANT[file];
+                }
+            }
+            Move::EnPassant { from, to, target } => {
+                self.0 ^=
+                    ZOBRIST_PIECES[color.to_index() * Role::Pawn.to_index() + from.to_index()];
+                self.0 ^= ZOBRIST_PIECES[color.to_index() * Role::Pawn.to_index() + to.to_index()];
+
+                self.0 ^=
+                    ZOBRIST_PIECES[!(color).to_index() * Role::Pawn.to_index() + target.to_index()];
+            }
+            Move::CastleShort => match color {
+                Color::White => {
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::King.to_index() + Square::E1.to_index()];
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::King.to_index() + Square::G1.to_index()];
+
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::Rook.to_index() + Square::H1.to_index()];
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::Rook.to_index() + Square::F1.to_index()];
+                }
+                Color::Black => {
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::King.to_index() + Square::E8.to_index()];
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::King.to_index() + Square::G8.to_index()];
+
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::Rook.to_index() + Square::H8.to_index()];
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::Rook.to_index() + Square::F8.to_index()];
+                }
+            },
+            Move::CastleLong => match color {
+                Color::White => {
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::King.to_index() + Square::E1.to_index()];
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::King.to_index() + Square::C1.to_index()];
+
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::Rook.to_index() + Square::A1.to_index()];
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::Rook.to_index() + Square::D1.to_index()];
+                }
+                Color::Black => {
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::King.to_index() + Square::E8.to_index()];
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::King.to_index() + Square::C8.to_index()];
+
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::Rook.to_index() + Square::A8.to_index()];
+                    self.0 ^= ZOBRIST_PIECES
+                        [color.to_index() * Role::Rook.to_index() + Square::D8.to_index()];
+                }
+            },
+        }
     }
 }
 
