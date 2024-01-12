@@ -4,7 +4,7 @@ use std::{
     str::FromStr,
 };
 
-use crate::{Bitboard, Error};
+use crate::Error;
 
 /// Represents the colors in chess.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -33,8 +33,8 @@ impl Color {
     }
 }
 
-impl Index<Color> for [Bitboard; Color::COUNT] {
-    type Output = Bitboard;
+impl<T> Index<Color> for [T; Color::COUNT] {
+    type Output = T;
 
     #[inline]
     fn index(&self, index: Color) -> &Self::Output {
@@ -42,7 +42,7 @@ impl Index<Color> for [Bitboard; Color::COUNT] {
     }
 }
 
-impl IndexMut<Color> for [Bitboard; Color::COUNT] {
+impl<T> IndexMut<Color> for [T; Color::COUNT] {
     #[inline]
     fn index_mut(&mut self, index: Color) -> &mut Self::Output {
         unsafe { self.get_unchecked_mut(index.to_index()) }
