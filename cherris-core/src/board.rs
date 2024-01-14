@@ -240,14 +240,14 @@ impl Board {
         let rook_queens = (self.role[Role::Rook] | self.role[Role::Queen]) & self.color[!color];
         let attackers = rook_attacks(king_sqaure, blocker) & rook_queens;
         for attacker in attackers {
-            check_mask |= RAY_BETWEEN[king_sqaure.to_index()][attacker.to_index()];
+            check_mask |= RAY_BETWEEN[king_sqaure][attacker];
         }
 
         let bishops_queens =
             (self.role[Role::Bishop] | self.role[Role::Queen]) & self.color[!color];
         let attackers = bishop_attacks(king_sqaure, blocker) & bishops_queens;
         for attacker in attackers {
-            check_mask |= RAY_BETWEEN[king_sqaure.to_index()][attacker.to_index()];
+            check_mask |= RAY_BETWEEN[king_sqaure][attacker];
         }
 
         let knights = self.role[Role::Knight] & self.color[!color];
@@ -279,7 +279,7 @@ impl Board {
         let rook_queens = (self.role[Role::Rook] | self.role[Role::Queen]) & self.color[color];
         let pinners = rook_xray_attacks(square, blocker) & rook_queens;
         for pinner in pinners {
-            pin_mask |= RAY_BETWEEN[square.to_index()][pinner];
+            pin_mask |= RAY_BETWEEN[square][pinner];
         }
 
         pin_mask
@@ -293,7 +293,7 @@ impl Board {
         let bishops_queens = (self.role[Role::Bishop] | self.role[Role::Queen]) & self.color[color];
         let pinners = bishop_xray_attacks(square, blocker) & bishops_queens;
         for pinner in pinners {
-            pin_mask |= RAY_BETWEEN[square.to_index()][pinner];
+            pin_mask |= RAY_BETWEEN[square][pinner];
         }
 
         pin_mask

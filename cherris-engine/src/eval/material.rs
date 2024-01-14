@@ -28,7 +28,7 @@ mod tests {
 
         let result = eval_material(&position);
 
-        assert_eq!(result, ROLE_VALUE[Role::Pawn.to_index()] * 2);
+        assert_eq!(result, ROLE_VALUE[Role::Pawn] * 2);
     }
 
     #[test]
@@ -38,6 +38,6 @@ mod tests {
 
         let result = eval_material(&position);
 
-        assert_eq!(result, ROLE_VALUE[Role::Pawn.to_index()] * -2);
+        assert_eq!(result, ROLE_VALUE[Role::Pawn] * -2);
     }
 }

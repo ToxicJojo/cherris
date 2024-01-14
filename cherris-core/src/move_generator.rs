@@ -316,7 +316,7 @@ pub fn generate_moves(position: &Position, moves: &mut ArrayVec<Move, 256>) {
 
         let path_empty = (castle_path_short & blockers).is_empty();
         let path_unattacked = (castle_path_short & attacked_squares).is_empty();
-        let castling_rights = position.castling_rights[position.color_to_move.to_index()];
+        let castling_rights = position.castling_rights[position.color_to_move];
 
         if path_empty
             && path_unattacked
@@ -329,7 +329,7 @@ pub fn generate_moves(position: &Position, moves: &mut ArrayVec<Move, 256>) {
 
         let path_empty = (castle_path_long & blockers).is_empty();
         let path_unattacked = (castle_path_long_attacks & attacked_squares).is_empty();
-        let castling_rights = position.castling_rights[position.color_to_move.to_index()];
+        let castling_rights = position.castling_rights[position.color_to_move];
 
         if path_empty
             && path_unattacked

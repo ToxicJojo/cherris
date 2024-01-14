@@ -44,41 +44,37 @@ impl Position {
             }
         }
 
-        self.castling_rights[self.color_to_move.to_index()] = match chess_move {
+        self.castling_rights[self.color_to_move] = match chess_move {
             Move::Standard { from, role, .. } => {
                 if role == Role::King {
-                    self.castling_rights[self.color_to_move.to_index()] = CastlingRights::NoSide;
+                    self.castling_rights[self.color_to_move] = CastlingRights::NoSide;
                 }
                 if role == Role::Rook {
                     match self.color_to_move {
                         Color::White => {
                             if from == Square::A1 {
-                                self.castling_rights[self.color_to_move.to_index()]
-                                    .remove_queen_side();
+                                self.castling_rights[self.color_to_move].remove_queen_side();
                             }
 
                             if from == Square::H1 {
-                                self.castling_rights[self.color_to_move.to_index()]
-                                    .remove_king_side();
+                                self.castling_rights[self.color_to_move].remove_king_side();
                             }
                         }
                         Color::Black => {
                             if from == Square::A8 {
-                                self.castling_rights[self.color_to_move.to_index()]
-                                    .remove_queen_side();
+                                self.castling_rights[self.color_to_move].remove_queen_side();
                             }
 
                             if from == Square::H8 {
-                                self.castling_rights[self.color_to_move.to_index()]
-                                    .remove_king_side();
+                                self.castling_rights[self.color_to_move].remove_king_side();
                             }
                         }
                     }
                 };
 
-                self.castling_rights[self.color_to_move.to_index()]
+                self.castling_rights[self.color_to_move]
             }
-            Move::EnPassant { .. } => self.castling_rights[self.color_to_move.to_index()],
+            Move::EnPassant { .. } => self.castling_rights[self.color_to_move],
             Move::CastleLong => CastlingRights::NoSide,
             Move::CastleShort => CastlingRights::NoSide,
         };
@@ -93,24 +89,20 @@ impl Position {
                 match !self.color_to_move {
                     Color::White => {
                         if to == Square::A1 {
-                            self.castling_rights[(!self.color_to_move).to_index()]
-                                .remove_queen_side();
+                            self.castling_rights[!self.color_to_move].remove_queen_side();
                         }
 
                         if to == Square::H1 {
-                            self.castling_rights[(!self.color_to_move).to_index()]
-                                .remove_king_side();
+                            self.castling_rights[!self.color_to_move].remove_king_side();
                         }
                     }
                     Color::Black => {
                         if to == Square::A8 {
-                            self.castling_rights[(!self.color_to_move).to_index()]
-                                .remove_queen_side();
+                            self.castling_rights[!self.color_to_move].remove_queen_side();
                         }
 
                         if to == Square::H8 {
-                            self.castling_rights[(!self.color_to_move).to_index()]
-                                .remove_king_side();
+                            self.castling_rights[!self.color_to_move].remove_king_side();
                         }
                     }
                 }

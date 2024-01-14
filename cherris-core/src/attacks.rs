@@ -7,29 +7,27 @@ use std::arch::x86_64::_pext_u64;
 
 #[inline]
 pub fn pawn_attacks(square: Square, color: Color) -> Bitboard {
-    unsafe {
-        match color {
-            Color::White => *PAWN_MOVES_WHITE.get_unchecked(square.to_index()),
-            Color::Black => *PAWN_MOVES_BLACK.get_unchecked(square.to_index()),
-        }
+    match color {
+        Color::White => PAWN_MOVES_WHITE[square],
+        Color::Black => PAWN_MOVES_BLACK[square],
     }
 }
 
 #[inline]
 pub fn king_attacks(square: Square) -> Bitboard {
-    unsafe { *KING_MOVES.get_unchecked(square.to_index()) }
+    KING_MOVES[square]
 }
 
 #[inline]
 pub fn knight_attacks(square: Square) -> Bitboard {
-    unsafe { *KNIGHT_MOVES.get_unchecked(square.to_index()) }
+    KNIGHT_MOVES[square]
 }
 
 #[inline]
 pub fn bishop_attacks(square: Square, blocker: Bitboard) -> Bitboard {
     unsafe {
-        let mask = *BISHOP_MASKS.get_unchecked(square.to_index());
-        let index = _pext_u64(blocker.0, mask) + *BISHOP_OFFSETS.get_unchecked(square.to_index());
+        let mask = BISHOP_MASKS[square];
+        let index = _pext_u64(blocker.0, mask) + BISHOP_OFFSETS[square];
         *BISHOP_ATTACKS.get_unchecked(index as usize)
     }
 }
@@ -37,8 +35,8 @@ pub fn bishop_attacks(square: Square, blocker: Bitboard) -> Bitboard {
 #[inline]
 pub fn bishop_xray_attacks(square: Square, blocker: Bitboard) -> Bitboard {
     unsafe {
-        let mask = *BISHOP_MASKS.get_unchecked(square.to_index());
-        let index = _pext_u64(blocker.0, mask) + *BISHOP_OFFSETS.get_unchecked(square.to_index());
+        let mask = BISHOP_MASKS[square];
+        let index = _pext_u64(blocker.0, mask) + BISHOP_OFFSETS[square];
         *BISHOP_XRAY_ATTACKS.get_unchecked(index as usize)
     }
 }
@@ -46,8 +44,8 @@ pub fn bishop_xray_attacks(square: Square, blocker: Bitboard) -> Bitboard {
 #[inline]
 pub fn rook_attacks(square: Square, blocker: Bitboard) -> Bitboard {
     unsafe {
-        let mask = *ROOK_MAKS.get_unchecked(square.to_index());
-        let index = _pext_u64(blocker.0, mask) + *ROOK_OFFSETS.get_unchecked(square.to_index());
+        let mask = ROOK_MAKS[square];
+        let index = _pext_u64(blocker.0, mask) + ROOK_OFFSETS[square];
         *ROOK_ATTACKS.get_unchecked(index as usize)
     }
 }
@@ -55,8 +53,8 @@ pub fn rook_attacks(square: Square, blocker: Bitboard) -> Bitboard {
 #[inline]
 pub fn rook_xray_attacks(square: Square, blocker: Bitboard) -> Bitboard {
     unsafe {
-        let mask = *ROOK_MAKS.get_unchecked(square.to_index());
-        let index = _pext_u64(blocker.0, mask) + *ROOK_OFFSETS.get_unchecked(square.to_index());
+        let mask = ROOK_MAKS[square];
+        let index = _pext_u64(blocker.0, mask) + ROOK_OFFSETS[square];
         *ROOK_XRAY_ATTACKS.get_unchecked(index as usize)
     }
 }
