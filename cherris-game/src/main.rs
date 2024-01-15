@@ -143,7 +143,7 @@ fn main() {
                                         }
                                     });
 
-                                    if let Some(choosen_move) = piece_moves.get(0) {
+                                    if let Some(choosen_move) = piece_moves.first() {
                                         game.make_move(*choosen_move);
                                         moves = game.legal_moves();
                                         if moves.is_empty() {
