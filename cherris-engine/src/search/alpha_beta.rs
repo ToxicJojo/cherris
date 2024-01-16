@@ -55,8 +55,13 @@ pub fn alpha_beta(
     let mut entry_type = TranspositionEntryType::UpperBound;
 
     for mv in moves {
-        let mut local_pv = Vec::new();
         search_data.nodes += 1;
+
+        if search_data.nodes > search_data.max_nodes {
+            break;
+        }
+
+        let mut local_pv = Vec::new();
         let mut next_position = *position;
         next_position.make_move(mv);
         let score = -alpha_beta(

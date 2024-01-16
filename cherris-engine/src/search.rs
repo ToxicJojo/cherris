@@ -17,6 +17,7 @@ const DEFAULT_MAX_DEPTH: u8 = 5;
 
 pub struct SearchData {
     pub nodes: u64,
+    pub max_nodes: u64,
     pub pv: Vec<Move>,
     pub transposition_table: Arc<Mutex<TranspositionTable>>,
 }
@@ -37,6 +38,7 @@ impl Search {
                 let timer = Instant::now();
                 let mut search_data = SearchData {
                     nodes: 0,
+                    max_nodes: search_params.nodes.unwrap_or(u64::MAX),
                     pv: pv.clone(),
                     transposition_table: transposition_table.clone(),
                 };
@@ -64,6 +66,10 @@ impl Search {
                 print!("{}", info_command);
 
                 if eval == i16::MIN + 2 || eval == i16::MAX - 2 {
+                    break;
+                }
+
+                if search_data.nodes > search_data.max_nodes {
                     break;
                 }
 
