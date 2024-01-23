@@ -1,7 +1,7 @@
 use arrayvec::ArrayVec;
 use cherris_core::{generate_moves, Color, Move, Position};
 
-use crate::{eval, transposition_table::TranspositionEntryType, SearchData};
+use crate::{eval, move_sort::sort_moves, transposition_table::TranspositionEntryType, SearchData};
 
 pub fn alpha_beta(
     alpha: i16,
@@ -47,12 +47,13 @@ pub fn alpha_beta(
 
     let mut alpha = alpha;
 
+    let mut entry_type = TranspositionEntryType::UpperBound;
+
+    let pv_move = search_data.pv.first();
+    sort_moves(&mut moves, pv_move);
     if !search_data.pv.is_empty() {
-        moves.insert(0, search_data.pv[0]);
         search_data.pv.remove(0);
     }
-
-    let mut entry_type = TranspositionEntryType::UpperBound;
 
     for mv in moves {
         search_data.nodes += 1;

@@ -12,3 +12,5 @@ pub fn eval(position: &Position) -> i16 {
 
     eval
 }
+
+pub use material::ROLE_VALUE;

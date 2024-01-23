@@ -1,6 +1,6 @@
 use cherris_core::{Color, Position, Role};
 
-const ROLE_VALUE: [i16; Role::COUNT] = [100, 300, 300, 500, 800, 10000];
+pub const ROLE_VALUE: [i16; Role::COUNT] = [100, 300, 300, 500, 800, 10000];
 
 pub fn eval_material(position: &Position) -> i16 {
     let mut eval = 0;

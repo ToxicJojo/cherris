@@ -11,6 +11,7 @@ use crate::{UCIGuiCommand, UCISearchInfo, UCISearchParams};
 use self::{alpha_beta::alpha_beta, transposition_table::TranspositionTable};
 
 pub mod alpha_beta;
+pub mod move_sort;
 pub mod transposition_table;
 
 const DEFAULT_MAX_DEPTH: u8 = 5;
