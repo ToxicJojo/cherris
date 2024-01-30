@@ -4,17 +4,18 @@ use std::{
     time::Instant,
 };
 
-use cherris_core::{Move, Position};
+use cherris_core::{Color, Move, Position};
 
-use crate::{UCIGuiCommand, UCISearchInfo, UCISearchParams};
+use crate::{time_managment::TimeManagment, UCIGuiCommand, UCISearchInfo, UCISearchParams};
 
 use self::{alpha_beta::alpha_beta, transposition_table::TranspositionTable};
 
 pub mod alpha_beta;
 pub mod move_sort;
+pub mod time_managment;
 pub mod transposition_table;
 
-const DEFAULT_MAX_DEPTH: u8 = 5;
+const DEFAULT_MAX_DEPTH: u8 = 10;
 
 pub struct SearchData {
     pub nodes: u64,
@@ -32,8 +33,21 @@ impl Search {
 
             let max_depth = search_params.depth.unwrap_or(DEFAULT_MAX_DEPTH);
 
-            let mut pv = Vec::new();
+            let mut pv = Vec::with_capacity(max_depth.into());
             let transposition_table = Arc::new(Mutex::new(TranspositionTable::new(2_u64.pow(16))));
+
+            let (time, increment) = match position.color_to_move {
+                Color::White => (
+                    search_params.w_time.unwrap_or(u64::MAX),
+                    search_params.w_inc.unwrap_or_default(),
+                ),
+                Color::Black => (
+                    search_params.b_time.unwrap_or(u64::MAX),
+                    search_params.b_inc.unwrap_or_default(),
+                ),
+            };
+
+            let time_managment = TimeManagment::new(time, increment);
 
             while depth <= max_depth {
                 let timer = Instant::now();
@@ -71,6 +85,10 @@ impl Search {
                 }
 
                 if search_data.nodes > search_data.max_nodes {
+                    break;
+                }
+
+                if !time_managment.has_time_for_next_iteration(timer.elapsed().as_millis()) {
                     break;
                 }
 
