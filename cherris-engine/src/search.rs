@@ -12,6 +12,7 @@ use self::{alpha_beta::alpha_beta, transposition_table::TranspositionTable};
 
 pub mod alpha_beta;
 pub mod move_sort;
+pub mod quiescence;
 pub mod time_managment;
 pub mod transposition_table;
 

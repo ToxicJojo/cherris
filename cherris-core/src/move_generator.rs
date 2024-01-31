@@ -388,3 +388,25 @@ fn generate_promotion_move(
         }
     }
 }
+
+pub fn generate_quiet_moves(position: &Position, moves: &mut ArrayVec<Move, 256>) {
+    // TODO This should have custom logic to only generate non captures instead of generating all
+    // moves and then filtering.
+    generate_moves(position, moves);
+    moves.retain(|mv| match mv {
+        Move::Standard { capture, .. } => capture.is_none(),
+        Move::EnPassant { .. } => false,
+        _ => true,
+    });
+}
+
+pub fn generate_loud_moves(position: &Position, moves: &mut ArrayVec<Move, 256>) {
+    // TODO This should have custom logic to only generate captures instead of generating all
+    // moves and then filtering.
+    generate_moves(position, moves);
+    moves.retain(|mv| match mv {
+        Move::Standard { capture, .. } => capture.is_some(),
+        Move::EnPassant { .. } => true,
+        _ => false,
+    });
+}
