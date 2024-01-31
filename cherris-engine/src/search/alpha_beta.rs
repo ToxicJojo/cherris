@@ -1,9 +1,9 @@
 use arrayvec::ArrayVec;
-use cherris_core::{generate_moves, Color, Move, Position};
+use cherris_core::{generate_moves, Move, Position};
 
 use crate::{
-    eval, move_sort::sort_moves, quiescence::quiescence,
-    transposition_table::TranspositionEntryType, SearchData,
+    move_sort::sort_moves, quiescence::quiescence, transposition_table::TranspositionEntryType,
+    SearchData,
 };
 
 pub fn alpha_beta(
