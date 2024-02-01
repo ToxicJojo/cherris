@@ -38,7 +38,11 @@ pub fn alpha_beta(
     generate_moves(position, &mut moves);
 
     if moves.is_empty() {
-        return i16::MIN + 6;
+        if position.is_in_check() {
+            return i16::MIN + 6;
+        } else {
+            return 0;
+        }
     }
 
     if depth == 0 {

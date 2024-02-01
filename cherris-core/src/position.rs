@@ -119,6 +119,13 @@ impl Position {
         generate_moves(self, &mut moves);
         moves
     }
+
+    pub fn is_in_check(&self) -> bool {
+        let king_sqaure = self.board.role[Role::King] & self.board.color[self.color_to_move];
+        let attacked_squares = self.board.attacked_sqaures(!self.color_to_move);
+
+        !(king_sqaure & attacked_squares).is_empty()
+    }
 }
 
 impl FromStr for Position {
