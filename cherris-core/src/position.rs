@@ -227,8 +227,7 @@ impl FromStr for Position {
 
         let color_to_move = Color::from_str(color_to_move)?;
 
-        let white_castling = CastlingRights::from_str(castling_rights, Color::White);
-        let black_castling = CastlingRights::from_str(castling_rights, Color::Black);
+        let castling_rights = CastlingRights::from_str(castling_rights);
 
         let mut en_passant_square = None;
         if en_passant != "-" {
@@ -250,7 +249,7 @@ impl FromStr for Position {
             en_passant_square,
             halfmove_clock,
             fullmove_number,
-            castling_rights: [white_castling, black_castling],
+            castling_rights,
             zobrist: Zobrist::DEFAULT,
         })
     }

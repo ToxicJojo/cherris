@@ -32,6 +32,7 @@ impl Rank {
     ];
 
     /// An iterator over all ranks starting with the first one.
+    #[inline]
     pub fn iter() -> Iter<'static, Rank> {
         Rank::ALL.iter()
     }

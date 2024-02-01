@@ -31,15 +31,16 @@ impl File {
         File::H,
     ];
 
+    /// An iterator over all files starting with the A file.
+    #[inline]
+    pub fn iter() -> Iter<'static, File> {
+        File::ALL.iter()
+    }
+
     /// Converts a `File` to a `usize`.
     #[inline]
     pub fn to_index(&self) -> usize {
         *self as usize
-    }
-
-    /// An iterator over all files starting with the A file.
-    pub fn iter() -> Iter<'static, File> {
-        File::ALL.iter()
     }
 
     /// Returns the file for the given index. Wraps around if index > 7.

@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
 
 use crate::Color;
 
@@ -17,27 +17,21 @@ impl CastlingRights {
     }
 
     /// Converts a `&str` to `CastlingRights` for a specific `Color`.
-    pub fn from_str(input: &str, color: Color) -> CastlingRights {
-        let mut castling = CastlingRights::NoSide;
-        match color {
-            Color::White => {
-                if input.contains("KQ") {
-                    castling = CastlingRights::BothSides;
-                } else if input.contains('K') {
-                    castling = CastlingRights::KingSide;
-                } else if input.contains('Q') {
-                    castling = CastlingRights::QueenSide;
-                }
-            }
-            Color::Black => {
-                if input.contains("kq") {
-                    castling = CastlingRights::BothSides
-                } else if input.contains('k') {
-                    castling = CastlingRights::KingSide
-                } else if input.contains('q') {
-                    castling = CastlingRights::QueenSide
-                }
-            }
+    pub fn from_str(input: &str) -> [CastlingRights; Color::COUNT] {
+        let mut castling = [CastlingRights::NoSide, CastlingRights::NoSide];
+        if input.contains("KQ") {
+            castling[Color::White] = CastlingRights::BothSides;
+        } else if input.contains('K') {
+            castling[Color::White] = CastlingRights::KingSide;
+        } else if input.contains('Q') {
+            castling[Color::White] = CastlingRights::QueenSide;
+        }
+        if input.contains("kq") {
+            castling[Color::Black] = CastlingRights::BothSides
+        } else if input.contains('k') {
+            castling[Color::Black] = CastlingRights::KingSide
+        } else if input.contains('q') {
+            castling[Color::Black] = CastlingRights::QueenSide
         }
         castling
     }
@@ -78,28 +72,46 @@ mod tests {
 
     #[test]
     fn from_str_white() {
-        let no_side = CastlingRights::from_str("", Color::White);
-        let king_side = CastlingRights::from_str("K", Color::White);
-        let queen_side = CastlingRights::from_str("Q", Color::White);
-        let both_sides = CastlingRights::from_str("KQ", Color::White);
+        let no_side = CastlingRights::from_str("");
+        let king_side = CastlingRights::from_str("K");
+        let queen_side = CastlingRights::from_str("Q");
+        let both_sides = CastlingRights::from_str("KQ");
 
-        assert_eq!(no_side, CastlingRights::NoSide);
-        assert_eq!(king_side, CastlingRights::KingSide);
-        assert_eq!(queen_side, CastlingRights::QueenSide);
-        assert_eq!(both_sides, CastlingRights::BothSides);
+        assert_eq!(no_side, [CastlingRights::NoSide, CastlingRights::NoSide]);
+        assert_eq!(
+            king_side,
+            [CastlingRights::KingSide, CastlingRights::NoSide]
+        );
+        assert_eq!(
+            queen_side,
+            [CastlingRights::QueenSide, CastlingRights::NoSide]
+        );
+        assert_eq!(
+            both_sides,
+            [CastlingRights::BothSides, CastlingRights::NoSide]
+        );
     }
 
     #[test]
     fn from_str_black() {
-        let no_side = CastlingRights::from_str("", Color::Black);
-        let king_side = CastlingRights::from_str("k", Color::Black);
-        let queen_side = CastlingRights::from_str("q", Color::Black);
-        let both_sides = CastlingRights::from_str("kq", Color::Black);
+        let no_side = CastlingRights::from_str("");
+        let king_side = CastlingRights::from_str("k");
+        let queen_side = CastlingRights::from_str("q");
+        let both_sides = CastlingRights::from_str("kq");
 
-        assert_eq!(no_side, CastlingRights::NoSide);
-        assert_eq!(king_side, CastlingRights::KingSide);
-        assert_eq!(queen_side, CastlingRights::QueenSide);
-        assert_eq!(both_sides, CastlingRights::BothSides);
+        assert_eq!(no_side, [CastlingRights::NoSide, CastlingRights::NoSide]);
+        assert_eq!(
+            king_side,
+            [CastlingRights::NoSide, CastlingRights::KingSide]
+        );
+        assert_eq!(
+            queen_side,
+            [CastlingRights::NoSide, CastlingRights::QueenSide]
+        );
+        assert_eq!(
+            both_sides,
+            [CastlingRights::NoSide, CastlingRights::BothSides,]
+        );
     }
 
     #[test]
