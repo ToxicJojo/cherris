@@ -34,7 +34,7 @@ pub fn quiescence(
     generate_loud_moves(position, &mut moves);
 
     let pv_move = search_data.pv.first();
-    sort_moves(&mut moves, pv_move);
+    sort_moves(&mut moves, None);
     if !search_data.pv.is_empty() {
         search_data.pv.remove(0);
     }

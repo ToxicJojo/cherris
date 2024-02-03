@@ -3,13 +3,13 @@ use cherris_core::Move;
 
 use crate::ROLE_VALUE;
 
-pub fn sort_moves(moves: &mut ArrayVec<Move, 256>, pv_move: Option<&Move>) {
-    moves.sort_unstable_by_key(|mv| score_move(mv, pv_move))
+pub fn sort_moves(moves: &mut ArrayVec<Move, 256>, tt_move: Option<Move>) {
+    moves.sort_by_key(|mv| score_move(mv, tt_move))
 }
 
-fn score_move(mv: &Move, pv_move: Option<&Move>) -> i16 {
-    if let Some(pv_move) = pv_move {
-        if mv == pv_move {
+fn score_move(mv: &Move, tt_move: Option<Move>) -> i16 {
+    if let Some(tt_move) = tt_move {
+        if mv == &tt_move {
             return -10000;
         }
     }

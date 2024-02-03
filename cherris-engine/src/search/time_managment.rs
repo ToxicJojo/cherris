@@ -18,7 +18,7 @@ impl TimeManagment {
     pub fn has_time_for_next_iteration(&self, last_iteration_time: u128) -> bool {
         let elapsed = self.start_time.elapsed().as_millis();
         let allocated_time = ((self.time_left + self.increment) / 24) as u128;
-        let expected_time = last_iteration_time * 10;
+        let expected_time = last_iteration_time * 5;
 
         allocated_time > elapsed + expected_time
     }

@@ -1,4 +1,4 @@
-use cherris_core::Zobrist;
+use cherris_core::{Move, Zobrist};
 
 #[derive(Clone, Copy, Debug)]
 pub struct TranspositionEntry {
@@ -6,6 +6,7 @@ pub struct TranspositionEntry {
     pub score: i16,
     pub depth: u8,
     pub entry_type: TranspositionEntryType,
+    pub chess_move: Move,
 }
 
 #[derive(Clone, Copy, Debug)]
