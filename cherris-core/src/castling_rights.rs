@@ -17,7 +17,7 @@ impl CastlingRights {
     }
 
     /// Converts a `&str` to `CastlingRights` for a specific `Color`.
-    pub fn from_str(input: &str) -> [CastlingRights; Color::COUNT] {
+    pub fn from_fen_str(input: &str) -> [CastlingRights; Color::COUNT] {
         let mut castling = [CastlingRights::NoSide, CastlingRights::NoSide];
         if input.contains("KQ") {
             castling[Color::White] = CastlingRights::BothSides;
@@ -72,10 +72,10 @@ mod tests {
 
     #[test]
     fn from_str_white() {
-        let no_side = CastlingRights::from_str("");
-        let king_side = CastlingRights::from_str("K");
-        let queen_side = CastlingRights::from_str("Q");
-        let both_sides = CastlingRights::from_str("KQ");
+        let no_side = CastlingRights::from_fen_str("");
+        let king_side = CastlingRights::from_fen_str("K");
+        let queen_side = CastlingRights::from_fen_str("Q");
+        let both_sides = CastlingRights::from_fen_str("KQ");
 
         assert_eq!(no_side, [CastlingRights::NoSide, CastlingRights::NoSide]);
         assert_eq!(
@@ -94,10 +94,10 @@ mod tests {
 
     #[test]
     fn from_str_black() {
-        let no_side = CastlingRights::from_str("");
-        let king_side = CastlingRights::from_str("k");
-        let queen_side = CastlingRights::from_str("q");
-        let both_sides = CastlingRights::from_str("kq");
+        let no_side = CastlingRights::from_fen_str("");
+        let king_side = CastlingRights::from_fen_str("k");
+        let queen_side = CastlingRights::from_fen_str("q");
+        let both_sides = CastlingRights::from_fen_str("kq");
 
         assert_eq!(no_side, [CastlingRights::NoSide, CastlingRights::NoSide]);
         assert_eq!(

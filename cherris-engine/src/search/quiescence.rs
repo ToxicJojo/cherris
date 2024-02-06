@@ -33,11 +33,7 @@ pub fn quiescence(
     let mut moves = ArrayVec::<Move, 256>::new();
     generate_loud_moves(position, &mut moves);
 
-    let pv_move = search_data.pv.first();
     sort_moves(&mut moves, None);
-    if !search_data.pv.is_empty() {
-        search_data.pv.remove(0);
-    }
 
     for mv in moves {
         let mut local_pv = Vec::new();

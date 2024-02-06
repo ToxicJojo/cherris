@@ -14,11 +14,12 @@ pub fn alpha_beta(
     position: &Position,
     search_data: &mut SearchData,
 ) -> i16 {
+    let is_root = search_data.nodes == 0;
     let tt_table = search_data.transposition_table.lock().unwrap();
     let mut tt_move = None;
     if let Some(tt_entry) = tt_table.get(position.zobrist) {
         tt_move = Some(tt_entry.chess_move);
-        if tt_entry.zobrist == position.zobrist && tt_entry.depth >= depth {
+        if tt_entry.zobrist == position.zobrist && tt_entry.depth >= depth && !is_root {
             match tt_entry.entry_type {
                 TranspositionEntryType::Exact => return tt_entry.score,
                 TranspositionEntryType::UpperBound => {
@@ -56,9 +57,6 @@ pub fn alpha_beta(
     let mut entry_type = TranspositionEntryType::UpperBound;
 
     sort_moves(&mut moves, tt_move);
-    if !search_data.pv.is_empty() {
-        search_data.pv.remove(0);
-    }
 
     let mut best_move = *moves.first().unwrap();
     for mv in moves {

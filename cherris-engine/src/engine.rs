@@ -1,12 +1,19 @@
-use std::str::FromStr;
+use std::{
+    str::FromStr,
+    sync::{Arc, Mutex},
+};
 
 use cherris_core::{generate_lookup_tables, Move, Position, LAN};
 
-use crate::{Search, UCIEngineCommand, UCIGuiCommand, UCISearchParams};
+use crate::{
+    transposition_table::TranspositionTable, Search, UCIEngineCommand, UCIGuiCommand,
+    UCISearchParams,
+};
 
 pub struct Engine {
     position: Position,
     uci_search_params: UCISearchParams,
+    transposition_table: Arc<Mutex<TranspositionTable>>,
 }
 
 impl Engine {
@@ -14,6 +21,7 @@ impl Engine {
         Engine {
             position: Position::default(),
             uci_search_params: UCISearchParams::default(),
+            transposition_table: Arc::new(Mutex::new(TranspositionTable::new(2_u64.pow(24)))),
         }
     }
 
@@ -47,7 +55,11 @@ impl Engine {
                     }
                     UCIEngineCommand::Go(search_params) => {
                         self.uci_search_params = search_params;
-                        Search::run(self.position, self.uci_search_params.clone());
+                        Search::run(
+                            self.position,
+                            self.uci_search_params.clone(),
+                            self.transposition_table.clone(),
+                        );
                     }
                     UCIEngineCommand::IsReady => self.send_command(UCIGuiCommand::ReadyOk),
                     UCIEngineCommand::Quit => break,

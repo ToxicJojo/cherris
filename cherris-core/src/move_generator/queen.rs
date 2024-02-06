@@ -1,5 +1,5 @@
 use super::add_attacks;
-use crate::{queen_attacks, Bitboard, Move, Position, Role};
+use crate::{bishop_attacks, queen_attacks, rook_attacks, Bitboard, Move, Position, Role};
 use arrayvec::ArrayVec;
 
 pub fn generate_queen_moves(
@@ -23,14 +23,14 @@ pub fn generate_queen_moves(
     }
 
     for from in queens_pinned_diag {
-        let mut attacks = queen_attacks(from, blockers);
+        let mut attacks = bishop_attacks(from, blockers);
         attacks &= !position.board.color[position.color_to_move] & check_mask & diag_pins;
 
         add_attacks(attacks, from, Role::Queen, position, moves);
     }
 
     for from in queens_pinned_hv {
-        let mut attacks = queen_attacks(from, blockers);
+        let mut attacks = rook_attacks(from, blockers);
         attacks &= !position.board.color[position.color_to_move] & check_mask & hv_pins;
 
         add_attacks(attacks, from, Role::Queen, position, moves);

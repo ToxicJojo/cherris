@@ -28,14 +28,17 @@ pub struct SearchData {
 pub struct Search {}
 
 impl Search {
-    pub fn run(position: Position, search_params: UCISearchParams) {
+    pub fn run(
+        position: Position,
+        search_params: UCISearchParams,
+        transposition_table: Arc<Mutex<TranspositionTable>>,
+    ) {
         thread::spawn(move || {
             let mut depth = 1;
 
             let max_depth = search_params.depth.unwrap_or(DEFAULT_MAX_DEPTH);
 
             let mut pv = Vec::with_capacity(max_depth.into());
-            let transposition_table = Arc::new(Mutex::new(TranspositionTable::new(2_u64.pow(24))));
 
             let (time, increment) = match position.color_to_move {
                 Color::White => (

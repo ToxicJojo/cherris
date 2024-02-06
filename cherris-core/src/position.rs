@@ -226,8 +226,7 @@ impl FromStr for Position {
         };
 
         let color_to_move = Color::from_str(color_to_move)?;
-
-        let castling_rights = CastlingRights::from_str(castling_rights);
+        let castling_rights = CastlingRights::from_fen_str(castling_rights);
 
         let mut en_passant_square = None;
         if en_passant != "-" {

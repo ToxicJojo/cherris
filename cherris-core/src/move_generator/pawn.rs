@@ -9,9 +9,9 @@ pub fn generate_pawn_moves(
     hv_pins: Bitboard,
     diag_pins: Bitboard,
     check_mask: Bitboard,
-    blockers: Bitboard,
     king: Square,
 ) {
+    let blockers = position.board.occupied;
     let pawns = position.board.role[Role::Pawn] & position.board.color[position.color_to_move];
     let pawns_attack = pawns & !hv_pins;
     let pawns_pinned_diag = pawns_attack & diag_pins;

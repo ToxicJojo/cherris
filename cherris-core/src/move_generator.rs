@@ -30,9 +30,7 @@ pub fn generate_moves(position: &Position, moves: &mut ArrayVec<Move, 256>) {
         .board
         .diagonal_pinmask(king, !position.color_to_move);
 
-    generate_pawn_moves(
-        position, moves, empty, hv_pins, diag_pins, check_mask, blockers, king,
-    );
+    generate_pawn_moves(position, moves, empty, hv_pins, diag_pins, check_mask, king);
     generate_king_moves(position, moves, attacked_squares);
     generate_knight_moves(position, moves, hv_pins, diag_pins, check_mask);
     generate_rook_moves(position, moves, hv_pins, diag_pins, check_mask, blockers);
