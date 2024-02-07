@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use arrayvec::ArrayVec;
 
@@ -254,8 +254,88 @@ impl FromStr for Position {
     }
 }
 
+impl Display for Position {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for rank in Rank::iter().rev() {
+            let mut empty_count = 0;
+            for file in File::iter() {
+                let square = Square::from((*file, *rank));
+                let piece = self.board.piece_on(square);
+                match piece {
+                    Some(piece) => {
+                        if empty_count > 0 {
+                            write!(f, "{}", empty_count)?;
+                            empty_count = 0;
+                        }
+                        write!(f, "{}", piece)?
+                    }
+                    None => empty_count += 1,
+                }
+            }
+            if empty_count > 0 {
+                write!(f, "{}", empty_count)?;
+            }
+            if *rank != Rank::First {
+                write!(f, "/")?;
+            }
+        }
+
+        write!(f, " {}", self.color_to_move)?;
+
+        let white_castling = self.castling_rights[Color::White];
+        let black_castling = self.castling_rights[Color::Black];
+        if white_castling == CastlingRights::NoSide && black_castling == CastlingRights::NoSide {
+            write!(f, " -")?;
+        } else {
+            write!(f, " {}", white_castling.to_string().to_uppercase())?;
+            write!(f, "{}", black_castling)?;
+        }
+
+        match self.en_passant_square {
+            Some(ep_square) => write!(f, " {}", ep_square)?,
+            None => write!(f, " -")?,
+        }
+
+        write!(f, " {}", self.halfmove_clock)?;
+        write!(f, " {}", self.fullmove_number)?;
+
+        Ok(())
+    }
+}
+
 impl Default for Position {
     fn default() -> Self {
         Position::from_str(Position::STARTING_FEN).unwrap()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn display_starting_pos() {
+        assert_eq!(Position::default().to_string(), Position::STARTING_FEN);
+    }
+
+    #[test]
+    fn display_1() {
+        let fen = "3k4/3p4/8/K1P4r/8/8/8/8 b - - 0 1";
+        let pos = Position::from_str(fen).unwrap();
+        assert_eq!(pos.to_string(), fen);
+    }
+
+    #[test]
+    fn display_2() {
+        let fen = "7k/3p4/8/8/3P4/8/8/K7 w - - 0 1";
+        let pos = Position::from_str(fen).unwrap();
+        assert_eq!(pos.to_string(), fen);
+    }
+
+    #[test]
+    fn display_3() {
+        let fen = "r3k2r/8/8/8/8/8/8/1R2K2R b Kkq - 0 1";
+        let pos = Position::from_str(fen).unwrap();
+        assert_eq!(pos.to_string(), fen);
     }
 }
