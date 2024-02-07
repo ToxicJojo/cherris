@@ -59,24 +59,29 @@ pub fn generate_pawn_moves(
         .en_passant_square
         .map_or(Bitboard::EMPTY, Bitboard::from);
 
+    let en_passant_target = match position.color_to_move {
+        Color::White => en_passant_bb >> 8,
+        Color::Black => en_passant_bb << 8,
+    };
+
+    let ep_check_mask = match position.color_to_move {
+        Color::White => (check_mask & en_passant_target) << 8,
+        Color::Black => (check_mask & en_passant_target) >> 8,
+    };
+
     for from in pawns_attack_unpinned_no_promotion {
         let attacks = pawn_attacks(from, position.color_to_move) & check_mask;
-
-        let attacks_en_passant = attacks & en_passant_bb & !diag_pins;
         let attacks = attacks & position.board.color[!position.color_to_move];
-
         add_attacks(attacks, from, Role::Pawn, position, moves);
 
+        let attacks_en_passant = pawn_attacks(from, position.color_to_move) & ep_check_mask;
+        let attacks_en_passant = attacks_en_passant & en_passant_bb & !diag_pins;
+
         for to in attacks_en_passant {
-            let target = match position.color_to_move {
-                Color::White => Square(to.0 - 8),
-                Color::Black => Square(to.0 + 8),
-            };
-
+            let target = Square(en_passant_target.0.trailing_zeros() as u8);
             let from_bb = Bitboard::from(from);
-            let target_bb = Bitboard::from(target);
 
-            let occ = blockers & !from_bb & !target_bb;
+            let occ = blockers & !from_bb & !en_passant_target;
             let king_sees = rook_attacks(king, occ);
             if !(king_sees
                 & position.board.color[!position.color_to_move]
@@ -104,22 +109,18 @@ pub fn generate_pawn_moves(
 
     for from in pawns_pinned_no_promotion {
         let attacks = pawn_attacks(from, position.color_to_move) & diag_pins & check_mask;
-
-        let attacks_en_passant = attacks & en_passant_bb & !diag_pins;
         let attacks = attacks & position.board.color[!position.color_to_move];
-
         add_attacks(attacks, from, Role::Pawn, position, moves);
 
+        let attacks_en_passant =
+            pawn_attacks(from, position.color_to_move) & diag_pins & ep_check_mask;
+        let attacks_en_passant = attacks_en_passant & en_passant_bb & !diag_pins;
+
         for to in attacks_en_passant {
-            let target = match position.color_to_move {
-                Color::White => Square(to.0 - 8),
-                Color::Black => Square(to.0 + 8),
-            };
-
+            let target = Square(en_passant_target.0.trailing_zeros() as u8);
             let from_bb = Bitboard::from(from);
-            let target_bb = Bitboard::from(target);
 
-            let occ = blockers & !from_bb & !target_bb;
+            let occ = blockers & !from_bb & !en_passant_target;
             let king_sees = rook_attacks(king, occ);
             if !(king_sees
                 & position.board.color[!position.color_to_move]

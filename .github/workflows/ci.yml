@@ -47,5 +47,5 @@ jobs:
     - name: Run tests
       run: |
         sudo apt install libsdl2-dev libsdl2-image-dev
-        RUST_MIN_STACK=8388608 cargo test --verbose
+        RUST_MIN_STACK=8388608 cargo test --verbose --release -- --include-ignored
   
