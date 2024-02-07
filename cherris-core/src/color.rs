@@ -1,4 +1,5 @@
 use std::{
+    fmt::Display,
     ops::{Index, IndexMut, Not},
     slice::Iter,
     str::FromStr,
@@ -73,6 +74,15 @@ impl FromStr for Color {
     }
 }
 
+impl Display for Color {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Color::White => write!(f, "w"),
+            Color::Black => write!(f, "b"),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -121,5 +131,11 @@ mod tests {
     #[test]
     fn from_str_error() {
         assert_eq!(Color::from_str("c"), Err(Error::ParseColor));
+    }
+
+    #[test]
+    fn display() {
+        assert_eq!(Color::White.to_string(), "w");
+        assert_eq!(Color::Black.to_string(), "b");
     }
 }
