@@ -1,5 +1,4 @@
-use arrayvec::ArrayVec;
-use cherris_core::{generate_moves, Move, Position};
+use cherris_core::{generate_moves, Move, MoveList, Position};
 
 use crate::{
     move_sort::sort_moves, quiescence::quiescence, transposition_table::TranspositionEntryType,
@@ -37,7 +36,7 @@ pub fn alpha_beta(
     }
     drop(tt_table);
 
-    let mut moves = ArrayVec::<Move, 256>::new();
+    let mut moves = MoveList::new();
     generate_moves(position, &mut moves);
 
     if moves.is_empty() {

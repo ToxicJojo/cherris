@@ -1,9 +1,8 @@
-use arrayvec::ArrayVec;
-use cherris_core::Move;
+use cherris_core::{Move, MoveList};
 
 use crate::ROLE_VALUE;
 
-pub fn sort_moves(moves: &mut ArrayVec<Move, 256>, tt_move: Option<Move>) {
+pub fn sort_moves(moves: &mut MoveList, tt_move: Option<Move>) {
     moves.sort_by_key(|mv| score_move(mv, tt_move))
 }
 

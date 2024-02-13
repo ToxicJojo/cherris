@@ -54,3 +54,6 @@ pub use crate::divide::*;
 
 mod zobrist;
 pub use crate::zobrist::*;
+
+mod move_list;
+pub use crate::move_list::*;

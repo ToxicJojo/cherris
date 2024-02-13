@@ -1,5 +1,4 @@
-use arrayvec::ArrayVec;
-use cherris_core::{generate_loud_moves, Color, Move, Position};
+use cherris_core::{generate_loud_moves, Color, Move, MoveList, Position};
 
 use crate::{eval, move_sort::sort_moves, SearchData};
 
@@ -30,7 +29,7 @@ pub fn quiescence(
         alpha = stand_pat
     }
 
-    let mut moves = ArrayVec::<Move, 256>::new();
+    let mut moves = MoveList::new();
     generate_loud_moves(position, &mut moves);
 
     sort_moves(&mut moves, None);

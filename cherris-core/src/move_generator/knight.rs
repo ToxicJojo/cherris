@@ -1,10 +1,9 @@
 use super::add_attacks;
-use crate::{knight_attacks, Bitboard, Move, Position, Role};
-use arrayvec::ArrayVec;
+use crate::{knight_attacks, Bitboard, MoveList, Position, Role};
 
 pub fn generate_knight_moves(
     position: &Position,
-    moves: &mut ArrayVec<Move, 256>,
+    moves: &mut MoveList,
     hv_pins: Bitboard,
     diag_pins: Bitboard,
     check_mask: Bitboard,

@@ -1,10 +1,9 @@
 use super::{add_attacks, generate_promotion_move};
-use crate::{pawn_attacks, rook_attacks, Bitboard, Color, Move, Position, Role, Square};
-use arrayvec::ArrayVec;
+use crate::{pawn_attacks, rook_attacks, Bitboard, Color, Move, MoveList, Position, Role, Square};
 
 pub fn generate_pawn_moves(
     position: &Position,
-    moves: &mut ArrayVec<Move, 256>,
+    moves: &mut MoveList,
     empty: Bitboard,
     hv_pins: Bitboard,
     diag_pins: Bitboard,

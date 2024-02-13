@@ -1,6 +1,4 @@
-use arrayvec::ArrayVec;
-
-use crate::{Color, Move, Position};
+use crate::{Color, Move, MoveList, Position};
 
 use self::game_result::GameResult;
 
@@ -25,7 +23,7 @@ impl Game {
         self.position.color_to_move
     }
 
-    pub fn moves(&self) -> ArrayVec<Move, 256> {
+    pub fn moves(&self) -> MoveList {
         self.position.legal_moves()
     }
 

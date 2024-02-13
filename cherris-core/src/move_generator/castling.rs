@@ -1,9 +1,8 @@
-use crate::{Bitboard, CastlingRights, Color, Move, Position, Square};
-use arrayvec::ArrayVec;
+use crate::{Bitboard, CastlingRights, Color, Move, MoveList, Position, Square};
 
 pub fn generate_castling_moves(
     position: &Position,
-    moves: &mut ArrayVec<Move, 256>,
+    moves: &mut MoveList,
     kings: Bitboard,
     blockers: Bitboard,
     attacked_squares: Bitboard,

@@ -3,8 +3,7 @@ use self::{
     knight::generate_knight_moves, pawn::generate_pawn_moves, queen::generate_queen_moves,
     rook::generate_rook_moves,
 };
-use crate::{Bitboard, Move, Position, Role, Square};
-use arrayvec::ArrayVec;
+use crate::{Bitboard, Move, MoveList, Position, Role, Square};
 
 mod bishop;
 mod castling;
@@ -14,7 +13,7 @@ mod pawn;
 mod queen;
 mod rook;
 
-pub fn generate_moves(position: &Position, moves: &mut ArrayVec<Move, 256>) {
+pub fn generate_moves(position: &Position, moves: &mut MoveList) {
     let blockers = position.board.occupied;
     let empty = !blockers;
 
@@ -40,7 +39,7 @@ pub fn generate_moves(position: &Position, moves: &mut ArrayVec<Move, 256>) {
     generate_castling_moves(position, moves, kings, blockers, attacked_squares);
 }
 
-pub fn generate_quiet_moves(position: &Position, moves: &mut ArrayVec<Move, 256>) {
+pub fn generate_quiet_moves(position: &Position, moves: &mut MoveList) {
     // TODO This should have custom logic to only generate non captures instead of generating all
     // moves and then filtering.
     generate_moves(position, moves);
@@ -51,7 +50,7 @@ pub fn generate_quiet_moves(position: &Position, moves: &mut ArrayVec<Move, 256>
     });
 }
 
-pub fn generate_loud_moves(position: &Position, moves: &mut ArrayVec<Move, 256>) {
+pub fn generate_loud_moves(position: &Position, moves: &mut MoveList) {
     // TODO This should have custom logic to only generate captures instead of generating all
     // moves and then filtering.
     generate_moves(position, moves);
@@ -68,7 +67,7 @@ fn add_attacks(
     from: Square,
     role: Role,
     position: &Position,
-    moves: &mut ArrayVec<Move, 256>,
+    moves: &mut MoveList,
 ) {
     for to in attacks {
         let mv = Move::Standard {
@@ -87,12 +86,7 @@ fn add_attacks(
 }
 
 #[inline]
-fn generate_promotion_move(
-    from: Square,
-    to: Square,
-    position: &Position,
-    moves: &mut ArrayVec<Move, 256>,
-) {
+fn generate_promotion_move(from: Square, to: Square, position: &Position, moves: &mut MoveList) {
     for role in Role::iter().skip(1).take(4) {
         let mv = Move::Standard {
             role: Role::Pawn,

@@ -1,10 +1,8 @@
 use std::{fmt::Display, str::FromStr};
 
-use arrayvec::ArrayVec;
-
 use crate::{
-    generate_moves, Bitboard, Board, CastlingRights, Color, Error, File, Move, Rank, Role, Square,
-    Zobrist,
+    generate_moves, Bitboard, Board, CastlingRights, Color, Error, File, Move, MoveList, Rank,
+    Role, Square, Zobrist,
 };
 
 /// Represents a chess position.
@@ -114,8 +112,8 @@ impl Position {
         self.color_to_move = !self.color_to_move;
     }
 
-    pub fn legal_moves(&self) -> ArrayVec<Move, 256> {
-        let mut moves = ArrayVec::<Move, 256>::new();
+    pub fn legal_moves(&self) -> MoveList {
+        let mut moves = MoveList::new();
         generate_moves(self, &mut moves);
         moves
     }
