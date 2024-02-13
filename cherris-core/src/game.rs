@@ -1,22 +1,23 @@
-use std::str::FromStr;
-
 use arrayvec::ArrayVec;
 
-use crate::{Color, GameAction, Move, Position};
+use crate::{Color, Move, Position};
+
+use self::game_result::GameResult;
 
 pub struct Game {
     position: Position,
-    game_actions: Vec<GameAction>,
+    game_result: GameResult,
 }
+
+mod game_action;
+mod game_result;
+mod pgn;
 
 impl Game {
     pub fn new() -> Game {
         Game {
-            position: Position::from_str(
-                "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-            )
-            .unwrap(),
-            game_actions: Vec::new(),
+            position: Position::default(),
+            game_result: GameResult::Ongoing,
         }
     }
 
@@ -24,29 +25,22 @@ impl Game {
         self.position.color_to_move
     }
 
-    pub fn game_actions(&self) -> &Vec<GameAction> {
-        &self.game_actions
-    }
-
-    pub fn legal_moves(&self) -> ArrayVec<Move, 256> {
+    pub fn moves(&self) -> ArrayVec<Move, 256> {
         self.position.legal_moves()
     }
 
     pub fn make_move(&mut self, chess_move: Move) {
-        self.game_actions.push(GameAction::MakeMove(chess_move));
         self.position.make_move(chess_move);
+
+        if self.position().is_checkmate() {
+            self.game_result = GameResult::Win(!self.position.color_to_move);
+        } else if self.position().is_stalemate() {
+            self.game_result = GameResult::Draw;
+        }
     }
 
-    pub fn resign(&mut self, color: Color) {
-        self.game_actions.push(GameAction::Resign(color));
-    }
-
-    pub fn offer_draw(&mut self, color: Color) {
-        self.game_actions.push(GameAction::OfferDraw(color));
-    }
-
-    pub fn accept_draw(&mut self) {
-        self.game_actions.push(GameAction::AcceptDraw);
+    pub fn result(&self) -> GameResult {
+        self.game_result
     }
 
     pub fn position(&self) -> &Position {

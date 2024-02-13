@@ -39,7 +39,7 @@ fn main() {
     let mut dragged_starting_sqaure: Option<Square> = None;
     let mut mouse_position = Point::new(0, 0);
 
-    let mut moves = game.legal_moves();
+    let mut moves = game.moves();
 
     let mut event_pump = sdl_context.event_pump().unwrap();
     'running: loop {
@@ -78,7 +78,7 @@ fn main() {
                     ..
                 } => {
                     game = Game::new();
-                    moves = game.legal_moves();
+                    moves = game.moves();
                 }
                 Event::MouseMotion { x, y, .. } => {
                     hovered_square = None;
@@ -145,7 +145,7 @@ fn main() {
 
                                     if let Some(choosen_move) = piece_moves.first() {
                                         game.make_move(*choosen_move);
-                                        moves = game.legal_moves();
+                                        moves = game.moves();
                                         if moves.is_empty() {
                                             match game.color_to_move() {
                                                 cherris_core::Color::White => {

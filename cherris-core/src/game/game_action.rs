@@ -6,4 +6,5 @@ pub enum GameAction {
     Resign(Color),
     OfferDraw(Color),
     AcceptDraw,
+    DeclareDrawByRepetition,
 }

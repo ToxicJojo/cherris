@@ -120,11 +120,28 @@ impl Position {
         moves
     }
 
+    /// Checks if the color that is moving is in check.
     pub fn is_in_check(&self) -> bool {
         let king_sqaure = self.board.role[Role::King] & self.board.color[self.color_to_move];
         let attacked_squares = self.board.attacked_sqaures(!self.color_to_move);
 
         !(king_sqaure & attacked_squares).is_empty()
+    }
+
+    /// Checks if the color that is moving is in checkmake.
+    pub fn is_checkmate(&self) -> bool {
+        let moves = self.legal_moves();
+        let check = self.is_in_check();
+
+        return moves.is_empty() && check;
+    }
+
+    /// Checks if the color that is moving is in stalemate.
+    pub fn is_stalemate(&self) -> bool {
+        let moves = self.legal_moves();
+        let check = self.is_in_check();
+
+        return moves.is_empty() && !check;
     }
 }
 
@@ -312,6 +329,49 @@ impl Default for Position {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn is_in_check_true() {
+        let pos =
+            Position::from_str("rnbqkbnr/ppppp1pp/8/5p1Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 1 2")
+                .unwrap();
+        assert_eq!(pos.is_in_check(), true);
+    }
+
+    #[test]
+    fn is_in_check_false() {
+        let pos =
+            Position::from_str("rnbqkbnr/ppppp1pp/8/5p1Q/4P3/8/PPPP1PPP/RNB1KBNR w KQkq - 1 2")
+                .unwrap();
+        assert_eq!(pos.is_in_check(), false);
+    }
+
+    #[test]
+    fn is_checkmate_true() {
+        let pos =
+            Position::from_str("rnbqkbnr/ppppp2p/8/5ppQ/4P3/3P4/PPP2PPP/RNB1KBNR b KQkq - 1 3")
+                .unwrap();
+        assert_eq!(pos.is_checkmate(), true);
+    }
+
+    #[test]
+    fn is_checkmate_false() {
+        let pos =
+            Position::from_str("2k5/pp1rn2p/4Q3/1Nqp1p2/2P5/8/PP3PPP/3R2K1 b - - 0 22").unwrap();
+        assert_eq!(pos.is_checkmate(), false);
+    }
+
+    #[test]
+    fn is_stalemate_true() {
+        let pos = Position::from_str("7k/5K2/6Q1/8/8/8/8/8 b - - 0 1").unwrap();
+        assert_eq!(pos.is_stalemate(), true);
+    }
+
+    #[test]
+    fn is_stalemate_false() {
+        let pos = Position::from_str("7k/5K2/6Q1/8/8/8/8/8 w - - 0 1").unwrap();
+        assert_eq!(pos.is_stalemate(), false);
+    }
 
     #[test]
     fn display_starting_pos() {
