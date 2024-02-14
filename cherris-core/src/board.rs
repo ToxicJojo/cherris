@@ -233,7 +233,7 @@ impl Board {
     pub fn check_mask(&self, color: Color) -> Bitboard {
         let mut check_mask = Bitboard::EMPTY;
         let kings = self.role[Role::King] & self.color[color];
-        let king_sqaure = Square(kings.0.trailing_zeros() as u8);
+        let king_sqaure = kings.to_square();
 
         let blocker = self.occupied;
 

@@ -1,11 +1,12 @@
 use std::str::FromStr;
+use std::usize;
 use std::{fmt::Display, ops::Index, slice::Iter};
 
 use crate::{Error, File, Rank};
 
 /// Represents a single sqaure on a chess board.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct Square(pub u8);
+pub struct Square(u8);
 
 impl Square {
     /// The number of sqaures on a chess board.
@@ -27,6 +28,13 @@ impl Square {
     #[inline]
     pub const fn to_index(&self) -> usize {
         self.0 as usize
+    }
+
+    /// Converts a `usize` to a `Square`.
+    /// Indexes larger than 63 wrap around.
+    #[inline]
+    pub fn from_index(index: u8) -> Square {
+        Square(index % 64)
     }
 
     /// Returns an iterator over all sqaures starting from A1 going file by file up to H8.

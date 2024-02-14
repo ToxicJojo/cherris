@@ -21,7 +21,7 @@ pub fn generate_moves(position: &Position, moves: &mut MoveList) {
     let check_mask = position.board.check_mask(position.color_to_move);
 
     let kings = position.board.role[Role::King] & position.board.color[position.color_to_move];
-    let king = Square(kings.0.trailing_zeros() as u8);
+    let king = kings.to_square();
     let hv_pins = position
         .board
         .horizontal_vertical_pinmask(king, !position.color_to_move);

@@ -77,7 +77,7 @@ pub fn generate_pawn_moves(
         let attacks_en_passant = attacks_en_passant & en_passant_bb & !diag_pins;
 
         for to in attacks_en_passant {
-            let target = Square(en_passant_target.0.trailing_zeros() as u8);
+            let target = en_passant_target.to_square();
             let from_bb = Bitboard::from(from);
 
             let occ = blockers & !from_bb & !en_passant_target;
@@ -116,7 +116,7 @@ pub fn generate_pawn_moves(
         let attacks_en_passant = attacks_en_passant & en_passant_bb & !diag_pins;
 
         for to in attacks_en_passant {
-            let target = Square(en_passant_target.0.trailing_zeros() as u8);
+            let target = en_passant_target.to_square();
             let from_bb = Bitboard::from(from);
 
             let occ = blockers & !from_bb & !en_passant_target;
@@ -145,9 +145,10 @@ pub fn generate_pawn_moves(
     }
 
     for to in pawns_fw_no_promotion {
+        let to_index = to.to_index() as u8;
         let from = match position.color_to_move {
-            Color::White => Square(to.0 - 8),
-            Color::Black => Square(to.0 + 8),
+            Color::White => Square::from_index(to_index - 8),
+            Color::Black => Square::from_index(to_index + 8),
         };
 
         let mv = Move::Standard {
@@ -165,23 +166,26 @@ pub fn generate_pawn_moves(
     }
 
     for to in pawns_fw_promotion {
+        let to_index = to.to_index() as u8;
         let from = match position.color_to_move {
-            Color::White => Square(to.0 - 8),
-            Color::Black => Square(to.0 + 8),
+            Color::White => Square::from_index(to_index - 8),
+            Color::Black => Square::from_index(to_index + 8),
         };
 
         generate_promotion_move(from, to, position, moves);
     }
 
     for to in pawns_push {
+        let to_index = to.to_index() as u8;
         let from = match position.color_to_move {
-            Color::White => Square(to.0 - 16),
-            Color::Black => Square(to.0 + 16),
+            Color::White => Square::from_index(to_index - 16),
+            Color::Black => Square::from_index(to_index + 16),
         };
 
+        let from_index = from.to_index() as u8;
         let en_passant = match position.color_to_move {
-            Color::White => Square(from.0 + 8),
-            Color::Black => Square(from.0 - 8),
+            Color::White => Square::from_index(from_index + 8),
+            Color::Black => Square::from_index(from_index - 8),
         };
 
         let mv = Move::Standard {

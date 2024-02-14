@@ -44,6 +44,11 @@ impl Bitboard {
     pub fn population_count(&self) -> u32 {
         self.0.count_ones()
     }
+
+    #[inline]
+    pub fn to_square(&self) -> Square {
+        Square::from_index(self.0.trailing_zeros() as u8)
+    }
 }
 
 impl Iterator for Bitboard {
@@ -53,8 +58,7 @@ impl Iterator for Bitboard {
         if self.0 == 0 {
             None
         } else {
-            let index = self.0.trailing_zeros();
-            let sqaure = Square(index as u8);
+            let sqaure = self.to_square();
             self.0 &= self.0.wrapping_sub(1);
 
             Some(sqaure)
