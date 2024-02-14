@@ -131,7 +131,7 @@ impl Position {
         let moves = self.legal_moves();
         let check = self.is_in_check();
 
-        return moves.is_empty() && check;
+        moves.is_empty() && check
     }
 
     /// Checks if the color that is moving is in stalemate.
@@ -139,7 +139,7 @@ impl Position {
         let moves = self.legal_moves();
         let check = self.is_in_check();
 
-        return moves.is_empty() && !check;
+        moves.is_empty() && !check
     }
 }
 
@@ -333,7 +333,7 @@ mod tests {
         let pos =
             Position::from_str("rnbqkbnr/ppppp1pp/8/5p1Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 1 2")
                 .unwrap();
-        assert_eq!(pos.is_in_check(), true);
+        assert!(pos.is_in_check());
     }
 
     #[test]
@@ -341,7 +341,7 @@ mod tests {
         let pos =
             Position::from_str("rnbqkbnr/ppppp1pp/8/5p1Q/4P3/8/PPPP1PPP/RNB1KBNR w KQkq - 1 2")
                 .unwrap();
-        assert_eq!(pos.is_in_check(), false);
+        assert!(!pos.is_in_check());
     }
 
     #[test]
@@ -349,26 +349,26 @@ mod tests {
         let pos =
             Position::from_str("rnbqkbnr/ppppp2p/8/5ppQ/4P3/3P4/PPP2PPP/RNB1KBNR b KQkq - 1 3")
                 .unwrap();
-        assert_eq!(pos.is_checkmate(), true);
+        assert!(pos.is_checkmate());
     }
 
     #[test]
     fn is_checkmate_false() {
         let pos =
             Position::from_str("2k5/pp1rn2p/4Q3/1Nqp1p2/2P5/8/PP3PPP/3R2K1 b - - 0 22").unwrap();
-        assert_eq!(pos.is_checkmate(), false);
+        assert!(!pos.is_checkmate());
     }
 
     #[test]
     fn is_stalemate_true() {
         let pos = Position::from_str("7k/5K2/6Q1/8/8/8/8/8 b - - 0 1").unwrap();
-        assert_eq!(pos.is_stalemate(), true);
+        assert!(pos.is_stalemate());
     }
 
     #[test]
     fn is_stalemate_false() {
         let pos = Position::from_str("7k/5K2/6Q1/8/8/8/8/8 w - - 0 1").unwrap();
-        assert_eq!(pos.is_stalemate(), false);
+        assert!(!pos.is_stalemate());
     }
 
     #[test]
