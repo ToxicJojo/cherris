@@ -51,7 +51,7 @@ impl Search {
                 ),
             };
 
-            let time_managment = TimeManagment::new(time, increment);
+            let time_managment = TimeManagment::new(time, increment, search_params.moves_to_go);
 
             while depth <= max_depth {
                 let timer = Instant::now();
