@@ -99,7 +99,15 @@ impl Search {
                 depth += 1;
             }
 
-            print!("{}", UCIGuiCommand::BestMove(pv[0].to_string()));
+            let best_move = match (pv[0], position.color_to_move) {
+                (Move::CastleShort, Color::White) => "e1g1".to_string(),
+                (Move::CastleShort, Color::Black) => "e8g8".to_string(),
+                (Move::CastleLong, Color::White) => "e1c1".to_string(),
+                (Move::CastleLong, Color::Black) => "e8c8".to_string(),
+                _ => pv[0].to_string(),
+            };
+
+            print!("{}", UCIGuiCommand::BestMove(best_move));
         });
     }
 }

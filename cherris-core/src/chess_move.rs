@@ -121,6 +121,7 @@ impl FromStr for LAN {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let from = Square::from_str(&s[0..2])?;
         let to = Square::from_str(&s[2..4])?;
+
         if s.len() == 5 {
             let role = Role::from_str(&s[4..5])?;
             Ok(LAN {
