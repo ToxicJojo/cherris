@@ -1,4 +1,4 @@
-use cherris_core::{generate_loud_moves, Color, Move, MoveList, Position};
+use cherris_core::{generate_loud_moves, generate_moves, Color, Move, MoveList, Position};
 
 use crate::{eval, move_sort::sort_moves, SearchData};
 
@@ -30,7 +30,11 @@ pub fn quiescence(
     }
 
     let mut moves = MoveList::new();
-    generate_loud_moves(position, &mut moves);
+    if position.is_in_check() {
+        generate_moves(position, &mut moves);
+    } else {
+        generate_loud_moves(position, &mut moves);
+    }
 
     sort_moves(&mut moves, None);
 
