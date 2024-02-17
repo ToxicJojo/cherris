@@ -8,9 +8,12 @@ use cherris_core::{Color, Move, Position};
 
 use crate::{time_managment::TimeManagment, UCIGuiCommand, UCISearchInfo, UCISearchParams};
 
-use self::{alpha_beta::alpha_beta, transposition_table::TranspositionTable};
+use self::{
+    alpha_beta::alpha_beta, history::HistoryTable, transposition_table::TranspositionTable,
+};
 
 pub mod alpha_beta;
+pub mod history;
 pub mod move_sort;
 pub mod quiescence;
 pub mod time_managment;
@@ -23,6 +26,7 @@ pub struct SearchData {
     pub max_nodes: u64,
     pub pv: Vec<Move>,
     pub transposition_table: Arc<Mutex<TranspositionTable>>,
+    pub history_table: Arc<Mutex<HistoryTable>>,
 }
 
 pub struct Search {}
@@ -52,6 +56,7 @@ impl Search {
             };
 
             let time_managment = TimeManagment::new(time, increment, search_params.moves_to_go);
+            let history_table = Arc::new(Mutex::new(HistoryTable::new()));
 
             while depth <= max_depth {
                 let timer = Instant::now();
@@ -60,6 +65,7 @@ impl Search {
                     max_nodes: search_params.nodes.unwrap_or(u64::MAX),
                     pv: pv.clone(),
                     transposition_table: transposition_table.clone(),
+                    history_table: history_table.clone(),
                 };
 
                 pv.clear();

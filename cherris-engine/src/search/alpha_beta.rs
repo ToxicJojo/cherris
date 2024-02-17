@@ -55,7 +55,9 @@ pub fn alpha_beta(
 
     let mut entry_type = TranspositionEntryType::UpperBound;
 
-    sort_moves(&mut moves, tt_move);
+    let history_table = search_data.history_table.lock().unwrap();
+    sort_moves(&mut moves, tt_move, &history_table, position.color_to_move);
+    drop(history_table);
 
     let mut best_move = *moves.first().unwrap();
     for mv in moves {
@@ -86,6 +88,12 @@ pub fn alpha_beta(
                 entry_type: TranspositionEntryType::LowerBound,
                 chess_move: mv,
             });
+
+            // History table currently just makes search worse :(
+            //let mut history_table = search_data.history_table.lock().unwrap();
+            //history_table.update(position.color_to_move, mv, depth);
+            //drop(history_table);
+
             return beta;
         }
 

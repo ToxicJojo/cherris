@@ -1,3 +1,4 @@
+use std::ops::IndexMut;
 use std::str::FromStr;
 use std::usize;
 use std::{fmt::Display, ops::Index, slice::Iter};
@@ -139,6 +140,13 @@ impl<T> Index<Square> for [T; Square::COUNT] {
     #[inline]
     fn index(&self, index: Square) -> &Self::Output {
         unsafe { self.get_unchecked(index.to_index()) }
+    }
+}
+
+impl<T> IndexMut<Square> for [T; Square::COUNT] {
+    #[inline]
+    fn index_mut(&mut self, index: Square) -> &mut Self::Output {
+        unsafe { self.get_unchecked_mut(index.to_index()) }
     }
 }
 
