@@ -27,6 +27,10 @@ pub fn alpha_beta(
         }
     }
 
+    if depth == 0 {
+        return quiescence(alpha, beta, position, pv, search_data);
+    }
+
     let mut moves = MoveList::new();
     generate_moves(position, &mut moves);
 
@@ -36,10 +40,6 @@ pub fn alpha_beta(
         } else {
             return 0;
         }
-    }
-
-    if depth == 0 {
-        return quiescence(alpha, beta, position, pv, search_data);
     }
 
     let mut alpha = alpha;
