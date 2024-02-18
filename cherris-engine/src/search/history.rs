@@ -18,14 +18,20 @@ impl HistoryTable {
     }
 
     pub fn update(&mut self, color: Color, chess_move: Move, depth: u8) {
-        match chess_move {
-            Move::Standard {
-                from,
-                to,
-                capture: None,
-                ..
-            } => self.0[color][from][to] += (depth * depth) as i16,
-            _ => (),
+        if let Move::Standard {
+            from,
+            to,
+            capture: None,
+            ..
+        } = chess_move
+        {
+            self.0[color][from][to] += (depth * depth) as i16
         }
+    }
+}
+
+impl Default for HistoryTable {
+    fn default() -> Self {
+        Self::new()
     }
 }

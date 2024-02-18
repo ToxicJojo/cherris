@@ -1,7 +1,9 @@
 use cherris_core::{generate_moves, Move, MoveList, Position};
 
 use crate::{
-    move_sort::sort_moves, quiescence::quiescence, transposition_table::TranspositionEntryType,
+    move_sort::sort_moves,
+    quiescence::quiescence,
+    transposition_table::{TranspositionEntry, TranspositionEntryType},
     SearchData,
 };
 
@@ -14,27 +16,16 @@ pub fn alpha_beta(
     search_data: &mut SearchData,
 ) -> i16 {
     let is_root = search_data.nodes == 0;
+
     let tt_table = search_data.transposition_table.lock().unwrap();
-    let mut tt_move = None;
-    if let Some(tt_entry) = tt_table.get(position.zobrist) {
-        tt_move = Some(tt_entry.chess_move);
-        if tt_entry.zobrist == position.zobrist && tt_entry.depth >= depth && !is_root {
-            match tt_entry.entry_type {
-                TranspositionEntryType::Exact => return tt_entry.score,
-                TranspositionEntryType::UpperBound => {
-                    if tt_entry.score <= alpha {
-                        return tt_entry.score;
-                    }
-                }
-                TranspositionEntryType::LowerBound => {
-                    if tt_entry.score >= beta {
-                        return tt_entry.score;
-                    }
-                }
-            }
+    let (tt_move, tt_value) = tt_table.get(position, alpha, beta, depth);
+    drop(tt_table);
+
+    if let Some(tt_value) = tt_value {
+        if !is_root {
+            return tt_value;
         }
     }
-    drop(tt_table);
 
     let mut moves = MoveList::new();
     generate_moves(position, &mut moves);
@@ -81,7 +72,7 @@ pub fn alpha_beta(
 
         if score >= beta {
             let mut tt_table = search_data.transposition_table.lock().unwrap();
-            tt_table.insert(crate::transposition_table::TranspositionEntry {
+            tt_table.insert(TranspositionEntry {
                 zobrist: position.zobrist,
                 score: beta,
                 depth,
@@ -109,7 +100,7 @@ pub fn alpha_beta(
     }
 
     let mut tt_table = search_data.transposition_table.lock().unwrap();
-    tt_table.insert(crate::transposition_table::TranspositionEntry {
+    tt_table.insert(TranspositionEntry {
         zobrist: position.zobrist,
         score: alpha,
         depth,
