@@ -25,7 +25,7 @@ pub fn quiescence(
         return beta;
     }
 
-    if alpha < stand_pat {
+    if stand_pat > alpha {
         alpha = stand_pat
     }
 
