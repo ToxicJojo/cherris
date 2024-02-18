@@ -6,10 +6,10 @@ use cherris_core::{Move, Position};
 pub struct UCISearchParams {
     pub search_moves: Vec<String>,
     pub ponder: bool,
-    pub w_time: Option<u64>,
-    pub b_time: Option<u64>,
-    pub w_inc: Option<u64>,
-    pub b_inc: Option<u64>,
+    pub w_time: Option<i64>,
+    pub b_time: Option<i64>,
+    pub w_inc: Option<i64>,
+    pub b_inc: Option<i64>,
     pub moves_to_go: Option<u64>,
     pub depth: Option<u8>,
     pub nodes: Option<u64>,
@@ -25,6 +25,7 @@ pub struct UCISearchInfo {
     pub nodes: u64,
     pub score: i16,
     pub pv: Vec<Move>,
+    pub nps: u64,
 }
 
 #[derive(Debug, PartialEq)]
@@ -118,10 +119,10 @@ impl UCIEngineCommand {
                 "movetime" => token = Token::MoveTime,
                 "infinite" => search_params.infinite = true,
                 _ => match token {
-                    Token::WTime => search_params.w_time = Some(u64::from_str(part).unwrap()),
-                    Token::BTime => search_params.b_time = Some(u64::from_str(part).unwrap()),
-                    Token::WInc => search_params.w_inc = Some(u64::from_str(part).unwrap()),
-                    Token::BInc => search_params.b_inc = Some(u64::from_str(part).unwrap()),
+                    Token::WTime => search_params.w_time = Some(i64::from_str(part).unwrap()),
+                    Token::BTime => search_params.b_time = Some(i64::from_str(part).unwrap()),
+                    Token::WInc => search_params.w_inc = Some(i64::from_str(part).unwrap()),
+                    Token::BInc => search_params.b_inc = Some(i64::from_str(part).unwrap()),
                     Token::MovesToGo => {
                         search_params.moves_to_go = Some(u64::from_str(part).unwrap())
                     }
@@ -228,8 +229,8 @@ impl Display for UCIGuiCommand {
             UCIGuiCommand::Info(info) => {
                 write!(
                     f,
-                    "info depth {} seldepth {} score cp {} time {} nodes {} pv",
-                    info.depth, info.seldepth, info.score, info.time, info.nodes
+                    "info depth {} seldepth {} score cp {} time {} nodes {} nps {} pv",
+                    info.depth, info.seldepth, info.score, info.time, info.nodes, info.nps
                 )?;
 
                 for mv in info.pv.clone() {

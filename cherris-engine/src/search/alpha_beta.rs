@@ -80,11 +80,6 @@ pub fn alpha_beta(
                 chess_move: mv,
             });
 
-            // History table currently just makes search worse :(
-            //let mut history_table = search_data.history_table.lock().unwrap();
-            //history_table.update(position.color_to_move, mv, depth);
-            //drop(history_table);
-
             return beta;
         }
 

@@ -57,3 +57,6 @@ pub use crate::zobrist::*;
 
 mod move_list;
 pub use crate::move_list::*;
+
+mod uci;
+pub use crate::uci::*;

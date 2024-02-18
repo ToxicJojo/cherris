@@ -2,6 +2,7 @@ use std::{
     sync::{Arc, Mutex},
     thread,
     time::Instant,
+    u128,
 };
 
 use cherris_core::{Color, Move, Position};
@@ -46,11 +47,11 @@ impl Search {
 
             let (time, increment) = match position.color_to_move {
                 Color::White => (
-                    search_params.w_time.unwrap_or(u64::MAX),
+                    search_params.w_time.unwrap_or(i64::MAX),
                     search_params.w_inc.unwrap_or_default(),
                 ),
                 Color::Black => (
-                    search_params.b_time.unwrap_or(u64::MAX),
+                    search_params.b_time.unwrap_or(i64::MAX),
                     search_params.b_inc.unwrap_or_default(),
                 ),
             };
@@ -79,13 +80,17 @@ impl Search {
                     &mut search_data,
                 );
 
+                let elapsed = timer.elapsed().as_millis().max(1);
+                let nps = ((search_data.nodes as u128) / elapsed) as u64 * 1000;
+
                 let search_info = UCISearchInfo {
                     depth,
                     seldepth: depth,
-                    time: timer.elapsed().as_millis(),
+                    time: elapsed,
                     score: eval,
                     nodes: search_data.nodes,
                     pv: pv.clone(),
+                    nps,
                 };
                 let info_command = UCIGuiCommand::Info(search_info);
                 print!("{}", info_command);
