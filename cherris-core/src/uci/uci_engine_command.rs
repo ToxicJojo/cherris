@@ -1,8 +1,7 @@
 use std::{fmt::Display, num::ParseIntError, str::FromStr};
 
 use crate::{
-    option_params::UCIOptionParams, position_params::UCIPositionParams,
-    register_params::UCIRegisterParams, uci_go_params::UCIGoParams,
+    uci::UCIGoParams, uci::UCIOptionParams, uci::UCIPositionParams, uci::UCIRegisterParams,
 };
 
 /// These are all the command the engine gets from the interface.

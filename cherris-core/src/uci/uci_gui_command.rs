@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::{uci_option::UCIOption, uci_search_info::UCISearchInfo};
+use crate::{uci::UCIOption, uci::UCISearchInfo};
 
 /// Represents all UCI commands that can be sent to a GUI.
 pub enum UCIGuiCommand {
@@ -59,7 +59,7 @@ impl Display for UCIGuiCommand {
 
 #[cfg(test)]
 mod tests {
-    use crate::uci_option::UCIOptionType;
+    use crate::uci::UCIOptionType;
 
     use super::*;
 

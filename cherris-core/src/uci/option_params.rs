@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::uci_engine_command::UCIEngineCommandParseError;
+use crate::uci::UCIEngineCommandParseError;
 
 #[derive(Debug, PartialEq)]
 pub struct UCIOptionParams {

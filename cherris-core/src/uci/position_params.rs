@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::{uci_engine_command::UCIEngineCommandParseError, Position};
+use crate::{uci::UCIEngineCommandParseError, Position};
 
 #[derive(Debug, PartialEq)]
 pub struct UCIPositionParams {

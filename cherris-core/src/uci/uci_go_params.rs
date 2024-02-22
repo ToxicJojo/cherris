@@ -1,6 +1,6 @@
 use std::{fmt::Display, u128};
 
-use crate::uci_engine_command::UCIEngineCommandParseError;
+use crate::uci::UCIEngineCommandParseError;
 
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub struct UCIGoParams {

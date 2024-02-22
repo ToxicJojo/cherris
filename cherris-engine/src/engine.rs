@@ -3,16 +3,17 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use cherris_core::{generate_lookup_tables, Move, Position, LAN};
-
-use crate::{
-    transposition_table::TranspositionTable, Search, UCIEngineCommand, UCIGuiCommand,
-    UCISearchParams,
+use cherris_core::{
+    generate_lookup_tables,
+    uci::{UCIEngineCommand, UCIGoParams, UCIGuiCommand},
+    Move, Position, LAN,
 };
+
+use crate::{transposition_table::TranspositionTable, Search};
 
 pub struct Engine {
     position: Position,
-    uci_search_params: UCISearchParams,
+    uci_search_params: UCIGoParams,
     transposition_table: Arc<Mutex<TranspositionTable>>,
 }
 
@@ -20,7 +21,7 @@ impl Engine {
     pub fn new() -> Engine {
         Engine {
             position: Position::default(),
-            uci_search_params: UCISearchParams::default(),
+            uci_search_params: UCIGoParams::default(),
             transposition_table: Arc::new(Mutex::new(TranspositionTable::new(2_u64.pow(24)))),
         }
     }
@@ -43,9 +44,9 @@ impl Engine {
                         self.send_command(UCIGuiCommand::IdAuthor("Johannes Thiel".to_string()));
                         self.send_command(UCIGuiCommand::UciOk);
                     }
-                    UCIEngineCommand::Position(fen, moves) => {
-                        self.position = Position::from_str(&fen).unwrap();
-                        for mv in moves {
+                    UCIEngineCommand::Position(params) => {
+                        self.position = Position::from_str(&params.fen).unwrap();
+                        for mv in params.moves {
                             if let Ok(lan) = LAN::from_str(&mv) {
                                 if let Ok(mv) = Move::from_lan(&lan, &self.position) {
                                     self.position.make_move(mv);

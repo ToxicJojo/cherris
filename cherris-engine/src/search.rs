@@ -5,9 +5,12 @@ use std::{
     u128,
 };
 
-use cherris_core::{Color, Move, Position};
+use cherris_core::{
+    uci::{UCIGoParams, UCIGuiCommand, UCISearchInfo},
+    Color, Move, Position,
+};
 
-use crate::{time_managment::TimeManagment, UCIGuiCommand, UCISearchInfo, UCISearchParams};
+use crate::time_managment::TimeManagment;
 
 use self::{
     alpha_beta::alpha_beta, history::HistoryTable, transposition_table::TranspositionTable,
@@ -35,7 +38,7 @@ pub struct Search {}
 impl Search {
     pub fn run(
         position: Position,
-        search_params: UCISearchParams,
+        search_params: UCIGoParams,
         transposition_table: Arc<Mutex<TranspositionTable>>,
     ) {
         thread::spawn(move || {
@@ -47,11 +50,11 @@ impl Search {
 
             let (time, increment) = match position.color_to_move {
                 Color::White => (
-                    search_params.w_time.unwrap_or(i64::MAX),
+                    search_params.w_time.unwrap_or(u128::MAX),
                     search_params.w_inc.unwrap_or_default(),
                 ),
                 Color::Black => (
-                    search_params.b_time.unwrap_or(i64::MAX),
+                    search_params.b_time.unwrap_or(u128::MAX),
                     search_params.b_inc.unwrap_or_default(),
                 ),
             };
@@ -89,7 +92,7 @@ impl Search {
                     time: elapsed,
                     score: eval,
                     nodes: search_data.nodes,
-                    pv: pv.clone(),
+                    pv: pv.iter().map(|mv| mv.to_string()).collect(),
                     nps,
                 };
                 let info_command = UCIGuiCommand::Info(search_info);
