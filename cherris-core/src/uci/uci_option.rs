@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+/// An option that can be set on a UCI server.
 pub struct UCIOption {
     pub id: String,
     pub option_type: UCIOptionType,
@@ -9,11 +10,17 @@ pub struct UCIOption {
     pub var: Vec<String>,
 }
 
+/// The type of option. There are 5 different types of options the engine can send.
 pub enum UCIOptionType {
+    /// A checkbox that can either be true or false
     Check,
+    /// A spin wheel that can be an integer in a certain range
     Spin,
+    /// A combo box that can have different predefined strings as a value
     Combo,
+    /// A button that can be pressed to send a command to the engine
     Button,
+    /// A text field that has a string as a value
     String,
 }
 
@@ -26,6 +33,29 @@ impl Display for UCIOptionType {
             UCIOptionType::Button => write!(f, "button"),
             UCIOptionType::String => write!(f, "string"),
         }
+    }
+}
+
+impl Display for UCIOption {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "name {} type {}", self.id, self.option_type)?;
+        if let Some(default) = &self.default {
+            write!(f, " default {}", default)?;
+        }
+
+        if let Some(min) = &self.min {
+            write!(f, " min {}", min)?;
+        }
+
+        if let Some(max) = &self.max {
+            write!(f, " max {}", max)?;
+        }
+
+        for var in &self.var {
+            write!(f, " var {}", var)?;
+        }
+
+        Ok(())
     }
 }
 
