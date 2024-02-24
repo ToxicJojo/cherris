@@ -46,9 +46,7 @@ pub fn alpha_beta(
 
     let mut entry_type = TranspositionEntryType::UpperBound;
 
-    let history_table = search_data.history_table.lock().unwrap();
-    sort_moves(&mut moves, tt_move, &history_table, position.color_to_move);
-    drop(history_table);
+    sort_moves(&mut moves, tt_move);
 
     let mut best_move = *moves.first().unwrap();
     for mv in moves {

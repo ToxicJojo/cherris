@@ -36,9 +36,7 @@ pub fn quiescence(
         generate_loud_moves(position, &mut moves);
     }
 
-    let history_table = search_data.history_table.lock().unwrap();
-    sort_moves(&mut moves, None, &history_table, position.color_to_move);
-    drop(history_table);
+    sort_moves(&mut moves, None);
 
     for mv in moves {
         let mut local_pv = Vec::new();

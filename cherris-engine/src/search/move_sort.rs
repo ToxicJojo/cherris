@@ -1,17 +1,12 @@
-use cherris_core::{Color, Move, MoveList};
+use cherris_core::{Move, MoveList};
 
-use crate::{history::HistoryTable, ROLE_VALUE};
+use crate::ROLE_VALUE;
 
-pub fn sort_moves(
-    moves: &mut MoveList,
-    tt_move: Option<Move>,
-    history: &HistoryTable,
-    color: Color,
-) {
-    moves.sort_by_key(|mv| score_move(mv, tt_move, history, color))
+pub fn sort_moves(moves: &mut MoveList, tt_move: Option<Move>) {
+    moves.sort_by_key(|mv| score_move(mv, tt_move))
 }
 
-fn score_move(mv: &Move, tt_move: Option<Move>, history: &HistoryTable, color: Color) -> i16 {
+fn score_move(mv: &Move, tt_move: Option<Move>) -> i16 {
     if let Some(tt_move) = tt_move {
         if mv == &tt_move {
             return -10000;
@@ -21,7 +16,7 @@ fn score_move(mv: &Move, tt_move: Option<Move>, history: &HistoryTable, color: C
     match mv {
         Move::Standard { role, capture, .. } => match capture {
             Some(capture) => ROLE_VALUE[role] - ROLE_VALUE[capture],
-            None => -history.get(color, *mv),
+            None => 0,
         },
         Move::EnPassant { .. } => 0,
         Move::CastleShort => 1000,
