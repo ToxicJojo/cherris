@@ -18,25 +18,38 @@ pub fn generate_moves(position: &Position, moves: &mut MoveList) {
     let empty = !blockers;
 
     let attacked_squares = position.board.attacked_sqaures(!position.color_to_move);
-    let check_mask = position.board.check_mask(position.color_to_move);
 
-    let kings = position.board.role[Role::King] & position.board.color[position.color_to_move];
-    let king = kings.to_square();
+    let king_bb = position.board.role[Role::King] & position.board.color[position.color_to_move];
+    let king_square = king_bb.to_square();
+
+    let mut check_mask = Bitboard::FULL;
+    if !(attacked_squares & king_bb).is_empty() {
+        check_mask = position.board.check_mask(position.color_to_move);
+    }
+
     let hv_pins = position
         .board
-        .horizontal_vertical_pinmask(king, !position.color_to_move);
+        .horizontal_vertical_pinmask(king_square, !position.color_to_move);
     let diag_pins = position
         .board
-        .diagonal_pinmask(king, !position.color_to_move);
+        .diagonal_pinmask(king_square, !position.color_to_move);
 
-    generate_pawn_moves(position, moves, empty, hv_pins, diag_pins, check_mask, king);
+    generate_pawn_moves(
+        position,
+        moves,
+        empty,
+        hv_pins,
+        diag_pins,
+        check_mask,
+        king_square,
+    );
     generate_king_moves(position, moves, attacked_squares);
     generate_knight_moves(position, moves, hv_pins, diag_pins, check_mask);
     generate_rook_moves(position, moves, hv_pins, diag_pins, check_mask, blockers);
     generate_bishop_moves(position, moves, hv_pins, diag_pins, check_mask, blockers);
     generate_queen_moves(position, moves, hv_pins, diag_pins, check_mask, blockers);
 
-    generate_castling_moves(position, moves, kings, blockers, attacked_squares);
+    generate_castling_moves(position, moves, king_bb, blockers, attacked_squares);
 }
 
 pub fn generate_quiet_moves(position: &Position, moves: &mut MoveList) {

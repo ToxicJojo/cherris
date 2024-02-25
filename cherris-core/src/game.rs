@@ -2,14 +2,14 @@ use crate::{Color, Move, MoveList, Position};
 
 use self::game_result::GameResult;
 
+mod game_action;
+mod game_result;
+mod pgn;
+
 pub struct Game {
     position: Position,
     game_result: GameResult,
 }
-
-mod game_action;
-mod game_result;
-mod pgn;
 
 impl Game {
     pub fn new() -> Game {
@@ -28,12 +28,14 @@ impl Game {
     }
 
     pub fn make_move(&mut self, chess_move: Move) {
-        self.position.make_move(chess_move);
+        if self.game_result == GameResult::Ongoing {
+            self.position.make_move(chess_move);
 
-        if self.position().is_checkmate() {
-            self.game_result = GameResult::Win(!self.position.color_to_move);
-        } else if self.position().is_stalemate() {
-            self.game_result = GameResult::Draw;
+            if self.position().is_checkmate() {
+                self.game_result = GameResult::Win(!self.position.color_to_move);
+            } else if self.position().is_stalemate() {
+                self.game_result = GameResult::Draw;
+            }
         }
     }
 

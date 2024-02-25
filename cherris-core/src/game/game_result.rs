@@ -3,7 +3,7 @@ use std::fmt::Display;
 use crate::Color;
 
 /// Represents the result of a chess game.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum GameResult {
     Win(Color),
     Draw,

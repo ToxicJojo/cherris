@@ -140,45 +140,37 @@ impl Board {
     }
 
     fn castle_long(&mut self, color: Color) {
-        match color {
-            Color::White => {
-                let king_bb = Bitboard(1 << 4) | Bitboard(1 << 2);
-                let rook_bb = Bitboard(1 << 0) | Bitboard(1 << 3);
+        let (king_bb, rook_bb) = match color {
+            Color::White => (
+                Bitboard(1 << 4) | Bitboard(1 << 2),
+                Bitboard(1 << 0) | Bitboard(1 << 3),
+            ),
+            Color::Black => (
+                Bitboard(1 << 60) | Bitboard(1 << 58),
+                Bitboard(1 << 56) | Bitboard(1 << 59),
+            ),
+        };
 
-                self.color[color] ^= king_bb | rook_bb;
-                self.role[Role::King] ^= king_bb;
-                self.role[Role::Rook] ^= rook_bb;
-            }
-            Color::Black => {
-                let king_bb = Bitboard(1 << 60) | Bitboard(1 << 58);
-                let rook_bb = Bitboard(1 << 56) | Bitboard(1 << 59);
-
-                self.color[color] ^= king_bb | rook_bb;
-                self.role[Role::King] ^= king_bb;
-                self.role[Role::Rook] ^= rook_bb;
-            }
-        }
+        self.color[color] ^= king_bb | rook_bb;
+        self.role[Role::King] ^= king_bb;
+        self.role[Role::Rook] ^= rook_bb;
     }
 
     fn castle_short(&mut self, color: Color) {
-        match color {
-            Color::White => {
-                let king_bb = Bitboard(1 << 4) | Bitboard(1 << 6);
-                let rook_bb = Bitboard(1 << 5) | Bitboard(1 << 7);
+        let (king_bb, rook_bb) = match color {
+            Color::White => (
+                Bitboard(1 << 4) | Bitboard(1 << 6),
+                Bitboard(1 << 5) | Bitboard(1 << 7),
+            ),
+            Color::Black => (
+                Bitboard(1 << 60) | Bitboard(1 << 62),
+                Bitboard(1 << 61) | Bitboard(1 << 63),
+            ),
+        };
 
-                self.color[color] ^= king_bb | rook_bb;
-                self.role[Role::King] ^= king_bb;
-                self.role[Role::Rook] ^= rook_bb;
-            }
-            Color::Black => {
-                let king_bb = Bitboard(1 << 60) | Bitboard(1 << 62);
-                let rook_bb = Bitboard(1 << 61) | Bitboard(1 << 63);
-
-                self.color[color] ^= king_bb | rook_bb;
-                self.role[Role::King] ^= king_bb;
-                self.role[Role::Rook] ^= rook_bb;
-            }
-        }
+        self.color[color] ^= king_bb | rook_bb;
+        self.role[Role::King] ^= king_bb;
+        self.role[Role::Rook] ^= rook_bb;
     }
 
     /// Returns a `Bitboard` that indicates which sqaures are currently attacked by the pieces of
