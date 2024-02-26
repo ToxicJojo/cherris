@@ -1,6 +1,7 @@
 use cherris_core::{generate_moves, Move, MoveList, Position};
 
 use crate::{
+    evaluation::Evaluation,
     move_sort::sort_moves,
     quiescence::quiescence,
     transposition_table::{TranspositionEntry, TranspositionEntryType},
@@ -8,13 +9,13 @@ use crate::{
 };
 
 pub fn alpha_beta(
-    alpha: i16,
-    beta: i16,
+    alpha: Evaluation,
+    beta: Evaluation,
     depth: u8,
     pv: &mut Vec<Move>,
     position: &Position,
     search_data: &mut SearchData,
-) -> i16 {
+) -> Evaluation {
     let is_root = search_data.nodes == 0;
 
     let tt_table = search_data.transposition_table.lock().unwrap();
@@ -27,14 +28,20 @@ pub fn alpha_beta(
         }
     }
 
+    let is_in_check = position.is_in_check();
+
+    if depth == 0 && !is_in_check {
+        return quiescence(alpha, beta, position, pv, search_data);
+    }
+
     let mut moves = MoveList::new();
     generate_moves(position, &mut moves);
 
     if moves.is_empty() {
-        if position.is_in_check() {
-            return i16::MIN + 6;
+        if is_in_check {
+            return Evaluation::new_mate_in(search_data.current_depth);
         } else {
-            return 0;
+            return Evaluation::DRAW;
         }
     }
 
@@ -56,6 +63,8 @@ pub fn alpha_beta(
             break;
         }
 
+        search_data.current_depth += 1;
+
         let mut local_pv = Vec::new();
         let mut next_position = *position;
         next_position.make_move(mv);
@@ -67,6 +76,7 @@ pub fn alpha_beta(
             &next_position,
             search_data,
         );
+        search_data.current_depth -= 1;
 
         if score >= beta {
             let mut tt_table = search_data.transposition_table.lock().unwrap();

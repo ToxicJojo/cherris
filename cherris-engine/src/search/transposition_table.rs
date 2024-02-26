@@ -1,10 +1,12 @@
 use cherris_core::{Move, Position, Zobrist};
 
+use crate::evaluation::Evaluation;
+
 // An entry in the transposition table.
 #[derive(Clone, Copy, Debug)]
 pub struct TranspositionEntry {
     pub zobrist: Zobrist,
-    pub score: i16,
+    pub score: Evaluation,
     pub depth: u8,
     pub entry_type: TranspositionEntryType,
     pub chess_move: Move,
@@ -54,10 +56,10 @@ impl TranspositionTable {
     pub fn get(
         &self,
         position: &Position,
-        alpha: i16,
-        beta: i16,
+        alpha: Evaluation,
+        beta: Evaluation,
         depth: u8,
-    ) -> (Option<Move>, Option<i16>) {
+    ) -> (Option<Move>, Option<Evaluation>) {
         let zobrist = position.zobrist;
         let key = self.get_entry_index(zobrist);
 

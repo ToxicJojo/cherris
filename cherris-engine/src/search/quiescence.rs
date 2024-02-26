@@ -1,16 +1,20 @@
 use cherris_core::{generate_loud_moves, generate_moves, Color, Move, MoveList, Position};
 
-use crate::{eval, move_sort::sort_moves, SearchData};
+use crate::{eval, evaluation::Evaluation, move_sort::sort_moves, SearchData};
 
 pub fn quiescence(
-    alpha: i16,
-    beta: i16,
+    alpha: Evaluation,
+    beta: Evaluation,
     position: &Position,
     pv: &mut Vec<Move>,
     search_data: &mut SearchData,
-) -> i16 {
+) -> Evaluation {
     let mut alpha = alpha;
     search_data.nodes += 1;
+
+    if search_data.current_depth > search_data.selective_depth {
+        search_data.selective_depth = search_data.current_depth;
+    }
 
     let stand_pat = match position.color_to_move {
         Color::White => eval(position),
@@ -40,9 +44,13 @@ pub fn quiescence(
 
     for mv in moves {
         let mut local_pv = Vec::new();
+        search_data.current_depth += 1;
+
         let mut next_position = *position;
         next_position.make_move(mv);
         let score = -quiescence(-beta, -alpha, &next_position, &mut local_pv, search_data);
+
+        search_data.current_depth -= 1;
 
         if score >= beta {
             return beta;

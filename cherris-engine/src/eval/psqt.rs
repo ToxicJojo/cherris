@@ -1,5 +1,7 @@
 use cherris_core::{Color, Position, Role, Square};
 
+use super::evaluation::Evaluation;
+
 #[rustfmt::skip]
 const PAWN_PSQT: [i16; Square::COUNT] =[
      0,   0,   0,   0,   0,   0,   0,   0,
@@ -93,7 +95,7 @@ pub const FLIP: [usize; 64] = [
      0,  1,  2,  3,  4,  5,  6,  7,
 ];
 
-pub fn eval_psqt(position: &Position) -> i16 {
+pub fn eval_psqt(position: &Position) -> Evaluation {
     let mut eval = 0;
 
     let white = position.board.color[Color::White];
@@ -112,5 +114,5 @@ pub fn eval_psqt(position: &Position) -> i16 {
         }
     }
 
-    eval
+    Evaluation::new(eval)
 }

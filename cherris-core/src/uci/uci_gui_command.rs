@@ -59,7 +59,7 @@ impl Display for UCIGuiCommand {
 
 #[cfg(test)]
 mod tests {
-    use crate::uci::UCIOptionType;
+    use crate::uci::{UCIOptionType, UCIScore};
 
     use super::*;
 
@@ -138,7 +138,7 @@ mod tests {
         let command = UCIGuiCommand::Info(UCISearchInfo {
             depth: 1,
             seldepth: 2,
-            score: 3,
+            score: UCIScore::Centipawns(3),
             time: 4,
             nodes: 5,
             pv: vec!["e2e4".to_string()],

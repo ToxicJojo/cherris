@@ -10,7 +10,7 @@ use cherris_core::{
     Color, Move, Position,
 };
 
-use crate::time_managment::TimeManagment;
+use crate::{evaluation::Evaluation, time_managment::TimeManagment};
 
 use self::{
     alpha_beta::alpha_beta, history::HistoryTable, transposition_table::TranspositionTable,
@@ -31,6 +31,8 @@ pub struct SearchData {
     pub pv: Vec<Move>,
     pub transposition_table: Arc<Mutex<TranspositionTable>>,
     pub history_table: Arc<Mutex<HistoryTable>>,
+    pub current_depth: u8,
+    pub selective_depth: u8,
 }
 
 pub struct Search {}
@@ -70,13 +72,15 @@ impl Search {
                     pv: pv.clone(),
                     transposition_table: transposition_table.clone(),
                     history_table: history_table.clone(),
+                    current_depth: 0,
+                    selective_depth: 0,
                 };
 
                 pv.clear();
 
                 let eval = alpha_beta(
-                    i16::MIN + 1,
-                    i16::MAX - 1,
+                    Evaluation::MIN,
+                    Evaluation::MAX,
                     depth,
                     &mut pv,
                     &position,
@@ -88,9 +92,9 @@ impl Search {
 
                 let search_info = UCISearchInfo {
                     depth,
-                    seldepth: depth,
+                    seldepth: search_data.selective_depth,
                     time: elapsed,
-                    score: eval,
+                    score: eval.into(),
                     nodes: search_data.nodes,
                     pv: pv.iter().map(|mv| mv.to_string()).collect(),
                     nps,
@@ -98,7 +102,7 @@ impl Search {
                 let info_command = UCIGuiCommand::Info(search_info);
                 print!("{}", info_command);
 
-                if eval <= i16::MIN + 6 || eval >= i16::MAX - 6 {
+                if eval.is_checkmate() {
                     break;
                 }
 

@@ -1,8 +1,10 @@
 use cherris_core::{Color, Position, Role};
 
+use super::evaluation::Evaluation;
+
 pub const ROLE_VALUE: [i16; Role::COUNT] = [100, 300, 300, 500, 800, 10000];
 
-pub fn eval_material(position: &Position) -> i16 {
+pub fn eval_material(position: &Position) -> Evaluation {
     let mut eval = 0;
 
     for role in Role::iter() {
@@ -13,7 +15,7 @@ pub fn eval_material(position: &Position) -> i16 {
         eval += role_diff * ROLE_VALUE[role];
     }
 
-    eval
+    Evaluation::new(eval)
 }
 
 #[cfg(test)]
@@ -28,7 +30,7 @@ mod tests {
 
         let result = eval_material(&position);
 
-        assert_eq!(result, ROLE_VALUE[Role::Pawn] * 2);
+        assert_eq!(result, Evaluation::new(ROLE_VALUE[Role::Pawn] * 2));
     }
 
     #[test]
@@ -38,6 +40,6 @@ mod tests {
 
         let result = eval_material(&position);
 
-        assert_eq!(result, ROLE_VALUE[Role::Pawn] * -2);
+        assert_eq!(result, Evaluation::new(ROLE_VALUE[Role::Pawn] * -2));
     }
 }
