@@ -202,3 +202,107 @@ pub fn generate_pawn_moves(
         }
     }
 }
+
+pub fn generate_loud_pawn_moves(
+    position: &Position,
+    moves: &mut MoveList,
+    hv_pins: Bitboard,
+    diag_pins: Bitboard,
+    check_mask: Bitboard,
+    king: Square,
+) {
+    let blockers = position.board.occupied;
+    let pawns = position.board.role[Role::Pawn] & position.board.color[position.color_to_move];
+    let pawns_attack = pawns & !hv_pins;
+    let pawns_pinned_diag = pawns_attack & diag_pins;
+
+    let pawns_pinned_promotion =
+        pawns_pinned_diag & Bitboard::PRE_PROMOTION_RANK[position.color_to_move];
+    let pawns_pinned_no_promotion = pawns_pinned_diag ^ pawns_pinned_promotion;
+
+    let pawns_attack_unpinned = pawns_attack ^ pawns_pinned_diag;
+    let pawns_attack_unpinned_promotion =
+        pawns_attack_unpinned & Bitboard::PRE_PROMOTION_RANK[position.color_to_move];
+    let pawns_attack_unpinned_no_promotion =
+        pawns_attack_unpinned ^ pawns_attack_unpinned_promotion;
+
+    let en_passant_bb = position
+        .en_passant_square
+        .map_or(Bitboard::EMPTY, Bitboard::from);
+
+    let en_passant_target = match position.color_to_move {
+        Color::White => en_passant_bb >> 8,
+        Color::Black => en_passant_bb << 8,
+    };
+
+    let ep_check_mask = match position.color_to_move {
+        Color::White => (check_mask & en_passant_target) << 8,
+        Color::Black => (check_mask & en_passant_target) >> 8,
+    };
+
+    for from in pawns_attack_unpinned_no_promotion {
+        let attacks = pawn_attacks(from, position.color_to_move) & check_mask;
+        let attacks = attacks & position.board.color[!position.color_to_move];
+        add_attacks(attacks, from, Role::Pawn, position, moves);
+
+        let attacks_en_passant = pawn_attacks(from, position.color_to_move) & ep_check_mask;
+        let attacks_en_passant = attacks_en_passant & en_passant_bb & !diag_pins;
+
+        for to in attacks_en_passant {
+            let target = en_passant_target.to_square();
+            let from_bb = Bitboard::from(from);
+
+            let occ = blockers & !from_bb & !en_passant_target;
+            let king_sees = rook_attacks(king, occ);
+            if !(king_sees
+                & position.board.color[!position.color_to_move]
+                & (position.board.role[Role::Rook] | position.board.role[Role::Queen]))
+                .is_empty()
+            {
+                continue;
+            }
+
+            let mv = Move::EnPassant { from, to, target };
+
+            moves.push(mv);
+        }
+    }
+
+    for from in pawns_attack_unpinned_promotion {
+        let attacks = pawn_attacks(from, position.color_to_move) & check_mask;
+        let attacks = attacks & position.board.color[!position.color_to_move];
+
+        for to in attacks {
+            generate_promotion_move(from, to, position, moves);
+        }
+    }
+
+    for from in pawns_pinned_no_promotion {
+        let attacks = pawn_attacks(from, position.color_to_move) & diag_pins & check_mask;
+        let attacks = attacks & position.board.color[!position.color_to_move];
+        add_attacks(attacks, from, Role::Pawn, position, moves);
+
+        let attacks_en_passant =
+            pawn_attacks(from, position.color_to_move) & diag_pins & ep_check_mask;
+        let attacks_en_passant = attacks_en_passant & en_passant_bb & !diag_pins;
+
+        for to in attacks_en_passant {
+            let target = en_passant_target.to_square();
+            let from_bb = Bitboard::from(from);
+
+            let occ = blockers & !from_bb & !en_passant_target;
+            let king_sees = rook_attacks(king, occ);
+            if !(king_sees
+                & position.board.color[!position.color_to_move]
+                & (position.board.role[Role::Rook] | position.board.role[Role::Queen]))
+                .is_empty()
+            {
+                continue;
+            }
+
+            let mv = Move::EnPassant { from, to, target };
+
+            moves.push(mv);
+        }
+    }
+}
