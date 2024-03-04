@@ -1,12 +1,11 @@
 use cherris_core::{generate_lookup_tables, perft, Position};
 use criterion::{criterion_group, criterion_main, Criterion};
-use std::{str::FromStr, time::Duration};
+use std::time::Duration;
 
 pub fn perft_benchmark(c: &mut Criterion) {
     generate_lookup_tables();
 
-    let position =
-        Position::from_str("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1").unwrap();
+    let position = Position::new();
 
     let mut group = c.benchmark_group("perft5");
 
