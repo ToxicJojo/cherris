@@ -1,5 +1,6 @@
 use std::time::Instant;
 
+#[derive(Clone, Copy)]
 pub struct TimeManagment {
     time_left: u128,
     increment: u128,

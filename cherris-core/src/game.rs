@@ -4,7 +4,6 @@ use self::game_result::GameResult;
 
 mod game_action;
 mod game_result;
-mod pgn;
 
 pub struct Game {
     position: Position,
