@@ -141,14 +141,8 @@ impl Board {
 
     fn castle_long(&mut self, color: Color) {
         let (king_bb, rook_bb) = match color {
-            Color::White => (
-                Bitboard(1 << 4) | Bitboard(1 << 2),
-                Bitboard(1 << 0) | Bitboard(1 << 3),
-            ),
-            Color::Black => (
-                Bitboard(1 << 60) | Bitboard(1 << 58),
-                Bitboard(1 << 56) | Bitboard(1 << 59),
-            ),
+            Color::White => (Bitboard(1 << 4 | 1 << 2), Bitboard(1 << 0 | 1 << 3)),
+            Color::Black => (Bitboard(1 << 60 | 1 << 58), Bitboard(1 << 56 | 1 << 59)),
         };
 
         self.color[color] ^= king_bb | rook_bb;
@@ -158,14 +152,8 @@ impl Board {
 
     fn castle_short(&mut self, color: Color) {
         let (king_bb, rook_bb) = match color {
-            Color::White => (
-                Bitboard(1 << 4) | Bitboard(1 << 6),
-                Bitboard(1 << 5) | Bitboard(1 << 7),
-            ),
-            Color::Black => (
-                Bitboard(1 << 60) | Bitboard(1 << 62),
-                Bitboard(1 << 61) | Bitboard(1 << 63),
-            ),
+            Color::White => (Bitboard(1 << 4 | 1 << 6), Bitboard(1 << 5 | 1 << 7)),
+            Color::Black => (Bitboard(1 << 60 | 1 << 62), Bitboard(1 << 61 | 1 << 63)),
         };
 
         self.color[color] ^= king_bb | rook_bb;
