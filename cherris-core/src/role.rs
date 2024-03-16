@@ -48,12 +48,12 @@ impl Role {
 impl Display for Role {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Role::Pawn => write!(f, "p"),
-            Role::Knight => write!(f, "n"),
-            Role::Bishop => write!(f, "b"),
-            Role::Rook => write!(f, "r"),
-            Role::Queen => write!(f, "q"),
-            Role::King => write!(f, "k"),
+            Role::Pawn => write!(f, "P"),
+            Role::Knight => write!(f, "N"),
+            Role::Bishop => write!(f, "B"),
+            Role::Rook => write!(f, "R"),
+            Role::Queen => write!(f, "Q"),
+            Role::King => write!(f, "K"),
         }
     }
 }
@@ -63,12 +63,12 @@ impl FromStr for Role {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "p" => Ok(Role::Pawn),
-            "n" => Ok(Role::Knight),
-            "b" => Ok(Role::Bishop),
-            "r" => Ok(Role::Rook),
-            "q" => Ok(Role::Queen),
-            "k" => Ok(Role::King),
+            "p" | "P" => Ok(Role::Pawn),
+            "n" | "N" => Ok(Role::Knight),
+            "b" | "B" => Ok(Role::Bishop),
+            "r" | "R" => Ok(Role::Rook),
+            "q" | "Q" => Ok(Role::Queen),
+            "k" | "K" => Ok(Role::King),
             _ => Err(Error::ParseRole),
         }
     }
@@ -141,12 +141,12 @@ mod tests {
         let queen = Role::Queen.to_string();
         let king = Role::King.to_string();
 
-        assert_eq!(pawn, "p");
-        assert_eq!(knight, "n");
-        assert_eq!(bishop, "b");
-        assert_eq!(rook, "r");
-        assert_eq!(queen, "q");
-        assert_eq!(king, "k");
+        assert_eq!(pawn, "P");
+        assert_eq!(knight, "N");
+        assert_eq!(bishop, "B");
+        assert_eq!(rook, "R");
+        assert_eq!(queen, "Q");
+        assert_eq!(king, "K");
     }
 
     #[test]

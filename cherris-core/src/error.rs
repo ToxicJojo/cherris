@@ -4,6 +4,7 @@ pub enum Error {
     ParseFile,
     ParseRank,
     ParseRole,
+    ParsePiece,
     InvalidFen,
     InvalidMove,
 }

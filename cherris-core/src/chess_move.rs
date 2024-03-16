@@ -191,7 +191,7 @@ mod tests {
             promotion: Some(Role::Queen),
         };
 
-        assert_eq!(lan.to_string(), "e7e8q");
+        assert_eq!(lan.to_string(), "e7e8Q");
     }
 
     #[test]
@@ -207,7 +207,7 @@ mod tests {
     }
     #[test]
     fn lan_from_string_promotion() {
-        let lan = LAN::from_str("e7e8q").unwrap();
+        let lan = LAN::from_str("e7e8Q").unwrap();
         let expected = LAN {
             from: Square::E7,
             to: Square::E8,

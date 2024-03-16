@@ -1,8 +1,8 @@
 use std::{fmt::Display, str::FromStr};
 
 use crate::{
-    generate_moves, Bitboard, Board, CastlingRights, Color, Error, File, Move, MoveList, Rank,
-    Role, Square, Zobrist,
+    generate_moves, Bitboard, Board, CastlingRights, Color, Error, File, Move, MoveList, Piece,
+    Rank, Role, Square, Zobrist,
 };
 
 /// Represents a chess position.
@@ -179,60 +179,13 @@ impl FromStr for Position {
                     }
                     continue;
                 }
-                'p' => {
-                    role[Role::Pawn] |= Bitboard::from(sqaure);
-                    color[Color::Black] |= Bitboard::from(sqaure);
-                }
-                'P' => {
-                    role[Role::Pawn] |= Bitboard::from(sqaure);
-                    color[Color::White] |= Bitboard::from(sqaure);
-                }
+                c => {
+                    let piece = Piece::try_from(c)?;
+                    let square_bb = Bitboard::from(sqaure);
 
-                'n' => {
-                    role[Role::Knight] |= Bitboard::from(sqaure);
-                    color[Color::Black] |= Bitboard::from(sqaure);
+                    role[piece.role] |= square_bb;
+                    color[piece.color] |= square_bb;
                 }
-                'N' => {
-                    role[Role::Knight] |= Bitboard::from(sqaure);
-                    color[Color::White] |= Bitboard::from(sqaure);
-                }
-
-                'b' => {
-                    role[Role::Bishop] |= Bitboard::from(sqaure);
-                    color[Color::Black] |= Bitboard::from(sqaure);
-                }
-                'B' => {
-                    role[Role::Bishop] |= Bitboard::from(sqaure);
-                    color[Color::White] |= Bitboard::from(sqaure);
-                }
-
-                'r' => {
-                    role[Role::Rook] |= Bitboard::from(sqaure);
-                    color[Color::Black] |= Bitboard::from(sqaure);
-                }
-                'R' => {
-                    role[Role::Rook] |= Bitboard::from(sqaure);
-                    color[Color::White] |= Bitboard::from(sqaure);
-                }
-
-                'q' => {
-                    role[Role::Queen] |= Bitboard::from(sqaure);
-                    color[Color::Black] |= Bitboard::from(sqaure);
-                }
-                'Q' => {
-                    role[Role::Queen] |= Bitboard::from(sqaure);
-                    color[Color::White] |= Bitboard::from(sqaure);
-                }
-
-                'k' => {
-                    role[Role::King] |= Bitboard::from(sqaure);
-                    color[Color::Black] |= Bitboard::from(sqaure);
-                }
-                'K' => {
-                    role[Role::King] |= Bitboard::from(sqaure);
-                    color[Color::White] |= Bitboard::from(sqaure);
-                }
-                _ => return Err(Error::InvalidFen),
             }
 
             file = file.right();

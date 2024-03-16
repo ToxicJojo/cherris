@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::{Color, Role};
+use crate::{Color, Error, Role};
 
 /// Represents a chess piece that has a role and color.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -76,8 +76,30 @@ impl Display for Piece {
         let role = self.role.to_string();
 
         match self.color {
-            Color::White => write!(f, "{}", role.to_uppercase()),
-            Color::Black => write!(f, "{}", role),
+            Color::White => write!(f, "{}", role),
+            Color::Black => write!(f, "{}", role.to_lowercase()),
+        }
+    }
+}
+
+impl TryFrom<char> for Piece {
+    type Error = Error;
+
+    fn try_from(value: char) -> Result<Self, Self::Error> {
+        match value {
+            'P' => Ok(Piece::WHITE_PAWN),
+            'p' => Ok(Piece::BLACK_PAWN),
+            'N' => Ok(Piece::WHITE_KNIGHT),
+            'n' => Ok(Piece::BLACK_KNIGHT),
+            'B' => Ok(Piece::WHITE_BISHOP),
+            'b' => Ok(Piece::BLACK_BISHOP),
+            'R' => Ok(Piece::WHITE_ROOK),
+            'r' => Ok(Piece::BLACK_ROOK),
+            'Q' => Ok(Piece::WHITE_QUEEN),
+            'q' => Ok(Piece::BLACK_QUEEN),
+            'K' => Ok(Piece::WHITE_KING),
+            'k' => Ok(Piece::BLACK_KING),
+            _ => Err(Error::ParsePiece),
         }
     }
 }
@@ -101,5 +123,24 @@ mod tests {
         assert_eq!(Piece::BLACK_ROOK.to_string(), "r");
         assert_eq!(Piece::BLACK_QUEEN.to_string(), "q");
         assert_eq!(Piece::BLACK_KING.to_string(), "k");
+    }
+
+    #[test]
+    fn try_from_char() {
+        assert_eq!(Piece::try_from('P'), Ok(Piece::WHITE_PAWN));
+        assert_eq!(Piece::try_from('N'), Ok(Piece::WHITE_KNIGHT));
+        assert_eq!(Piece::try_from('B'), Ok(Piece::WHITE_BISHOP));
+        assert_eq!(Piece::try_from('R'), Ok(Piece::WHITE_ROOK));
+        assert_eq!(Piece::try_from('Q'), Ok(Piece::WHITE_QUEEN));
+        assert_eq!(Piece::try_from('K'), Ok(Piece::WHITE_KING));
+
+        assert_eq!(Piece::try_from('p'), Ok(Piece::BLACK_PAWN));
+        assert_eq!(Piece::try_from('n'), Ok(Piece::BLACK_KNIGHT));
+        assert_eq!(Piece::try_from('b'), Ok(Piece::BLACK_BISHOP));
+        assert_eq!(Piece::try_from('r'), Ok(Piece::BLACK_ROOK));
+        assert_eq!(Piece::try_from('q'), Ok(Piece::BLACK_QUEEN));
+        assert_eq!(Piece::try_from('k'), Ok(Piece::BLACK_KING));
+
+        assert_eq!(Piece::try_from('X'), Err(Error::ParsePiece))
     }
 }
