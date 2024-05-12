@@ -1,10 +1,12 @@
 use std::fmt::Display;
 
+#[derive(Clone)]
 pub enum UCIScore {
     Centipawns(i16),
     Mate(i16),
 }
 
+#[derive(Clone)]
 pub struct UCISearchInfo {
     pub depth: u8,
     pub seldepth: u8,

@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
 /// An option that can be set on a UCI server.
+#[derive(Clone)]
 pub struct UCIOption {
     pub id: String,
     pub option_type: UCIOptionType,
@@ -11,6 +12,7 @@ pub struct UCIOption {
 }
 
 /// The type of option. There are 5 different types of options the engine can send.
+#[derive(Clone)]
 pub enum UCIOptionType {
     /// A checkbox that can either be true or false
     Check,

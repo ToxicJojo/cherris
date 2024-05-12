@@ -11,10 +11,15 @@ use cherris_core::{
 
 use crate::{transposition_table::TranspositionTable, Search};
 
+use self::engine_option::EngineOptions;
+
+mod engine_option;
+
 pub struct Engine {
     position: Position,
     uci_search_params: UCIGoParams,
     transposition_table: Arc<Mutex<TranspositionTable>>,
+    options: EngineOptions,
 }
 
 impl Engine {
@@ -23,6 +28,7 @@ impl Engine {
             position: Position::default(),
             uci_search_params: UCIGoParams::default(),
             transposition_table: Arc::new(Mutex::new(TranspositionTable::new(2_u64.pow(24)))),
+            options: EngineOptions::new(),
         }
     }
 
@@ -42,6 +48,9 @@ impl Engine {
                         generate_lookup_tables();
                         self.send_command(UCIGuiCommand::IdName("cherris".to_string()));
                         self.send_command(UCIGuiCommand::IdAuthor("Johannes Thiel".to_string()));
+                        for option in self.options.0.iter() {
+                            self.send_command(UCIGuiCommand::Option(option.clone()));
+                        }
                         self.send_command(UCIGuiCommand::UciOk);
                     }
                     UCIEngineCommand::Position(params) => {

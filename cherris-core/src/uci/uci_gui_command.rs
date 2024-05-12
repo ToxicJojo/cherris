@@ -3,6 +3,7 @@ use std::fmt::Display;
 use crate::{uci::UCIOption, uci::UCISearchInfo};
 
 /// Represents all UCI commands that can be sent to a GUI.
+#[derive(Clone)]
 pub enum UCIGuiCommand {
     /// This must be sent after receiving the uci command to identify the engine.
     IdName(String),
