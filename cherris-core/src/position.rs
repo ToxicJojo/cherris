@@ -1,8 +1,8 @@
 use std::{fmt::Display, str::FromStr};
 
 use crate::{
-    generate_moves, Bitboard, Board, CastlingRights, Color, Error, File, Move, MoveList, Piece,
-    Rank, Role, Square, Zobrist,
+    Bitboard, Board, CastlingRights, Color, Error, File, Move, MoveList, Piece, Rank, Role, Square,
+    Zobrist, generate_moves,
 };
 
 /// Represents a chess position.

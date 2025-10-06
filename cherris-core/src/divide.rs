@@ -1,4 +1,4 @@
-use crate::{generate_moves, perft, MoveList, Position};
+use crate::{MoveList, Position, generate_moves, perft};
 
 pub fn divide(depth: u64, position: &Position) {
     let mut moves = MoveList::new();

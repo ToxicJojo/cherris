@@ -1,5 +1,5 @@
 use super::add_attacks;
-use crate::{knight_attacks, Bitboard, MoveList, Position, Role};
+use crate::{Bitboard, MoveList, Position, Role, knight_attacks};
 
 pub fn generate_knight_moves(
     position: &Position,

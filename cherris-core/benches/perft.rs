@@ -1,5 +1,5 @@
-use cherris_core::{generate_lookup_tables, perft, Position};
-use criterion::{criterion_group, criterion_main, Criterion};
+use cherris_core::{Position, generate_lookup_tables, perft};
+use criterion::{Criterion, criterion_group, criterion_main};
 use std::time::Duration;
 
 pub fn perft_benchmark(c: &mut Criterion) {

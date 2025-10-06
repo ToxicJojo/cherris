@@ -1,5 +1,5 @@
 use super::add_attacks;
-use crate::{bishop_attacks, queen_attacks, rook_attacks, Bitboard, MoveList, Position, Role};
+use crate::{Bitboard, MoveList, Position, Role, bishop_attacks, queen_attacks, rook_attacks};
 
 pub fn generate_queen_moves(
     position: &Position,

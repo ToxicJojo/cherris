@@ -4,12 +4,11 @@ use std::{
 };
 
 use cherris_core::{
-    generate_lookup_tables,
+    LAN, Move, Position, generate_lookup_tables,
     uci::{UCIEngineCommand, UCIGoParams, UCIGuiCommand},
-    Move, Position, LAN,
 };
 
-use crate::{transposition_table::TranspositionTable, Search};
+use crate::{Search, transposition_table::TranspositionTable};
 
 use self::engine_option::EngineOptions;
 

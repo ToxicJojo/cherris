@@ -1,8 +1,9 @@
 use std::fmt::Display;
 
 use crate::{
-    bishop_attacks, bishop_xray_attacks, king_attacks, knight_attacks, pawn_attacks, rook_attacks,
-    rook_xray_attacks, Bitboard, Color, File, Move, Piece, Rank, Role, Square, RAY_BETWEEN,
+    Bitboard, Color, File, Move, Piece, RAY_BETWEEN, Rank, Role, Square, bishop_attacks,
+    bishop_xray_attacks, king_attacks, knight_attacks, pawn_attacks, rook_attacks,
+    rook_xray_attacks,
 };
 
 /// Represents a chess board.

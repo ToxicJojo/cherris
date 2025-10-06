@@ -4,8 +4,8 @@ use std::{
 };
 
 use cherris_core::{
-    uci::{UCIGoParams, UCIGuiCommand},
     Color, Move, Position,
+    uci::{UCIGoParams, UCIGuiCommand},
 };
 
 use crate::{iterative_deepening::iterative_deepening, time_managment::TimeManagment};

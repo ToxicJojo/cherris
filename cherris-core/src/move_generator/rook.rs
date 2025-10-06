@@ -1,5 +1,5 @@
 use super::add_attacks;
-use crate::{rook_attacks, Bitboard, MoveList, Position, Role};
+use crate::{Bitboard, MoveList, Position, Role, rook_attacks};
 
 pub fn generate_rook_moves(
     position: &Position,

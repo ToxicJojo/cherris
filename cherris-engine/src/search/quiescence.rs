@@ -1,6 +1,6 @@
-use cherris_core::{generate_loud_moves, generate_moves, Color, Move, MoveList, Position};
+use cherris_core::{Color, Move, MoveList, Position, generate_loud_moves, generate_moves};
 
-use crate::{eval, evaluation::Evaluation, move_sort::sort_moves, SearchData};
+use crate::{SearchData, eval, evaluation::Evaluation, move_sort::sort_moves};
 
 pub fn quiescence(
     alpha: Evaluation,

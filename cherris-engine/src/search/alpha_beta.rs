@@ -1,11 +1,11 @@
-use cherris_core::{generate_moves, Move, MoveList, Position};
+use cherris_core::{Move, MoveList, Position, generate_moves};
 
 use crate::{
+    SearchData,
     evaluation::Evaluation,
     move_sort::sort_moves,
     quiescence::quiescence,
     transposition_table::{TranspositionEntry, TranspositionEntryType},
-    SearchData,
 };
 
 pub fn alpha_beta(

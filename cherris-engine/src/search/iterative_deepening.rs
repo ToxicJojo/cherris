@@ -4,13 +4,13 @@ use std::{
 };
 
 use cherris_core::{
-    uci::{UCIGuiCommand, UCISearchInfo},
     Move, Position,
+    uci::{UCIGuiCommand, UCISearchInfo},
 };
 
 use crate::{
-    alpha_beta::alpha_beta, evaluation::Evaluation, time_managment::TimeManagment,
-    transposition_table::TranspositionTable, SearchData,
+    SearchData, alpha_beta::alpha_beta, evaluation::Evaluation, time_managment::TimeManagment,
+    transposition_table::TranspositionTable,
 };
 
 pub fn iterative_deepening(

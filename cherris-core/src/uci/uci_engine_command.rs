@@ -360,7 +360,10 @@ mod tests {
             infinite: true,
         });
 
-        assert_eq!(command.to_string(), "go searchmoves e2e4 ponder wtime 1 btime 2 winc 3 binc 4 movestogo 5 depth 6 nodes 7 mate 8 movetime 9 infinite\n");
+        assert_eq!(
+            command.to_string(),
+            "go searchmoves e2e4 ponder wtime 1 btime 2 winc 3 binc 4 movestogo 5 depth 6 nodes 7 mate 8 movetime 9 infinite\n"
+        );
     }
 
     #[test]

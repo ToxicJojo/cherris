@@ -1,9 +1,9 @@
-use cherris_core::{generate_lookup_tables, Position};
+use cherris_core::{Position, generate_lookup_tables};
 use cherris_engine::{
     iterative_deepening::iterative_deepening, time_managment::TimeManagment,
     transposition_table::TranspositionTable,
 };
-use criterion::{criterion_group, criterion_main, BatchSize, Criterion};
+use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use std::{
     str::FromStr,
     sync::{Arc, Mutex},

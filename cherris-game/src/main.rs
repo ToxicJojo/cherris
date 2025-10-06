@@ -7,7 +7,7 @@ use sdl2::{
 };
 use std::time::Duration;
 
-use cherris_core::{generate_lookup_tables, File, Game, Move, Piece, Position, Rank, Role, Square};
+use cherris_core::{File, Game, Move, Piece, Position, Rank, Role, Square, generate_lookup_tables};
 use sdl2::{event::Event, keyboard::Keycode, pixels::Color, render::Canvas};
 
 const WINDOW_WIDTH: u32 = 800;

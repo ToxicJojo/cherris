@@ -1,5 +1,5 @@
 use super::{add_attacks, generate_promotion_move};
-use crate::{pawn_attacks, rook_attacks, Bitboard, Color, Move, MoveList, Position, Role, Square};
+use crate::{Bitboard, Color, Move, MoveList, Position, Role, Square, pawn_attacks, rook_attacks};
 
 pub fn generate_pawn_moves(
     position: &Position,
