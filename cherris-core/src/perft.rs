@@ -1,4 +1,4 @@
-use crate::{generate_moves, MoveList, Position};
+use crate::{MoveList, Position, generate_moves};
 
 pub fn perft(depth: u64, position: &Position) -> usize {
     let mut nodes = 0;
@@ -22,7 +22,7 @@ pub fn perft(depth: u64, position: &Position) -> usize {
 mod tests {
     use super::*;
     use crate::generate_lookup_tables;
-    use std::{str::FromStr, u64, usize};
+    use std::str::FromStr;
 
     fn test_edp(edp: &str) {
         generate_lookup_tables();
@@ -44,12 +44,16 @@ mod tests {
 
     #[test]
     fn perft_starting_pos() {
-        test_edp("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ;D1 20 ;D2 400 ;D3 8902 ;D4 197281");
+        test_edp(
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ;D1 20 ;D2 400 ;D3 8902 ;D4 197281",
+        );
     }
 
     #[test]
     fn perft_position_2() {
-        test_edp("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1 ;D1 48 ;D2 2039 ;D3 97862 ;D4 4085603");
+        test_edp(
+            "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1 ;D1 48 ;D2 2039 ;D3 97862 ;D4 4085603",
+        );
     }
 
     #[test]
@@ -59,16 +63,22 @@ mod tests {
 
     #[test]
     fn perft_position_4() {
-        test_edp("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1 ;D1 6 ;D2 264 ;D3 9467 ;D4 422333",);
+        test_edp(
+            "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1 ;D1 6 ;D2 264 ;D3 9467 ;D4 422333",
+        );
     }
     #[test]
     fn perft_position_5() {
-        test_edp("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8 ;D1 44 ;D2 1486 ;D3 62379 ;D4 2103487");
+        test_edp(
+            "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8 ;D1 44 ;D2 1486 ;D3 62379 ;D4 2103487",
+        );
     }
 
     #[test]
     fn perft_position_6() {
-        test_edp("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10 ;D1 46 ;D2 2079 ;D3 89890 ;D4 3894594");
+        test_edp(
+            "r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10 ;D1 46 ;D2 2079 ;D3 89890 ;D4 3894594",
+        );
     }
 
     #[test]

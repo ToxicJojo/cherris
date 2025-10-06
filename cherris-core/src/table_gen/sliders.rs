@@ -1,5 +1,6 @@
-use crate::{ray, xray, Bitboard, Square, DIRECTIONS};
+use crate::{Bitboard, DIRECTIONS, Square, ray, xray};
 use core::arch::x86_64::_pdep_u64;
+use std::sync::LazyLock;
 
 const A_FILE: u64 = 0x0101010101010101;
 const H_FILE: u64 = 0x0101010101010101 << 7;
@@ -8,21 +9,21 @@ const EIGHT_RANK: u64 = 0xFF00000000000000;
 
 pub static ROOK_MAKS: [u64; Square::COUNT] = generate_rook_masks();
 pub static ROOK_OFFSETS: [u64; Square::COUNT] = generate_rook_offsets();
-pub static mut ROOK_ATTACKS: [Bitboard; 102400] = [Bitboard::EMPTY; 102400];
-pub static mut ROOK_XRAY_ATTACKS: [Bitboard; 102400] = [Bitboard::EMPTY; 102400];
+pub static ROOK_ATTACKS: LazyLock<[Bitboard; 102400]> = LazyLock::new(generate_rook_attacks);
+pub static ROOK_XRAY_ATTACKS: LazyLock<[Bitboard; 102400]> =
+    LazyLock::new(generate_rook_xray_attacks);
 
 pub static BISHOP_MASKS: [u64; Square::COUNT] = generate_bishop_masks();
 pub static BISHOP_OFFSETS: [u64; Square::COUNT] = generate_bishop_offsets();
-pub static mut BISHOP_ATTACKS: [Bitboard; 5248] = [Bitboard::EMPTY; 5248];
-pub static mut BISHOP_XRAY_ATTACKS: [Bitboard; 5248] = [Bitboard::EMPTY; 5248];
+pub static BISHOP_ATTACKS: LazyLock<[Bitboard; 5248]> = LazyLock::new(generate_bishop_attacks);
+pub static BISHOP_XRAY_ATTACKS: LazyLock<[Bitboard; 5248]> =
+    LazyLock::new(generate_bishop_xray_attacks);
 
 pub fn generate_lookup_tables() {
-    unsafe {
-        ROOK_ATTACKS = generate_rook_attacks();
-        ROOK_XRAY_ATTACKS = generate_rook_xray_attacks();
-        BISHOP_ATTACKS = generate_bishop_attacks();
-        BISHOP_XRAY_ATTACKS = generate_bishop_xray_attacks();
-    };
+    let _ = &*ROOK_ATTACKS;
+    let _ = &*ROOK_XRAY_ATTACKS;
+    let _ = &*BISHOP_ATTACKS;
+    let _ = &*BISHOP_XRAY_ATTACKS;
 }
 
 pub const fn generate_bishop_masks() -> [u64; Square::COUNT] {
